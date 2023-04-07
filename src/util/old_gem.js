@@ -3,7 +3,7 @@
  * @param data The data, object or array to check.
  * @returns true if TRUTHY and false if FALSY.
  */
-export const isTruthy = (data) => {
+export const isTruthyTreasure = (data) => {
     // Checking for falsy objects. https://stackoverflow.com/questions/679915/how-do-i-test-for-an-empty-javascript-object
     if (data && Object.getOwnPropertyNames(data).length === 0 && Object.getPrototypeOf(data) === Object.prototype) return false;
 

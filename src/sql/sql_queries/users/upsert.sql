@@ -1,0 +1,2 @@
+INSERT INTO users (name) VALUES (?);
+ON CONFLICT (name) DO NOTHING;
