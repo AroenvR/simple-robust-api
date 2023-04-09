@@ -17,4 +17,4 @@ export class Entity implements IEntity {
         if (isTruthy(this._id)) throw Error('User: ID is already set');
         this._id = value;
     }
-}
+} 

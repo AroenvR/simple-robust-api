@@ -11,6 +11,8 @@ describe('UserRepo', () => {
     let database: Database;
     let userRepo: UserRepo;
 
+    const johnUUID = generateUUID();
+
     beforeAll(async () => {
         jest.spyOn(console, 'debug').mockImplementation(() => { });
         jest.spyOn(console, 'info').mockImplementation(() => { });
@@ -38,7 +40,7 @@ describe('UserRepo', () => {
     // ----------------------------
 
     test('should upsert a user', async () => {
-        const john = new User(0, generateUUID(), "John Doe");
+        const john = new User(0, johnUUID, "John Doe");
         const jane = new User(0, generateUUID(), "Jane Doe");
 
         const lastId = await userRepo.upsert([john, jane]);
@@ -54,12 +56,15 @@ describe('UserRepo', () => {
         expect(users[1].name).toBe('Jane Doe');
     });
 
-    // test('should not insert user with same name', async () => {
-    //     await userRepo.upsert();
-    //     const users = await userRepo.getAll();
-    //     expect(users.length).toBe(2);
-    //     await userRepo.upsert();
-    //     const newUsers = await userRepo.getAll();
-    //     expect(newUsers.length).toBe(2);
-    // });
+    test('should not insert user with same UUID', async () => {
+        const john = new User(0, johnUUID, "John Doe");
+
+        const users = await userRepo.getAll();
+        expect(users.length).toBe(2);
+
+        await userRepo.upsert([john]);
+
+        const newUsers = await userRepo.getAll();
+        expect(newUsers.length).toBe(2);
+    });
 });
