@@ -8,20 +8,59 @@ import { UserController } from '../api/controller/UserController';
 
 export class App {
     private config: IAppConfig;
+    private app: express.Application = express();
+    private server: any;
 
     constructor(config: IAppConfig) {
         this.config = config;
     }
 
+    /**
+     * Starts the app.
+     */
     async start(): Promise<void> {
         try {
-            await this.config.database.connect();
-            await this.config.database.setup();
+            await Promise.all([
+                this.initDatabase(),
+                this.initServer(),
+            ]);
 
-            logger(`App: ${this.config.name} started successfully with the database connected.`, LogLevel.DEBUG);
+            logger(`App: ${this.config.name} started successfully!`, LogLevel.DEBUG);
         } catch (error: Error | any) {
             logger('App: Error starting the app:', LogLevel.CRITICAL, error);
         }
+    }
+
+    /**
+     * Initializes the app database.
+     */
+    private async initDatabase(): Promise<void> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                await this.config.database.connect();
+                await this.config.database.setup();
+
+                logger(`App: ${this.config.name} successfully set up the database.`, LogLevel.DEBUG);
+                resolve();
+            } catch (error: Error | any) {
+                logger('App: Error initializing the app database:', LogLevel.CRITICAL, error);
+                reject(error);
+            }
+        });
+    }
+
+    private async initServer(): Promise<void> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                this.app.options('*', cors()); // TODO: Enable preflight / options & make this more secure.
+                this.app.use(express.json());
+                this.server = this.app.listen(this.config.port, () => console.log(`App running on: http://localhost:${this.config.port}/`));
+                resolve();
+            } catch (error: Error | any) {
+                logger('App: Error initializing express:', LogLevel.CRITICAL, error);
+                reject(error);
+            }
+        });
     }
 }
 
