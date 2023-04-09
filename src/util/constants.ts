@@ -6,6 +6,9 @@ export const constants = {
     database: {
         DB_NAME: 'conversations.db',
         DB_PATH: './conversations.db',
+        types: {
+            SQLITE3: 'sqlite3',
+        },
         TABLES: {
             CONVERSATIONS: 'conversations',
             MESSAGES: 'messages',
@@ -30,3 +33,7 @@ export const constants = {
         on: true,
     },
 }
+
+/*
+    
+*/

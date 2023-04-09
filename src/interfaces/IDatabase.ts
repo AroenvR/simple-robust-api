@@ -1,3 +1,5 @@
+import { IDatabaseConfig } from "./IDatabaseConfig";
+
 /**
  * IDatabase interface represents the contract for a database class.
  * It defines the methods required for connecting, querying, closing, and setting up the database.
@@ -22,6 +24,13 @@ export interface IDatabase {
     close(): Promise<void>;
 
     /**
+     * TODO
+     * @param table 
+     * @param params 
+     */
+    upsert(query: string, params?: any[]): Promise<any>;
+
+    /**
      * Executes a SELECT query by reading the query from a file.
      * @param {string} queryName - The name of the file containing the SQL query.
      * @param {any[]} [params] - Optional parameters for the SQL query.
@@ -29,10 +38,9 @@ export interface IDatabase {
      */
     selectAll(queryName: string, params?: any[]): Promise<any[]>;
 
-    /**
-     * TODO
-     * @param queryName 
-     * @param params 
-     */
-    upsert(queryName: string, params?: any[]): Promise<any>;
+    // select by id
+
+    // update
+
+    // delete
 }

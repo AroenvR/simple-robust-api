@@ -1,9 +1,22 @@
 const USERS = "users";
 
 const queries = {
+    tables: {
+        users: USERS,
+    },
     users: {
-        select_all: `${USERS}/select_all`,
-        upsert: `${USERS}/upsert`,
+        // Create
+        insert: `INSERT INTO ${USERS} (uuid, name) VALUES`,
+        onConflict: `ON CONFLICT (uuid) DO NOTHING`,
+        placeholders: '(?, ?)',
+
+        // Read
+        select_all: `SELECT * FROM ${USERS}`,
+
+        // Update
+
+        // Delete
+
     }
 }
 

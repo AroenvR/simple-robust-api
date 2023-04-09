@@ -6,7 +6,7 @@ import axios from 'axios';
  * @returns server's response object if response.ok, else returns void.
  * Response.ok: https://developer.mozilla.org/en-US/docs/Web/API/Response/ok
  */
-export const httpGet = async (url: string): Promise<void | object | any>=> {
+export const httpsGet = async (url: string): Promise<void | object | any> => {
     return await axios.get(`https://${url}`)
         .then((response) => {
             if (response.status === 200) {

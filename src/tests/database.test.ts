@@ -1,5 +1,5 @@
 import { Database } from '../classes/Database';
-import queries from "../sql/queries"
+import { constants } from '../util/constants';
 
 describe('Database', () => {
     let database: Database;
@@ -15,19 +15,19 @@ describe('Database', () => {
     });
 
     beforeEach(async () => {
-        database = new Database({ filename: ':memory:' });
-        await database.connect();
-        await database.setup();
+        database = new Database({ filename: ':memory:', type: constants.database.types.SQLITE3 });
     });
 
     afterEach(async () => {
-        await database.close();
+        if (database) await database.close();
     });
 
-    // TESTS:
+    test('Successfully connects', async () => {
+        await database.connect();
+    });
 
-    test('select users', async () => {
-        const rows = await database.selectAll(queries.users.select_all);
-        expect(rows).toBeDefined();
+    test('Successfully sets up', async () => {
+        await database.connect();
+        await database.setup();
     });
 });

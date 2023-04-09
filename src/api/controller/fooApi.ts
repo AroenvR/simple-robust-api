@@ -1,6 +1,6 @@
-import app from "../providers/expressProvider";
-import { constants } from "../util/constants";
-import { isTruthy } from "../util/old_gem";
+import app from "../../providers/expressProvider";
+import { constants } from "../../util/constants";
+import { isTruthy } from "../../util/isTruthy";
 
 /**
  * Starts the Foo Service.
@@ -11,7 +11,7 @@ export const runFooApi = () => {
      * GET for /foo
      */
     app.get('/foo', (req: any, res: any) => {
-        res.setHeader('Access-Control-Allow-Origin', constants.FRONTEND_URL);
+        res.setHeader('Access-Control-Allow-Origin', constants.app_data.FRONTEND_URL); // TODO: Config
 
         console.log("GET for /foo got called");
 
@@ -25,7 +25,7 @@ export const runFooApi = () => {
      * POST for /foo
      */
     app.post('/foo', (req: any, res: any) => {
-        res.setHeader('Access-Control-Allow-Origin', constants.FRONTEND_URL);
+        res.setHeader('Access-Control-Allow-Origin', constants.app_data.FRONTEND_URL);
         console.log("POST for /foo got called");
 
         const data = req.body;

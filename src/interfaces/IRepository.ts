@@ -1,4 +1,4 @@
 export interface IRepository {
-    upsert(params?: any[]): Promise<void>;
+    upsert(params?: any[]): Promise<any>;
     getAll(): Promise<any[]>;
 }

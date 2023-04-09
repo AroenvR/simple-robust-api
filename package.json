@@ -16,6 +16,7 @@
     "license": "ISC",
     "_license_todo": "Figure it out at some point.",
     "dependencies": {
+        "@types/uuid": "^9.0.1",
         "axios": "^1.2.2",
         "cors": "^2.8.5",
         "crypto-js": "^4.1.1",
@@ -25,7 +26,8 @@
         "openai": "^3.1.0",
         "path": "^0.12.7",
         "sqlite3": "^5.1.6",
-        "tsconfig-paths": "^4.2.0"
+        "tsconfig-paths": "^4.2.0",
+        "uuid": "^9.0.0"
     },
     "devDependencies": {
         "@types/fs-extra": "^11.0.1",
