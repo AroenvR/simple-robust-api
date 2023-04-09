@@ -29,7 +29,8 @@ describe('App', () => {
 
     afterAll(async () => {
         // Shut down the application after all tests.
-        await app.stop();
+        // await app.stop();
+        await database.close();
 
         // Re-enable console.log methods after all tests
         jest.restoreAllMocks();
