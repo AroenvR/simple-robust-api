@@ -20,7 +20,7 @@ describe('App', () => {
         container = new Container();
 
         container.service('Database', () => new Database({ filename: ':memory:', type: constants.database.types.SQLITE3 }));
-        container.service('App', (c) => new App({ name: 'Test App', database: c.Database }));
+        container.service('App', (c) => new App({ name: 'Test App', database: c.Database, port: 1337 }));
 
         // Get the instance of the App class from the container.
         database = container.Database;
@@ -28,8 +28,8 @@ describe('App', () => {
     });
 
     afterAll(async () => {
-        // Close the database connection.
-        await database.close();
+        // Shut down the application after all tests.
+        await app.stop();
 
         // Re-enable console.log methods after all tests
         jest.restoreAllMocks();

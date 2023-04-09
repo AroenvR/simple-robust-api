@@ -1,13 +1,28 @@
+import { UserController } from "../api/controller/UserController";
 import { constants } from "../util/constants";
+import express from 'express';
+import iocContainer from "./containerProvider";
+import { isTruthy } from "../util/isTruthy";
+import { LogLevel, logger } from "../util/logger";
+import { serverConfig } from "../serverConfig";
+import cors from 'cors';
 
-const express = require('express');
-const cors = require('cors');
 const app = express();
-
-// https://www.youtube.com/watch?v=-MTSQjw5DrM&t=242s
 
 app.options('*', cors());
 app.use(express.json());
-app.listen(constants.app_data.PORT, () => console.log(`App running on: http://localhost:${constants.app_data.PORT}/`));
+app.listen(serverConfig.app.port, () => console.log(`App running on: http://localhost:${serverConfig.app.port}/`));
+
+app.get('/users', async (req: any, res: any) => {
+    res.setHeader('Access-Control-Allow-Origin', serverConfig.app.port); // TODO: Config
+
+    logger('GET for /users got called', LogLevel.DEBUG);
+
+    const userController = new UserController(iocContainer.UserService);
+    const users = await userController.getAll();
+
+    if (isTruthy(users)) res.status(200).json(users);
+    else res.status(404).json({ message: 'No users found.' });
+});
 
 export default app;

@@ -1,4 +1,4 @@
-import { IService } from "../../interfaces/IService";
+import { IService } from "../interfaces/IService";
 import { PubSub } from "../../util/PubSub";
 import { TaskProcessor } from "../../util/TaskProcessor";
 import { LogLevel, logger } from "../../util/logger";

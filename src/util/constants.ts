@@ -1,6 +1,5 @@
 export const constants = {
-    app_data: {
-        PORT: 6969,
+    frontend: {
         FRONTEND_URL: 'http://localhost:8080',
     },
     database: {
