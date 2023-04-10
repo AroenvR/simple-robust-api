@@ -87,6 +87,9 @@ export default class App {
         });
     }
 
+    /**
+     * Initializes the app routes.
+     */
     private async initRoutes(): Promise<void> {
         this.config.routeInitEvent.emitRouteInit(this.app);
     }
