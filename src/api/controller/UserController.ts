@@ -1,5 +1,4 @@
 import express from 'express';
-import { IService } from "../interfaces/IService";
 import { UserDTO } from "../dto/UserDTO";
 import { UserService } from "../service/UserService";
 import { LogLevel, logger } from "../../util/logger";
