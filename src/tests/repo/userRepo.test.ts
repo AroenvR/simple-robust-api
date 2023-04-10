@@ -2,9 +2,9 @@ import { Container } from "../../classes/Container";
 import { Database } from "../../classes/Database";
 import { UserRepo } from "../../api/repo/UserRepo";
 import { User } from "../../api/model/User";
-import { UserDTO } from "../../api/dto/UserDTO";
 import { constants } from "../../util/constants";
 import { generateUUID } from "../../util/uuid";
+import { testServerConfig } from "../testServerConfig";
 
 describe('UserRepo', () => {
     let container: Container;
@@ -19,13 +19,13 @@ describe('UserRepo', () => {
         jest.spyOn(console, 'log').mockImplementation(() => { });
 
         // Create a new container instance with a mock database.
-        container = new Container();
+        container = new Container({ ...testServerConfig });
 
-        container.service('Database', () => new Database({ filename: ':memory:', type: constants.database.types.SQLITE3 }));
-        container.service('UserRepo', (c) => new UserRepo(c.Database));
+        container.register(Database, () => new Database({ filename: ':memory:', type: constants.database.types.SQLITE3 }));
+        container.register(UserRepo, (c) => new UserRepo(c.get(Database)));
 
-        database = container.Database;
-        userRepo = container.UserRepo;
+        database = container.get(Database);
+        userRepo = container.get(UserRepo);
 
         await database.connect();
         await database.setup();
@@ -49,7 +49,7 @@ describe('UserRepo', () => {
     });
 
     test('should get all users', async () => {
-        const users = await userRepo.getAll();
+        const users = await userRepo.selectAll();
 
         expect(users.length).toBe(2);
         expect(users[0].name).toBe('John Doe');
@@ -59,12 +59,12 @@ describe('UserRepo', () => {
     test('should not insert user with same UUID', async () => {
         const john = new User(0, johnUUID, "John Doe");
 
-        const users = await userRepo.getAll();
+        const users = await userRepo.selectAll();
         expect(users.length).toBe(2);
 
         await userRepo.upsert([john]);
 
-        const newUsers = await userRepo.getAll();
+        const newUsers = await userRepo.selectAll();
         expect(newUsers.length).toBe(2);
     });
 });

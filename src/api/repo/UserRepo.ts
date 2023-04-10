@@ -1,9 +1,11 @@
 import { IDatabase } from "../../interfaces/IDatabase";
 import queries from "../../sql/queries";
+import { LogLevel, logger } from "../../util/logger";
 import { IUserRepo } from "../interfaces/IUserRepo";
 import { User } from "../model/User";
 
 export class UserRepo implements IUserRepo {
+    name = 'UserRepo';
     private readonly TABLE = 'users';
     private _db: IDatabase;
 
@@ -25,7 +27,22 @@ export class UserRepo implements IUserRepo {
      * Gets all users.
      * @returns {Promise<User[]>} - The requested users.
      */
-    async getAll(): Promise<User[]> {
+    async selectAll(): Promise<User[]> {
+        logger(`${this.name}: selecting all users.`, LogLevel.DEBUG);
+
         return this._db.selectAll(queries.users.select_all);
+    }
+
+    /**
+     * Gets the last user.
+     * @returns {Promise<User>} - The last user.
+     */
+    async getLast(): Promise<User> {
+        logger(`${this.name}: getting the last one.`, LogLevel.DEBUG);
+
+        const query = queries.users.select_current_id;
+        const result = await this._db.getLast(query);
+
+        return result;
     }
 }

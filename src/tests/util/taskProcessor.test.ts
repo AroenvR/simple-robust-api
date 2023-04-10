@@ -1,10 +1,11 @@
 import { TaskProcessor } from '../../util/TaskProcessor';
+import { testServerConfig } from '../testServerConfig';
 
 describe('TaskProcessor', () => {
     let taskProcessor: TaskProcessor;
 
     beforeEach(() => {
-        taskProcessor = new TaskProcessor(10); // Set a small interval for testing purposes
+        taskProcessor = new TaskProcessor({ ...testServerConfig.tasks }); // Set a small interval for testing purposes
     });
 
     afterEach(async () => {

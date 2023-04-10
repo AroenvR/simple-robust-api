@@ -1,13 +1,31 @@
+import express from 'express';
 import { IService } from "../interfaces/IService";
 import { UserDTO } from "../dto/UserDTO";
 import { UserService } from "../service/UserService";
-import { IController } from "../interfaces/IController";
+import { LogLevel, logger } from "../../util/logger";
+import { IUserController } from "../interfaces/IUserController";
+import { RouteInitEvent } from '../../util/RouteInitEvent';
 
-export class UserController implements IController {
+export class UserController implements IUserController {
+    name = 'UserController';
     service: UserService;
 
-    constructor(service: UserService) {
+    constructor(service: UserService, routeInitEvent: RouteInitEvent) {
         this.service = service;
+        routeInitEvent.onRouteInit(this.setupRoutes.bind(this));
+    }
+
+    private setupRoutes(app: express.Application): void {
+        app.get('/users', async (req, res) => {
+            logger('UserController: GET /users', LogLevel.DEBUG);
+
+            try {
+                const users = await this.selectAll();
+                res.status(200).json(users);
+            } catch (error) {
+                res.status(500).json({ message: 'Error getting users', error });
+            }
+        });
     }
 
     /**
@@ -16,11 +34,13 @@ export class UserController implements IController {
      * @returns {Promise<any>} - The result of the upsert operation.
      */
     public async upsert(userDtos: UserDTO[]): Promise<any> {
+        logger(`${this.name}: Upserting users.`, LogLevel.DEBUG);
+
         try {
-            const result = await this.service.create(userDtos);
+            const result = await this.service.upsert(userDtos);
             return result;
         } catch (error) {
-            console.error('UserController: Error upserting users', error);
+            console.error(`${this.name}: Error upserting users`, error);
             throw error;
         }
     }
@@ -29,7 +49,9 @@ export class UserController implements IController {
      * Retrieves all users.
      * @returns {Promise<any[]>} - The array of users.
      */
-    public async getAll(): Promise<any[]> {
+    public async selectAll(): Promise<any[]> {
+        logger(`${this.name}: Getting all users.`, LogLevel.DEBUG);
+
         try {
             const users = await this.service.getAll();
             return users;
@@ -37,5 +59,9 @@ export class UserController implements IController {
             console.error('UserController: Error getting all users', error);
             throw error;
         }
+    }
+
+    public async getLast(): Promise<any> {
+        throw new Error('Method not implemented.');
     }
 }

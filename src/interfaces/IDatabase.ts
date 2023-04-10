@@ -24,7 +24,7 @@ export interface IDatabase {
     close(): Promise<void>;
 
     /**
-     * TODO
+     * TODO: Document
      * @param table 
      * @param params 
      */
@@ -37,6 +37,12 @@ export interface IDatabase {
      * @returns {Promise<any[]>} A promise that resolves with the result rows, or rejects with an error if the query fails.
      */
     selectAll(queryName: string, params?: any[]): Promise<any[]>;
+
+    /**
+     * TODO: Document
+     * @param query 
+     */
+    getLast(query: string): Promise<any>;
 
     // select by id
 

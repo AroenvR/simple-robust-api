@@ -11,6 +11,7 @@ const queries = {
         placeholders: '(?, ?)',
 
         // Read
+        select_current_id: `SELECT * FROM ${USERS} ORDER BY id DESC LIMIT 1`,
         select_all: `SELECT * FROM ${USERS}`,
 
         // Update

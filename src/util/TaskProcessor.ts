@@ -1,3 +1,5 @@
+import { ITaskProcessorConfig } from "../interfaces/ITaskProcessorConfig";
+
 export type Task = () => void;
 
 /**
@@ -13,8 +15,8 @@ export class TaskProcessor {
      * Constructs a TaskProcessor instance with a specified processing interval.
      * @param {number} processingInterval - The interval between processing tasks in milliseconds.
      */
-    constructor(processingInterval: number = 1000) {
-        this.processingInterval = processingInterval;
+    constructor(config: ITaskProcessorConfig) {
+        this.processingInterval = config.timeout;
     }
 
     /**

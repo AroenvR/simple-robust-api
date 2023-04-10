@@ -10,5 +10,8 @@ export const serverConfig = { // TODO: Provide a proper serverConfig.
     database: {
         filename: './to_improve.db',
         type: 'sqlite3'
+    },
+    tasks: {
+        timeout: 500
     }
 }

@@ -1,7 +1,9 @@
+import { RouteInitEvent } from "../util/RouteInitEvent";
 import { IDatabase } from "./IDatabase";
 
 export interface IAppConfig {
     name: string;
-    database: IDatabase;
     port: number;
+    database: IDatabase;
+    routeInitEvent: RouteInitEvent;
 }

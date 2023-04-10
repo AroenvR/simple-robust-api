@@ -71,6 +71,26 @@ export class Database implements IDatabase {
     // ---------------------
 
     /**
+     * TOOD: Document
+     * @param params 
+     * @returns 
+     */
+    async upsert(query: string, params?: any[]): Promise<number> {
+        if (!this.db) throw new Error('Database: Database not connected!');
+
+        // TODO: Check against SQL injection.
+        // TODO: Sanitize params.
+
+        switch (this.config.type) {
+            case constants.database.types.SQLITE3:
+                return this.sqliteUpsert(query, params);
+
+            default:
+                throw new Error(`Database: Database type ${this.config.type} not supported!`);
+        }
+    }
+
+    /**
      * TODO: Document
      * @param query 
      * @returns 
@@ -90,19 +110,14 @@ export class Database implements IDatabase {
     }
 
     /**
-     * TOOD: Document
-     * @param params 
-     * @returns 
+     * TODO: Document
      */
-    async upsert(query: string, params?: any[]): Promise<number> {
+    async getLast(query: string): Promise<number> {
         if (!this.db) throw new Error('Database: Database not connected!');
-
-        // TODO: Check against SQL injection.
-        // TODO: Sanitize params.
 
         switch (this.config.type) {
             case constants.database.types.SQLITE3:
-                return this.sqliteUpsert(query, params);
+                return this.sqliteGetLast(query);
 
             default:
                 throw new Error(`Database: Database type ${this.config.type} not supported!`);
@@ -233,6 +248,23 @@ export class Database implements IDatabase {
                     reject(err);
                 } else {
                     resolve(rows);
+                }
+            });
+        });
+    }
+
+    /**
+     * SELECT last user query for SQLite3
+     */
+    private sqliteGetLast = async (query: string): Promise<number> => {
+        logger("Database: User executing SQLite3 get current id query.", LogLevel.DEBUG);
+
+        return new Promise((resolve, reject) => {
+            this.db!.get(query, [], (err: Error | null, row: any) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row);
                 }
             });
         });

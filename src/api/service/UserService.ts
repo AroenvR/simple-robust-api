@@ -10,6 +10,7 @@ import { UserRepo } from "../repo/UserRepo";
  * The UserService class provides methods for managing users in the application.
  */
 export class UserService implements IService {
+    name = 'UserService';
     repository: UserRepo;
     taskProcessor: TaskProcessor;
     pubSub: PubSub;
@@ -24,8 +25,6 @@ export class UserService implements IService {
         this.repository = repository;
         this.taskProcessor = taskProcessor;
         this.pubSub = pubSub;
-
-        logger(`UserService: created.`, LogLevel.DEBUG);
     }
 
     /**
@@ -33,7 +32,7 @@ export class UserService implements IService {
      * @param {UserDTO[]} userDtos - An array of user data transfer objects.
      * @returns {Promise<any>} - A promise that resolves to the result of the user creation operation.
      */
-    async create(userDtos: UserDTO | UserDTO[]): Promise<any> {
+    async upsert(userDtos: UserDTO | UserDTO[]): Promise<number> {
         let users: User[] = [];
 
         if (Array.isArray(userDtos)) users = userDtos.map((userDto: UserDTO) => new User(0, userDto.uuid, userDto.name));
@@ -46,7 +45,8 @@ export class UserService implements IService {
 
             return result;
         } catch (error: Error | any) {
-            logger('UserService: Error creating a user:', LogLevel.CRITICAL, error);
+            logger(`${this.name}: Error creating a user:`, LogLevel.ERROR, error);
+            throw error;
         }
     }
 
@@ -55,6 +55,8 @@ export class UserService implements IService {
      * @returns {Promise<User[]>} - A promise that resolves to an array of users.
      */
     async getAll(): Promise<User[]> {
-        return this.repository.getAll();
+        logger(`${this.name}: Getting all users.`, LogLevel.DEBUG);
+
+        return this.repository.selectAll();
     }
 }

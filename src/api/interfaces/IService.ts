@@ -6,7 +6,11 @@ import { IRepository } from "../../interfaces/IRepository";
  * TODO: Document.
  */
 export interface IService {
+    name: string;
     repository: IRepository;
     taskProcessor: TaskProcessor;
     pubSub: PubSub;
+
+    upsert(data: any | any[]): Promise<any>;
+    getAll(): Promise<any>;
 }
