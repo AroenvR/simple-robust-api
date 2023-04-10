@@ -15,6 +15,7 @@ The application is structured using a Dependency Injection Container to manage d
 - App: The core of the application, responsible for starting and stopping the server, initializing the database, and setting up the routes.
 - Container: Manages the dependencies and services in the application, providing methods to register and get instances of services.
 - Repositories: Interact with the database to perform CRUD operations on specific entities (e.g., Users).
+- Services: Execute any additional logic necessary for handling a request.
 - Controllers: Handle incoming requests, process data, and return responses.
 - Routes: Define the API endpoints and map them to the corresponding controllers.
 
@@ -22,9 +23,12 @@ The application is structured using a Dependency Injection Container to manage d
 
 1. An incoming request is received by the Express server.
 2. The request is routed to the corresponding controller based on the defined routes.
-3. The controller processes the request and interacts with the appropriate repository to perform the required database operations.
-4. The repository returns the data to the controller.
-5. The controller processes the data and sends the response back to the client.
+3. The controller processes the request and interacts with the appropriate service.
+4. The service processes the request and interacts with the appropriate repository.
+5. The repository executes a query on the database and returns the data to the controller.
+6. The controller processes the data and sends the response back to the client.
+
+<hr/>
 
 ## Getting Started
 
