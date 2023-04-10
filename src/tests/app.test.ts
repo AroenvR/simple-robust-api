@@ -60,9 +60,14 @@ describe('App', () => {
 
     // ----------------------------
 
+    // TODO: Create users!
+
+    // ----------------------------
+
     test('handles an HTTP get request', async () => {
         const response = await httpGet(`localhost:${testServerConfig.app.port}/users`);
 
         expect(response).toBeTruthy();
     });
+
 });

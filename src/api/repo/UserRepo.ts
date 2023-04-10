@@ -4,6 +4,9 @@ import { LogLevel, logger } from "../../util/logger";
 import { IUserRepo } from "../interfaces/IUserRepo";
 import { User } from "../model/User";
 
+/**
+ * UserRepo class implements IUserRepo and provides methods to interact with the user records in the database.
+ */
 export class UserRepo implements IUserRepo {
     name = 'UserRepo';
     private readonly TABLE = 'users';

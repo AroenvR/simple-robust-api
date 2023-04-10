@@ -2,13 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import { logger, LogLevel } from "../util/logger";
 import { IAppConfig } from "../interfaces/IAppConfig";
-import iocContainer from '../providers/containerProvider';
-import { isTruthy } from '../util/isTruthy';
-import { UserController } from '../api/controller/UserController';
-import { IDatabase } from '../interfaces/IDatabase';
-import { User } from '../api/model/User';
-import { generateUUID } from '../util/uuid';
 
+/**
+ * App class is the core of the application, responsible for starting and stopping the server,
+ * initializing the database, and setting up the routes.
+ */
 export default class App {
     private config: IAppConfig;
     private app: express.Application = express();

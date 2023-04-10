@@ -1,6 +1,11 @@
 import express from 'express';
 import { EventEmitter } from 'events';
 
+/**
+ * RouteInitEvent class extends EventEmitter and is used to emit and listen for route
+ * initialization events. Controllers can subscribe to this event and set up their routes
+ * accordingly.
+ */
 export class RouteInitEvent extends EventEmitter {
     public static readonly eventName = 'routeInit';
 

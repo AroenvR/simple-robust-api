@@ -1,6 +1,4 @@
-import { IAppConfig } from "../interfaces/IAppConfig";
 import { IContainerConfig } from "../interfaces/IContainerConfig";
-import { IDatabaseConfig } from "../interfaces/IDatabaseConfig";
 import { logger, LogLevel } from "../util/logger";
 
 interface ServiceFactory<T> {
@@ -9,6 +7,10 @@ interface ServiceFactory<T> {
 
 type ServiceIdentifier<T> = new (...args: any[]) => T;
 
+/**
+ * Container class is responsible for managing dependencies and services.
+ * It provides methods to register and get instances of services.
+ */
 export class Container {
     private config: IContainerConfig;
     private services: Map<ServiceIdentifier<any>, any>;
