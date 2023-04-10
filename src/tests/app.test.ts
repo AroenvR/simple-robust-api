@@ -16,9 +16,7 @@ import { RouteInitEvent } from "../util/RouteInitEvent";
  * Test suite for the App class.
  */
 describe('App', () => {
-    let container: Container;
     let app: App;
-    let database: Database;
 
     beforeAll(async () => {
         // Disable console.log methods before all tests
@@ -62,11 +60,9 @@ describe('App', () => {
 
     // ----------------------------
 
-    test('it handles a user endpoint', async () => {
+    test('handles an HTTP get request', async () => {
         const response = await httpGet(`localhost:${testServerConfig.app.port}/users`);
 
         expect(response).toBeTruthy();
-
-        console.log("RESP:", response);
     });
 });
