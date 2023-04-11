@@ -2,7 +2,6 @@ import { Container } from "../../classes/Container";
 import { Database } from "../../classes/Database";
 import { UserRepo } from "../../api/repo/UserRepo";
 import { User } from "../../api/model/User";
-import { constants } from "../../util/constants";
 import { generateUUID } from "../../util/uuid";
 import { testServerConfig } from "../testServerConfig";
 
@@ -21,7 +20,7 @@ describe('UserRepo', () => {
         // Create a new container instance with a mock database.
         container = new Container({ ...testServerConfig });
 
-        container.register(Database, () => new Database({ filename: ':memory:', type: constants.database.types.SQLITE3 }));
+        container.register(Database, () => new Database({ ...testServerConfig.database }));
         container.register(UserRepo, (c) => new UserRepo(c.get(Database)));
 
         database = container.get(Database);

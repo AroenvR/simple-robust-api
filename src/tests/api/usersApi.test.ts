@@ -1,21 +1,19 @@
-import { request } from "https";
-import App from "../classes/App";
-import { Container } from "../classes/Container";
-import { Database } from "../classes/Database";
-import { constants } from "../util/constants";
-import { httpGet, httpsGet } from "../util/http";
-import { testServerConfig } from "./testServerConfig";
-import { TaskProcessor } from "../util/TaskProcessor";
-import { PubSub } from "../util/PubSub";
-import { UserRepo } from "../api/repo/UserRepo";
-import { UserService } from "../api/service/UserService";
-import { UserController } from "../api/controller/UserController";
-import { RouteInitEvent } from "../util/RouteInitEvent";
+import App from "../../classes/App";
+import { Container } from "../../classes/Container";
+import { Database } from "../../classes/Database";
+import { httpGet, httpsGet } from "../../util/http";
+import { testServerConfig } from "../testServerConfig";
+import { TaskProcessor } from "../../util/TaskProcessor";
+import { PubSub } from "../../util/PubSub";
+import { UserRepo } from "../../api/repo/UserRepo";
+import { UserService } from "../../api/service/UserService";
+import { UserController } from "../../api/controller/UserController";
+import { RouteInitEvent } from "../../util/RouteInitEvent";
 
 /**
- * Test suite for the App class.
+ * Integration test for the Users API.
  */
-describe('App', () => {
+describe('Users API', () => {
     let app: App;
 
     beforeAll(async () => {

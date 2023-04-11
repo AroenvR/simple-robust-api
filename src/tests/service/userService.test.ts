@@ -1,13 +1,10 @@
 import { UserDTO } from "../../api/dto/UserDTO";
-import { IUserRepo } from "../../api/interfaces/IUserRepo";
-import { User } from "../../api/model/User";
 import { UserRepo } from "../../api/repo/UserRepo";
 import { UserService } from "../../api/service/UserService";
 import { Container } from "../../classes/Container";
 import { Database } from "../../classes/Database";
 import { PubSub } from "../../util/PubSub";
 import { TaskProcessor } from "../../util/TaskProcessor";
-import { constants } from "../../util/constants";
 import { generateUUID } from "../../util/uuid";
 import { testServerConfig } from "../testServerConfig";
 
