@@ -10,9 +10,8 @@ export class PubSub {
 
     /**
      * Publishes an event to all subscribers of the specified event type.
-     * @param {string} eventType - The type of event being published.
-     * @param {any} event - The event data.
-     * @returns {Promise<void>}
+     * @param eventType - The type of event being published.
+     * @param event - The event data.
      */
     public async publish(eventType: string, event: any): Promise<void> {
         if (!eventType) {
@@ -31,8 +30,7 @@ export class PubSub {
 
     /**
      * Subscribes a callback to the specified event type.
-     * @param {Subscriber} subscriber - The subscriber object containing name, event type, and callback.
-     * @returns {Promise<void>}
+     * @param subscriber - The subscriber object containing name, event type, and callback.
      */
     public async subscribe(subscriber: ISubscriber): Promise<void> {
         if (this.subscribers.some((s) => s.name === subscriber.name && s.eventType === subscriber.eventType)) {

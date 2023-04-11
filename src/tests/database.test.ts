@@ -1,5 +1,5 @@
-import { Database } from '../classes/Database';
-import { constants } from '../util/constants';
+import Database from '../domain/Database';
+import { testServerConfig } from './testServerConfig';
 
 describe('Database', () => {
     let database: Database;
@@ -15,7 +15,7 @@ describe('Database', () => {
     });
 
     beforeEach(async () => {
-        database = new Database({ filename: ':memory:', type: constants.database.types.SQLITE3 });
+        database = new Database({ ...testServerConfig.database });
     });
 
     afterEach(async () => {

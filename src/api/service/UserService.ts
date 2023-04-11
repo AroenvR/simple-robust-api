@@ -1,4 +1,4 @@
-import { IService } from "../interfaces/IService";
+import { IService } from "./IService";
 import { PubSub } from "../../util/PubSub";
 import { TaskProcessor } from "../../util/TaskProcessor";
 import { LogLevel, logger } from "../../util/logger";
@@ -10,7 +10,7 @@ import { UserRepo } from "../repo/UserRepo";
  * The UserService class provides methods for managing users in the application.
  */
 export class UserService implements IService {
-    name = 'UserService';
+    readonly name = 'UserService';
     repository: UserRepo;
     taskProcessor: TaskProcessor;
     pubSub: PubSub;

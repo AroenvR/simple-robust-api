@@ -1,22 +1,15 @@
-import App from "../classes/App";
-import { Container } from "../classes/Container";
-import { Database } from "../classes/Database";
+import App from "../domain/App";
+import Container from "../domain/Container";
+import Database from "../domain/Database";
 import { UserRepo } from "../api/repo/UserRepo";
-import { constants } from "../util/constants";
 import { TaskProcessor } from "../util/TaskProcessor";
 import { PubSub } from "../util/PubSub";
 import { UserService } from "../api/service/UserService";
 import { serverConfig } from "../serverConfig";
 import { UserController } from "../api/controller/UserController";
-import { IContainerConfig } from "../interfaces/IContainerConfig";
 import { RouteInitEvent } from "../util/RouteInitEvent";
 
-const config: IContainerConfig = {
-    database: { ...serverConfig.database },
-    app: { ...serverConfig.app },
-    tasks: { ...serverConfig.tasks },
-}
-const iocContainer = new Container(config);
+const iocContainer = new Container(serverConfig);
 
 // Util
 iocContainer.register(RouteInitEvent, () => new RouteInitEvent());

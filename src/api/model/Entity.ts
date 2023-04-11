@@ -1,7 +1,7 @@
-import { IEntity } from "../interfaces/IEntity";
-import { isTruthy } from "../util/isTruthy";
+import { IEntity } from "./IEntity";
+import { isTruthy } from "../../util/isTruthy";
 
-export class Entity implements IEntity {
+export default abstract class Entity implements IEntity {
     private _id: number;
 
     constructor(id: number) {

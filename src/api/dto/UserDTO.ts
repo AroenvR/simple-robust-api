@@ -1,6 +1,6 @@
-import { DataTransferObject } from "../../classes/DataTransferObject";
+import DataTransferObject from "./DataTransferObject";
 import { isTruthy } from "../../util/isTruthy";
-import { IUser } from "../interfaces/IUser";
+import { IUser } from "../model/IUser";
 import { User } from "../model/User";
 
 /**

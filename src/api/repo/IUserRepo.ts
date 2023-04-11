@@ -1,4 +1,4 @@
-import { IRepository } from "../../interfaces/IRepository";
+import { IRepository } from "./IRepository";
 import { User } from "../model/User";
 
 /**

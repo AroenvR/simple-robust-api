@@ -1,10 +1,10 @@
-import { IEntity } from "../interfaces/IEntity";
-import { isTruthy } from "../util/isTruthy";
+import { IEntity } from "../model/IEntity";
+import { isTruthy } from "../../util/isTruthy";
 
 /**
  * DataTransferObject is a base class for all data transfer objects.
  */
-export class DataTransferObject implements IEntity {
+export default abstract class DataTransferObject implements IEntity {
     private _id: number | null = null;
 
     get id(): number {

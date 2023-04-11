@@ -7,15 +7,19 @@ import { IDatabaseConfig } from '../interfaces/IDatabaseConfig';
 import { IDatabase } from '../interfaces/IDatabase';
 import { isTruthy } from "../util/isTruthy";
 import { constants } from "../util/constants";
-import queries from "../sql/queries";
 
 /**
- * TODO: Document this class.
+ * A class that manages a database connection and provides methods to query the database.
+ * @implements {IDatabase}
  */
-export class Database implements IDatabase {
+export default class Database implements IDatabase {
     private config: IDatabaseConfig;
     private db: SQLiteDatabase | null = null;
 
+    /**
+     * Creates an instance of the Database class.
+     * @param config - The configuration object for the database.
+     */
     constructor(config: IDatabaseConfig) {
         this.config = config;
     }
@@ -25,8 +29,8 @@ export class Database implements IDatabase {
     // -----------------------
 
     /**
-     * Connect to the database.
-     * @returns 
+     * Connects to the database.
+     * @throws { Error } - If the database type is not supported.
      */
     async connect(): Promise<void> {
         switch (this.config.type) {
@@ -39,8 +43,8 @@ export class Database implements IDatabase {
     }
 
     /**
-     * Setup the database.
-     * @returns 
+     * Sets up the database by creating tables and enabling foreign keys.
+     * @throws { Error } - If the database type is not supported or if an error occurs while creating the schema.
      */
     async setup(): Promise<void> {
         switch (this.config.type) {
@@ -53,8 +57,8 @@ export class Database implements IDatabase {
     }
 
     /**
-     * Close the database connection.
-     * @returns 
+     * Closes the database connection.
+     * @throws { Error } - If the database type is not supported.
      */
     async close(): Promise<void> {
         switch (this.config.type) {
@@ -71,11 +75,13 @@ export class Database implements IDatabase {
     // ---------------------
 
     /**
-     * TOOD: Document
-     * @param params 
-     * @returns 
+     * Executes an upsert query.
+     * @param query - The SQL query to execute.
+     * @param params - The query parameters.
+     * @returns The ID of the inserted row.
+     * @throws {Error} - If the database is not connected or if an error occurs while executing the query.
      */
-    async upsert(query: string, params?: any[]): Promise<number> {
+    async upsert(query: string, params?: any | any[]): Promise<number> {
         if (!this.db) throw new Error('Database: Database not connected!');
 
         // TODO: Check against SQL injection.
@@ -91,18 +97,19 @@ export class Database implements IDatabase {
     }
 
     /**
-     * TODO: Document
-     * @param query 
-     * @returns 
+     * Executes a select all query.
+     * @param {string} query - The SQL query to execute.
+     * @returns An array of objects representing the selected rows.
+     * @throws { Error } - If the database is not connected or if an error occurs while executing the query.
      */
-    async selectAll(query: string): Promise<any[]> {
+    async selectMany(query: string, params?: string[] | number[]): Promise<any[]> {
         if (!this.db) throw new Error('Database: Database not connected!');
 
         // TODO: Check against SQL injection.
 
         switch (this.config.type) {
             case constants.database.types.SQLITE3:
-                return this.sqliteSelectAll(query);
+                return this.sqliteSelectMany(query, params);
 
             default:
                 throw new Error(`Database: Database type ${this.config.type} not supported!`);
@@ -110,14 +117,18 @@ export class Database implements IDatabase {
     }
 
     /**
-     * TODO: Document
+     * Executes the provided query and returns a single row from the result set.
+     * @param query - The SQL query string to execute.
+     * @param params - Optional parameters to pass to the query.
+     * @returns A promise that resolves to a single row from the result set.
+     * @throws { Error } - If the database is not connected or if the database type is not supported.
      */
-    async getLast(query: string): Promise<number> {
+    async selectOne(query: string, params?: string[] | number[]): Promise<number> {
         if (!this.db) throw new Error('Database: Database not connected!');
 
         switch (this.config.type) {
             case constants.database.types.SQLITE3:
-                return this.sqliteGetLast(query);
+                return this.sqliteGetOne(query, params);
 
             default:
                 throw new Error(`Database: Database type ${this.config.type} not supported!`);
@@ -129,9 +140,11 @@ export class Database implements IDatabase {
     // ---------------------
 
     /**
-     * Connector for SQLite3
+     * Connect to a SQLite3 database.
      */
     private sqliteConnect(): Promise<void> {
+        logger("Database: Connecting to SQLite database.", LogLevel.DEBUG);
+
         return new Promise((resolve, reject) => {
             this.db = new sqlite3.Database(this.config.filename, (err: Error | null) => {
                 if (err) {
@@ -146,9 +159,11 @@ export class Database implements IDatabase {
     }
 
     /**
-     * Setup for SQLite3
+     * Setup a SQLite3 database.
      */
     private sqliteSetup(): Promise<void> {
+        logger("Database: Setting up SQLite database.", LogLevel.DEBUG);
+
         return new Promise(async (resolve, reject) => {
             if (!this.db) {
                 reject(new Error('Database: Database not connected'));
@@ -182,9 +197,11 @@ export class Database implements IDatabase {
     }
 
     /**
-     * Closer for SQLite3
+     * Close the connection to a SQLite3 database.
      */
     private sqliteClose(): Promise<void> {
+        logger("Database: Closing SQLite database connection.", LogLevel.DEBUG);
+
         return new Promise((resolve, reject) => {
             if (!this.db) {
                 reject(new Error('Database: Database not connected!'));
@@ -207,8 +224,8 @@ export class Database implements IDatabase {
     /**
      * UPSERT query for SQLite3
      */
-    private sqliteUpsert = async (query: string, params: any): Promise<number> => { // TODO: Intrerface?
-        logger("Database: User executing SQLite3 upsert query.", LogLevel.DEBUG);
+    private sqliteUpsert = async (query: string, params: any | any[]): Promise<number> => { // TODO: Intrerface?
+        logger("Database: User executing SQLite upsert query.", LogLevel.DEBUG);
 
         return new Promise((resolve, reject) => {
             const mappedParams: any[] = [];
@@ -234,15 +251,18 @@ export class Database implements IDatabase {
     }
 
     /**
-     * SELECT all query for SQLite3
+     * SELECT many rows for SQLite3
      */
-    private sqliteSelectAll = async (query: string): Promise<any[]> => {
+    private sqliteSelectMany = async (query: string, params?: string[] | number[]): Promise<any[]> => {
+        logger("Database: User executing SQLite get many query.", LogLevel.DEBUG);
+
         return new Promise((resolve, reject) => {
             if (!this.db) {
                 reject(new Error('Database: Database not connected!'));
                 return;
             }
 
+            if (!isTruthy(params)) params = [];
             this.db.all(query, [], (err: Error | null, rows: any[]) => {
                 if (err) {
                     reject(err);
@@ -254,13 +274,15 @@ export class Database implements IDatabase {
     }
 
     /**
-     * SELECT last user query for SQLite3
+     * SELECT one row for SQLite3
      */
-    private sqliteGetLast = async (query: string): Promise<number> => {
-        logger("Database: User executing SQLite3 get current id query.", LogLevel.DEBUG);
+    private sqliteGetOne = async (query: string, params?: string[] | number[]): Promise<number> => {
+        logger("Database: User executing SQLite get one query.", LogLevel.DEBUG);
+
 
         return new Promise((resolve, reject) => {
-            this.db!.get(query, [], (err: Error | null, row: any) => {
+            if (!isTruthy(params)) params = [];
+            this.db!.get(query, params, (err: Error | null, row: any) => {
                 if (err) {
                     reject(err);
                 } else {

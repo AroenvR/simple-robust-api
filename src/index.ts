@@ -1,5 +1,12 @@
-import App from './classes/App';
-import iocContainer from './providers/containerProvider';
+import App from './domain/App';
+import Container from './domain/Container';
+import { serverConfig } from './serverConfig';
+import { LogLevel, logger } from './util/logger';
+
+logger('--- Starting the application ---', LogLevel.LOG);
+
+const iocContainer = new Container(serverConfig);
+iocContainer.initContainer();
 
 const app = iocContainer.get(App);
 app.start();

@@ -2,11 +2,11 @@ import express from 'express';
 import { UserDTO } from "../dto/UserDTO";
 import { UserService } from "../service/UserService";
 import { LogLevel, logger } from "../../util/logger";
-import { IUserController } from "../interfaces/IUserController";
+import { IUserController } from "./IUserController";
 import { RouteInitEvent } from '../../util/RouteInitEvent';
 
 export class UserController implements IUserController {
-    name = 'UserController';
+    readonly name = 'UserController';
     service: UserService;
 
     constructor(service: UserService, routeInitEvent: RouteInitEvent) {

@@ -1,6 +1,6 @@
-import { Entity } from "../../classes/Entity";
+import Entity from "./Entity";
 import { isTruthy } from "../../util/isTruthy";
-import { IUser } from "../interfaces/IUser";
+import { IUser } from "./IUser";
 
 export class User extends Entity implements IUser {
     private _uuid: string;

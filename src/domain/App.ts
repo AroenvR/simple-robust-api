@@ -28,7 +28,7 @@ export default class App {
 
             await this.initRoutes();
 
-            logger(`App: ${this.config.name} started successfully!`, LogLevel.DEBUG);
+            logger(`--- ${this.config.name} started successfully! ---\n`, LogLevel.LOG);
         } catch (error: Error | any) {
             logger('App: Error starting the app:', LogLevel.CRITICAL, error);
         }
@@ -76,9 +76,11 @@ export default class App {
             try {
                 this.app.options('*', cors()); // TODO: Enable preflight / options & make this more secure.
                 this.app.use(express.json());
-                this.server = this.app.listen(this.config.port, () => console.log(`App running on: http://localhost:${this.config.port}/`));
+
+                this.server = this.app.listen(this.config.port);
 
                 logger(`App: ${this.config.name} successfully initialized the express server.`, LogLevel.DEBUG);
+                logger(`App: ${this.config.name} live at => http://localhost:${this.config.port}/`, LogLevel.DEBUG)
                 resolve();
             } catch (error: Error | any) {
                 logger('App: Error initializing express:', LogLevel.CRITICAL, error);
@@ -91,6 +93,8 @@ export default class App {
      * Initializes the app routes.
      */
     private async initRoutes(): Promise<void> {
+        logger(`App: ${this.config.name} initializing API routes.`, LogLevel.DEBUG);
+
         this.config.routeInitEvent.emitRouteInit(this.app);
     }
 }

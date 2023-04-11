@@ -1,8 +1,8 @@
+import Container from "../../domain/Container";
+import Database from "../../domain/Database";
 import { UserDTO } from "../../api/dto/UserDTO";
 import { UserRepo } from "../../api/repo/UserRepo";
 import { UserService } from "../../api/service/UserService";
-import { Container } from "../../classes/Container";
-import { Database } from "../../classes/Database";
 import { PubSub } from "../../util/PubSub";
 import { TaskProcessor } from "../../util/TaskProcessor";
 import { generateUUID } from "../../util/uuid";
