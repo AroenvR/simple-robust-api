@@ -13,7 +13,7 @@ export const serverConfig: IServerConfig = { // TODO: Provide a proper serverCon
         }
     },
     database: {
-        filename: './to_improve.db',
+        filename: ':memory:',
         type: 'sqlite3'
     },
     tasks: {

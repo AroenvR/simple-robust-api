@@ -1,14 +1,14 @@
 import helmet, { HelmetOptions } from 'helmet';
 
-interface IHTTPConfig {
-}
+// interface IHTTPConfig {
+// }
 
 /**
  * SECURITY
  * @param config 
  * @returns 
  */
-export const configuredHelmet = (config: IHTTPConfig) => {
+export const configuredHelmet = (config: any) => {
     const helmetConfig: HelmetOptions = {
         // ... defaultHelmetConfig,
         referrerPolicy: { policy: 'no-referrer' }
