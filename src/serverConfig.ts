@@ -1,11 +1,16 @@
-import { constants } from "./util/constants";
+import { IServerConfig } from "./interfaces/IServerConfig";
 
-export const serverConfig = { // TODO: Provide a proper serverConfig.
+export const serverConfig: IServerConfig = { // TODO: Provide a proper serverConfig.
     app: {
         name: 'Simple Robust API',
         port: 3000,
         // logLevel: 'debug', // TODO
         // environment: 'development' // TODO
+        corsConfig: {
+            originAllowList: [
+                // `http://localhost:6969`,
+            ]
+        }
     },
     database: {
         filename: './to_improve.db',

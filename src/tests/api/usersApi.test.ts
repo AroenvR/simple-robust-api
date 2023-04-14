@@ -1,14 +1,7 @@
 import App from "../../domain/App";
 import Container from "../../domain/Container";
-import Database from "../../domain/Database";
-import { httpGet, httpsGet } from "../../util/http";
 import { testServerConfig } from "../testServerConfig";
-import { TaskProcessor } from "../../util/TaskProcessor";
-import { PubSub } from "../../util/PubSub";
-import { UserRepo } from "../../api/repo/UserRepo";
-import { UserService } from "../../api/service/UserService";
-import { UserController } from "../../api/controller/UserController";
-import { RouteInitEvent } from "../../util/RouteInitEvent";
+import axios from "axios";
 
 /**
  * Integration test for the Users API.
@@ -43,10 +36,16 @@ describe('Users API', () => {
 
     // ----------------------------
 
-    test('handles an HTTP get request', async () => {
-        const response = await httpGet(`localhost:${testServerConfig.app.port}/users`);
+    test('handles an HTTP GET request from whitelisted origin', async () => {
+        const origin = 'http://test.com';
 
-        expect(response).toBeTruthy();
+        const response = await axios.get(`http://localhost:${testServerConfig.app.port}/users`, {
+            headers: {
+                Origin: origin
+            }
+        });
+
+        expect(response.status).toBe(200);
     });
 
 });

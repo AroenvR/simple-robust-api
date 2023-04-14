@@ -1,9 +1,16 @@
+import { IServerConfig } from "../interfaces/IServerConfig";
 import { constants } from "../util/constants";
 
-export const testServerConfig = { // TODO: Provide a proper serverConfig.
+export const testServerConfig: IServerConfig = {
     app: {
         name: 'Test App',
         port: 1337,
+        corsConfig: {
+            originAllowList: [
+                `http://localhost:3000`,
+                `http://test.com`
+            ]
+        }
     },
     database: {
         filename: ':memory:',

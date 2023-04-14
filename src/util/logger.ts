@@ -2,7 +2,7 @@ export enum LogLevel {
     DEBUG = "DEBUG",
     INFO = "INFO",
     LOG = "LOG",
-    WARNING = "WARNING",
+    WARN = "WARNING",
     ERROR = "ERROR",
     CRITICAL = "CRITICAL",
 }
@@ -93,7 +93,7 @@ export const logger = async (message: string, logLevel: LogLevel, object?: objec
             console.log(logMessage, object ?? "");
             break;
 
-        case LogLevel.WARNING:
+        case LogLevel.WARN:
             console.warn(logMessage, object ?? "");
             break;
 

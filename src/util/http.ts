@@ -1,5 +1,14 @@
 import axios from 'axios';
 
+const instance = axios.create({
+    timeout: 1000,
+    headers: {
+        'Authorization': `Bearer ${process.env.BEARER_TOKEN}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+    },
+});
+
 /**
  * Simple GET request using HTTP.
  * @param url addition to the base domain url to send the getRequest to.
@@ -7,11 +16,13 @@ import axios from 'axios';
  * Response.ok: https://developer.mozilla.org/en-US/docs/Web/API/Response/ok
  */
 export const httpGet = async (url: string): Promise<void | object | any> => {
-    return await axios.get(`http://${url}`)
+    return instance.get(`http://${url}`)
         .then((response) => {
             if (response.status === 200) {
-                return response.data;
+                return response;
             }
+
+            throw new Error(`httpGet: Response status ${response.status} not OK.`);
         })
         .catch((error) => {
             console.error("Error in httpGet: ", error);
@@ -26,7 +37,7 @@ export const httpGet = async (url: string): Promise<void | object | any> => {
  * Response.ok: https://developer.mozilla.org/en-US/docs/Web/API/Response/ok
  */
 export const httpsGet = async (url: string): Promise<void | object | any> => {
-    return await axios.get(`https://${url}`)
+    return instance.get(`https://${url}`)
         .then((response) => {
             if (response.status === 200) {
                 return response.data;

@@ -1,4 +1,5 @@
 import { RouteInitEvent } from "../util/RouteInitEvent";
+import { ICorsConfig } from "./ICorsConfig";
 import { IDatabase } from "./IDatabase";
 
 /**
@@ -10,4 +11,5 @@ export interface IAppConfig {
     port: number;
     database: IDatabase;
     routeInitEvent: RouteInitEvent;
+    corsConfig: ICorsConfig;
 }
