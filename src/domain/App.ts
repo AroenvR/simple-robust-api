@@ -2,7 +2,7 @@ import express from 'express';
 import helmet from 'helmet';
 import { logger, LogLevel } from "../util/logger";
 import { IAppConfig } from "../interfaces/IAppConfig";
-import { configuredCors } from '../middleware/corsConfig';
+import { configuredCors } from '../middleware/configuredCors';
 
 /**
  * App class is the core of the application, responsible for starting and stopping the server,
@@ -75,10 +75,9 @@ export default class App {
     private async initServer(): Promise<void> {
         return new Promise(async (resolve, reject) => {
             try {
-                //
-                this.app.use(configuredCors(this.config.corsConfig)); // Enable CORS
-                this.app.use(helmet()); // Enable HTTP Headers
-                this.app.use(express.json()); // Enable JSON parsing
+                this.app.use(configuredCors(this.config.corsConfig));   // Enable CORS
+                this.app.use(helmet());                                 // Enable HTTP Headers
+                this.app.use(express.json());                           // Enable JSON parsing
 
                 this.server = this.app.listen(this.config.port); // Start the server on the specified port
 
@@ -99,5 +98,9 @@ export default class App {
         logger(`App: ${this.config.name} initializing API routes.`, LogLevel.DEBUG);
 
         this.config.routeInitEvent.emitRouteInit(this.app);
+
+        this.app.get('/', (req, res) => {
+            res.send(`Hello from ${this.app.name}!`);
+        });
     }
 }

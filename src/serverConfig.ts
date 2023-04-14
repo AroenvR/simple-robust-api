@@ -8,7 +8,7 @@ export const serverConfig: IServerConfig = { // TODO: Provide a proper serverCon
         // environment: 'development' // TODO
         corsConfig: {
             originAllowList: [
-                // `http://localhost:6969`,
+                `http://curl.home`,
             ]
         }
     },

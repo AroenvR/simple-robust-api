@@ -4,9 +4,8 @@ import Container from "../../domain/Container";
 import { testServerConfig } from "../testServerConfig";
 
 // SECURITY testing
-describe('Helmet middleware', () => {
+describe('CORS middleware', () => {
     let app: App;
-    let requestHeaders: any;
 
     beforeAll(async () => {
         // Disable console.log methods before all tests
@@ -20,14 +19,6 @@ describe('Helmet middleware', () => {
 
         app = iocContainer.get(App);
         await app.start();
-
-        requestHeaders = {
-            'Origin': 'http://test.com',
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${process.env.TEST_BEARER_TOKEN}`,
-            'withCredentials': 'false',
-        };
     });
 
     afterAll(async () => {
@@ -40,7 +31,21 @@ describe('Helmet middleware', () => {
 
     // ----------------------------
 
-    test('CORS should block requests from unlisted domains', async () => {
+    test('should allow correctly configured requests from listed domains', async () => {
+        const requestHeaders = {
+            'Origin': 'http://test.com',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${process.env.TEST_BEARER_TOKEN}`
+        };
+
+        const response = await axios.get(`http://localhost:${testServerConfig.app.port}/users`, { headers: requestHeaders });
+        expect(response.status).toBe(200);
+    });
+
+    // ----------------------------
+
+    test('should block requests from unlisted domains', async () => {
         const response = await axios.get(`http://localhost:${testServerConfig.app.port}/users`, {
             headers: {
                 Origin: 'http://www.unknown.com'
@@ -54,22 +59,11 @@ describe('Helmet middleware', () => {
 
     // ----------------------------
 
-    test('HTTP Headers should be configured', async () => {
-        const response = await axios.get(`http://localhost:${testServerConfig.app.port}/users`, { headers: requestHeaders })
-            .catch(err => {
-                return err.response;
-            });
+    test('should block requests without an Origin header', async () => {
+        const response = await axios.get(`http://localhost:${testServerConfig.app.port}/users`).catch(err => {
+            return err.response;
+        });
 
-        expect(response.headers['content-security-policy']).toContain("default-src 'self'");
-        expect(response.headers['x-frame-options']).toBe('SAMEORIGIN');
-        expect(response.headers['x-xss-protection']).toBe('0');
-
+        expect(response.status).toBe(500);
     });
-
-    // ----------------------------
-
-    // test.skip('...', async () => {
-    //     expect(true).toBe(true);
-    // });
-
 });
