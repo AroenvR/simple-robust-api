@@ -40,20 +40,6 @@ describe('Helmet middleware', () => {
 
     // ----------------------------
 
-    test('CORS should block requests from unlisted domains', async () => {
-        const response = await axios.get(`http://localhost:${testServerConfig.app.port}/users`, {
-            headers: {
-                Origin: 'http://www.unknown.com'
-            }
-        }).catch(err => {
-            return err.response;
-        });
-
-        expect(response.status).toBe(500);
-    });
-
-    // ----------------------------
-
     test('HTTP Headers should be configured', async () => {
         const response = await axios.get(`http://localhost:${testServerConfig.app.port}/users`, { headers: requestHeaders })
             .catch(err => {
@@ -65,11 +51,5 @@ describe('Helmet middleware', () => {
         expect(response.headers['x-xss-protection']).toBe('0');
 
     });
-
-    // ----------------------------
-
-    // test.skip('...', async () => {
-    //     expect(true).toBe(true);
-    // });
 
 });

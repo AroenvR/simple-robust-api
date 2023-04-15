@@ -4,6 +4,7 @@ import { logger, LogLevel } from "../util/logger";
 import { IAppConfig } from "../interfaces/IAppConfig";
 import { configuredCors } from '../middleware/configuredCors';
 import { configuredHelmet } from '../middleware/configuredHelmet';
+import { configuredRateLimiter } from '../middleware/configuredRateLimit';
 
 /**
  * App class is the core of the application, responsible for starting and stopping the server,
@@ -71,6 +72,7 @@ export default class App {
     }
 
     /**
+     * SECURITY
      * Initializes the app server.
      */
     private async initServer(): Promise<void> {
@@ -78,8 +80,9 @@ export default class App {
             try {
                 this.app.use(configuredCors(this.config.corsConfig)); // Enable CORS
                 this.app.use(configuredHelmet({}));                   // Enable HTTP Headers
-                this.app.use(express.json());                         // Enable JSON parsing
+                this.app.use(configuredRateLimiter({}));              // Enable Rate Limiting
 
+                this.app.use(express.json()); // Enable JSON parsing
                 this.server = this.app.listen(this.config.port); // Start the server on the specified port
 
                 logger(`App: ${this.config.name} successfully initialized the express server.`, LogLevel.DEBUG);

@@ -1,8 +1,5 @@
 import helmet, { HelmetOptions } from 'helmet';
 
-// interface IHTTPConfig {
-// }
-
 /**
  * SECURITY
  * @param config 

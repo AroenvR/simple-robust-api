@@ -44,3 +44,19 @@ TODO: Check out validator.js
 
 # Rate limiting:
 express-rate-limit was chosen for the following reason: // TODO
+
+### Files:
+```
+src/middleware/configuredRateLimit.ts
+```
+
+{  
+    windowMs: 15 * 60 * 1000,  
+    max: 100,  
+    standardHeaders: true,  
+    legacyHeaders: false,  
+    message: 'Too many requests, please try again later.',  
+    statusCode: 429,  
+}  
+
+TODO: defaults...
