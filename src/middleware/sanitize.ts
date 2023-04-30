@@ -1,4 +1,5 @@
 import DOMPurify from "dompurify";
+import { LogLevel, logger } from "../util/old_logger";
 
 /**
  * Recursively sanitizes the input value using DOMPurify. Supports strings, arrays, and objects.  
@@ -7,11 +8,17 @@ import DOMPurify from "dompurify";
  * @returns the sanitized value.
  */
 export const sanitizeValue = async (val: any): Promise<any> => {
+    // get allowed tags
+    // get allowed attributes
+
     if (typeof val === 'string') {
-        return DOMPurify.sanitize(val);
+        const sanitized = DOMPurify.sanitize(val);
+
+        if (sanitized !== val) logger(`sanitizeValue: User triggered sanitization!`, LogLevel.WARN);
+        return sanitized;
 
     } else if (Array.isArray(val)) {
-        return val.map(sanitizeValue);
+        return Promise.all(val.map(sanitizeValue));
 
     } else if (val !== null && typeof val === 'object') {
         return sanitizeObject(val);

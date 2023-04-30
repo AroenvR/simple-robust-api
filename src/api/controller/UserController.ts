@@ -1,7 +1,7 @@
 import express from 'express';
 import { UserDTO } from "../dto/UserDTO";
 import { UserService } from "../service/UserService";
-import { LogLevel, logger } from "../../util/logger";
+import { LogLevel, logger } from "../../util/old_logger";
 import { IUserController } from "./IUserController";
 import { RouteInitEvent } from '../../util/RouteInitEvent';
 

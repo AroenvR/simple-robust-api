@@ -1,6 +1,6 @@
 import cors, { CorsOptions } from 'cors';
 import { ICorsConfig } from '../interfaces/ICorsConfig';
-import { LogLevel, logger } from '../util/logger';
+import { LogLevel, logger } from '../util/old_logger';
 
 /**
  * SECURITY

@@ -1,10 +1,9 @@
 import express from 'express';
-import helmet from 'helmet';
-import { logger, LogLevel } from "../util/logger";
 import { IAppConfig } from "../interfaces/IAppConfig";
 import { configuredCors } from '../middleware/configuredCors';
 import { configuredHelmet } from '../middleware/configuredHelmet';
 import { configuredRateLimiter } from '../middleware/configuredRateLimit';
+import Logger from '../util/Logger';
 
 /**
  * App class is the core of the application, responsible for starting and stopping the server,
@@ -31,9 +30,9 @@ export default class App {
 
             await this.initRoutes();
 
-            logger(`--- ${this.config.name} started successfully! ---\n`, LogLevel.LOG);
+            Logger.instance.log(`App: --- ${this.config.name} started successfully! ---\n`);
         } catch (error: Error | any) {
-            logger('App: Error starting the app:', LogLevel.CRITICAL, error);
+            Logger.instance.error('App: Error starting the app:', error);
         }
     }
 
@@ -47,9 +46,9 @@ export default class App {
                 this.config.database.close(),
             ]);
 
-            logger(`App: ${this.config.name} stopped successfully.`, LogLevel.DEBUG);
+            Logger.instance.debug(`\n\nApp: ${this.config.name} stopped successfully.\n\n`);
         } catch (error: Error | any) {
-            logger('App: Error stopping the app:', LogLevel.ERROR, error);
+            Logger.instance.error('App: Error stopping the app:', error);
         }
     }
 
@@ -62,10 +61,10 @@ export default class App {
                 await this.config.database.connect();
                 await this.config.database.setup();
 
-                logger(`App: ${this.config.name} successfully set up the database.`, LogLevel.DEBUG);
+                Logger.instance.debug(`App: ${this.config.name} successfully set up the database.`);
                 resolve();
             } catch (error: Error | any) {
-                logger('App: Error initializing the app database:', LogLevel.CRITICAL, error);
+                Logger.instance.critical('App: Error initializing the app database:', error);
                 reject(error);
             }
         });
@@ -85,11 +84,11 @@ export default class App {
                 this.app.use(express.json()); // Enable JSON parsing
                 this.server = this.app.listen(this.config.port); // Start the server on the specified port
 
-                logger(`App: ${this.config.name} successfully initialized the express server.`, LogLevel.DEBUG);
-                logger(`App: ${this.config.name} live at => http://localhost:${this.config.port}/`, LogLevel.DEBUG)
+                Logger.instance.debug(`App: ${this.config.name} successfully initialized the express server.`);
+                Logger.instance.debug(`App: ${this.config.name} live at => http://localhost:${this.config.port}/`)
                 resolve();
             } catch (error: Error | any) {
-                logger('App: Error initializing express:', LogLevel.CRITICAL, error);
+                Logger.instance.critical('App: Error initializing express:', error);
                 reject(error);
             }
         });
@@ -99,7 +98,7 @@ export default class App {
      * Initializes the app routes.
      */
     private async initRoutes(): Promise<void> {
-        logger(`App: ${this.config.name} initializing API routes.`, LogLevel.DEBUG);
+        Logger.instance.debug(`App: ${this.config.name} initializing API routes.`);
 
         this.config.routeInitEvent.emitRouteInit(this.app);
 

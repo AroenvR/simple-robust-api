@@ -34,7 +34,8 @@
         "sqlite3": "^5.1.6",
         "tsconfig-paths": "^4.2.0",
         "uuid": "^9.0.0",
-        "validator": "^13.9.0"
+        "validator": "^13.9.0",
+        "winston": "^3.8.2"
     },
     "devDependencies": {
         "@types/fs-extra": "^11.0.1",

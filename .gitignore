@@ -3,10 +3,12 @@
 /node_modules
 /coverage
 /tmp
+/logs
 
 # File extensions to ignore
 *.bak
 *.db
+*.log
 
 # ENV files
 .env

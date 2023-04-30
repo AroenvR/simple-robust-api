@@ -1,6 +1,6 @@
 import { IDatabase } from "../../interfaces/IDatabase";
 import queries from "../../sql/queries";
-import { LogLevel, logger } from "../../util/logger";
+import { LogLevel, logger } from "../../util/old_logger";
 import { IUserRepo } from "./IUserRepo";
 import { User } from "../model/User";
 

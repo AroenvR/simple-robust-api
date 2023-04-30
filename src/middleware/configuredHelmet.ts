@@ -6,11 +6,13 @@ import helmet, { HelmetOptions } from 'helmet';
  * @returns 
  */
 export const configuredHelmet = (config: any) => {
+    // Create CSP Hash for meta tags: cat myscript.js | openssl dgst -sha256 -binary | openssl base64 -A
+    // Check CSP strength: csp-evaluator.withgoogle.com
+
     const helmetConfig: HelmetOptions = {
         // ... defaultHelmetConfig,
         referrerPolicy: { policy: 'no-referrer' }
-    }
-
+    };
 
     // Configure CSP
     return helmet(helmetConfig);

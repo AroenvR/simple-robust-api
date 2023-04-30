@@ -14,6 +14,12 @@ export interface IServerConfig {
         filename: string;
         type: string;
     };
+    logger: {
+        level: string;
+        console: boolean;
+        http: boolean;
+        file: boolean;
+    };
     tasks: {
         timeout: number;
     };

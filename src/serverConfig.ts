@@ -16,6 +16,12 @@ export const serverConfig: IServerConfig = { // TODO: Provide a proper serverCon
         filename: ':memory:',
         type: 'sqlite3'
     },
+    logger: {
+        level: "debug",
+        console: true,
+        http: true,
+        file: true,
+    },
     tasks: {
         timeout: 500
     }

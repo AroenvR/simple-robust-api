@@ -5,7 +5,7 @@ import { IServerConfig } from "../interfaces/IServerConfig";
 import { PubSub } from "../util/PubSub";
 import { RouteInitEvent } from "../util/RouteInitEvent";
 import { TaskProcessor } from "../util/TaskProcessor";
-import { logger, LogLevel } from "../util/logger";
+import Logger from "../util/Logger";
 import App from "./App";
 import Database from "./Database";
 
@@ -41,7 +41,7 @@ export default class Container {
         this.config = config;
         this.services = new Map();
 
-        logger("Container: Container created successfully.", LogLevel.DEBUG);
+        console.info("Container: Container created successfully.");
     }
 
     /**
@@ -53,13 +53,13 @@ export default class Container {
      */
     register<T>(key: ServiceIdentifier<T>, factory: ServiceFactory<T>): Container {
         if (this.services.has(key)) {
-            logger(`Container: Service '${key.name}' is already registered.`, LogLevel.ERROR);
+            console.error(`Container: Service '${key.name}' is already registered.`);
             throw new Error(`Service '${key.name}' is already registered.`);
         }
 
         const instance = factory(this);
         this.services.set(key, instance);
-        console.log(`Container: ${key.name} service created successfully.`);
+        console.info(`Container: ${key.name} service created successfully.`);
 
         return this;
     }
@@ -92,10 +92,11 @@ export default class Container {
      * This method initializes the container by registering various services and dependencies that the application requires.
      */
     initContainer(): void {
-        logger("Container: Initializing container.", LogLevel.DEBUG);
+        console.debug("Container: Initializing container.");
 
         try {
             // Util
+            this.register(Logger, (c) => Logger.create({ ...c.getConfiguration().logger }));
             this.register(RouteInitEvent, () => new RouteInitEvent());
             this.register(PubSub, (c) => new PubSub());
             this.register(TaskProcessor, (c) => new TaskProcessor({ ...c.getConfiguration().tasks }));
@@ -116,7 +117,7 @@ export default class Container {
             this.register(App, (c) => new App({ ...c.getConfiguration().app, database: c.get(Database), routeInitEvent: c.get(RouteInitEvent) }));
 
         } catch (error) {
-            logger(`Container: Error initializing container!`, LogLevel.CRITICAL, error);
+            console.error(`Container: Error initializing container!`);
             throw error;
         }
     }

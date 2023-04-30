@@ -2,7 +2,7 @@ import fs from "fs-extra";
 import path from 'path';
 import sqlite3 from 'sqlite3';
 import { Database as SQLiteDatabase } from 'sqlite3';
-import { logger, LogLevel } from '../util/logger';
+import { logger, LogLevel } from '../util/old_logger';
 import { IDatabaseConfig } from '../interfaces/IDatabaseConfig';
 import { IDatabase } from '../interfaces/IDatabase';
 import { isTruthy } from "../util/isTruthy";

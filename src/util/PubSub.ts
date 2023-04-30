@@ -1,5 +1,5 @@
 import { ISubscriber } from "../interfaces/ISubscriber";
-import { LogLevel, logger } from "./logger";
+import { LogLevel, logger } from "./old_logger";
 
 /**
  * The PubSub class provides a simple publish-subscribe pattern implementation.

@@ -1,7 +1,7 @@
 import { IService } from "./IService";
 import { PubSub } from "../../util/PubSub";
 import { TaskProcessor } from "../../util/TaskProcessor";
-import { LogLevel, logger } from "../../util/logger";
+import { LogLevel, logger } from "../../util/old_logger";
 import { UserDTO } from "../dto/UserDTO";
 import { User } from "../model/User";
 import { UserRepo } from "../repo/UserRepo";
