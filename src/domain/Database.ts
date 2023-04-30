@@ -2,11 +2,11 @@ import fs from "fs-extra";
 import path from 'path';
 import sqlite3 from 'sqlite3';
 import { Database as SQLiteDatabase } from 'sqlite3';
-import { logger, LogLevel } from '../util/old_logger';
 import { IDatabaseConfig } from '../interfaces/IDatabaseConfig';
 import { IDatabase } from '../interfaces/IDatabase';
 import { isTruthy } from "../util/isTruthy";
 import { constants } from "../util/constants";
+import Logger from "../util/Logger";
 
 /**
  * A class that manages a database connection and provides methods to query the database.
@@ -143,15 +143,15 @@ export default class Database implements IDatabase {
      * Connect to a SQLite3 database.
      */
     private sqliteConnect(): Promise<void> {
-        logger("Database: Connecting to SQLite database.", LogLevel.DEBUG);
+        Logger.instance.debug("Database: Connecting to SQLite database.");
 
         return new Promise((resolve, reject) => {
             this.db = new sqlite3.Database(this.config.filename, (err: Error | null) => {
                 if (err) {
-                    logger("Database: Error connecting to database:", LogLevel.CRITICAL, err);
+                    Logger.instance.error("Database: Error connecting to database:", err);
                     reject(err);
                 } else {
-                    logger("Database: SQLite database connected.", LogLevel.DEBUG);
+                    Logger.instance.debug("Database: SQLite database connected.");
                     resolve();
                 }
             });
@@ -162,7 +162,7 @@ export default class Database implements IDatabase {
      * Setup a SQLite3 database.
      */
     private sqliteSetup(): Promise<void> {
-        logger("Database: Setting up SQLite database.", LogLevel.DEBUG);
+        Logger.instance.debug("Database: Setting up SQLite database.");
 
         return new Promise(async (resolve, reject) => {
             if (!this.db) {
@@ -173,10 +173,10 @@ export default class Database implements IDatabase {
             // Enable foreign keys.
             this.db.exec('PRAGMA foreign_keys = ON', (err: Error | null) => {
                 if (err) {
-                    logger("Database: Error executing PRAGMA foreign_keys:", LogLevel.CRITICAL, err);
+                    Logger.instance.critical("Database: Error executing PRAGMA foreign_keys:", err);
                     reject(new Error('Database: Error executing PRAGMA foreign_keys: ' + err.message));
                 } else {
-                    logger("Database: SQLite database foreign keys successfully enabled.", LogLevel.DEBUG);
+                    Logger.instance.debug("Database: SQLite database foreign keys successfully enabled.");
                 }
             });
 
@@ -186,10 +186,10 @@ export default class Database implements IDatabase {
 
             this.db.exec(schema, (err: Error | null) => {
                 if (err) {
-                    logger("Database: Error creating Database schema:", LogLevel.CRITICAL, err);
+                    Logger.instance.critical("Database: Error creating Database schema:", err);
                     reject(new Error('Database: Error creating Database schema: ' + err.message));
                 } else {
-                    logger("Database: SQLite database schema successfully created.", LogLevel.DEBUG);
+                    Logger.instance.debug("Database: SQLite database schema successfully created.");
                     resolve();
                 }
             });
@@ -200,7 +200,7 @@ export default class Database implements IDatabase {
      * Close the connection to a SQLite3 database.
      */
     private sqliteClose(): Promise<void> {
-        logger("Database: Closing SQLite database connection.", LogLevel.DEBUG);
+        Logger.instance.debug("Database: Closing SQLite database connection.");
 
         return new Promise((resolve, reject) => {
             if (!this.db) {
@@ -212,7 +212,7 @@ export default class Database implements IDatabase {
                 if (err) {
                     reject(err);
                 } else {
-                    logger("Database: SQLite database closed.", LogLevel.DEBUG);
+                    Logger.instance.debug("Database: SQLite database closed.");
                     this.db = null;
 
                     resolve();
@@ -225,7 +225,7 @@ export default class Database implements IDatabase {
      * UPSERT query for SQLite3
      */
     private sqliteUpsert = async (query: string, params: any | any[]): Promise<number> => { // TODO: Intrerface?
-        logger("Database: User executing SQLite upsert query.", LogLevel.DEBUG);
+        Logger.instance.debug("Database: User executing SQLite upsert query.");
 
         return new Promise((resolve, reject) => {
             const mappedParams: any[] = [];
@@ -254,7 +254,7 @@ export default class Database implements IDatabase {
      * SELECT many rows for SQLite3
      */
     private sqliteSelectMany = async (query: string, params?: string[] | number[]): Promise<any[]> => {
-        logger("Database: User executing SQLite get many query.", LogLevel.DEBUG);
+        Logger.instance.debug("Database: User executing SQLite get many query.");
 
         return new Promise((resolve, reject) => {
             if (!this.db) {
@@ -277,7 +277,7 @@ export default class Database implements IDatabase {
      * SELECT one row for SQLite3
      */
     private sqliteGetOne = async (query: string, params?: string[] | number[]): Promise<number> => {
-        logger("Database: User executing SQLite get one query.", LogLevel.DEBUG);
+        Logger.instance.debug("Database: User executing SQLite get one query.");
 
 
         return new Promise((resolve, reject) => {

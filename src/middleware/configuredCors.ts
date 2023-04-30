@@ -1,6 +1,6 @@
 import cors, { CorsOptions } from 'cors';
 import { ICorsConfig } from '../interfaces/ICorsConfig';
-import { LogLevel, logger } from '../util/old_logger';
+import Logger from '../util/Logger';
 
 /**
  * SECURITY
@@ -16,7 +16,7 @@ export const configuredCors = (config: ICorsConfig) => {
             if (allowList.indexOf(requestOrigin!) !== -1) {
                 callback(null, true);
             } else {
-                logger(`CORS: A Disallowed origin is sending a request: ${requestOrigin}`, LogLevel.WARN)
+                Logger.instance.warn(`CORS: A Disallowed origin is sending a request: ${requestOrigin}`);
                 callback(new Error('Origin not allow listed by CORS'));
             }
         },

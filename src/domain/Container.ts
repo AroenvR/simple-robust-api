@@ -32,6 +32,7 @@ type ServiceIdentifier<T> = new (...args: any[]) => T;
 export default class Container {
     private config: IServerConfig;
     private services: Map<ServiceIdentifier<any>, any>;
+    private logger: Logger;
 
     /**
      * Creates a new instance of the Container class.
@@ -41,7 +42,9 @@ export default class Container {
         this.config = config;
         this.services = new Map();
 
-        console.info("Container: Container created successfully.");
+        // Initialize the logger first
+        this.logger = Logger.create({ ...config.logger });
+        this.logger.debug("Container: Container created successfully.");
     }
 
     /**
@@ -53,13 +56,13 @@ export default class Container {
      */
     register<T>(key: ServiceIdentifier<T>, factory: ServiceFactory<T>): Container {
         if (this.services.has(key)) {
-            console.error(`Container: Service '${key.name}' is already registered.`);
+            this.logger.error(`Container: Service '${key.name}' is already registered.`);
             throw new Error(`Service '${key.name}' is already registered.`);
         }
 
         const instance = factory(this);
         this.services.set(key, instance);
-        console.info(`Container: ${key.name} service created successfully.`);
+        this.logger.debug(`Container: ${key.name} service created successfully.`);
 
         return this;
     }
@@ -92,7 +95,7 @@ export default class Container {
      * This method initializes the container by registering various services and dependencies that the application requires.
      */
     initContainer(): void {
-        console.debug("Container: Initializing container.");
+        this.logger.debug("Container: Initializing container.");
 
         try {
             // Util
@@ -117,7 +120,7 @@ export default class Container {
             this.register(App, (c) => new App({ ...c.getConfiguration().app, database: c.get(Database), routeInitEvent: c.get(RouteInitEvent) }));
 
         } catch (error) {
-            console.error(`Container: Error initializing container!`);
+            this.logger.error(`Container: Error initializing container!`);
             throw error;
         }
     }

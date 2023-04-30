@@ -1,9 +1,9 @@
 import express from 'express';
 import { UserDTO } from "../dto/UserDTO";
 import { UserService } from "../service/UserService";
-import { LogLevel, logger } from "../../util/old_logger";
 import { IUserController } from "./IUserController";
 import { RouteInitEvent } from '../../util/RouteInitEvent';
+import Logger from '../../util/Logger';
 
 export class UserController implements IUserController {
     readonly name = 'UserController';
@@ -16,7 +16,7 @@ export class UserController implements IUserController {
 
     private setupRoutes(app: express.Application): void {
         app.get('/users', async (req, res) => {
-            logger('UserController: GET /users', LogLevel.DEBUG);
+            Logger.instance.debug('UserController: GET /users');
 
             try {
                 const users = await this.selectAll();
@@ -33,13 +33,13 @@ export class UserController implements IUserController {
      * @returns {Promise<any>} - The result of the upsert operation.
      */
     public async upsert(userDtos: UserDTO[]): Promise<any> {
-        logger(`${this.name}: Upserting users.`, LogLevel.DEBUG);
+        Logger.instance.debug(`${this.name}: Upserting users.`);
 
         try {
             const result = await this.service.upsert(userDtos);
             return result;
         } catch (error) {
-            console.error(`${this.name}: Error upserting users`, error);
+            Logger.instance.error(`${this.name}: Error upserting users`, error);
             throw error;
         }
     }
@@ -49,7 +49,7 @@ export class UserController implements IUserController {
      * @returns {Promise<any[]>} - The array of users.
      */
     public async selectAll(): Promise<any[]> {
-        logger(`${this.name}: Getting all users.`, LogLevel.DEBUG);
+        Logger.instance.debug(`${this.name}: Getting all users.`);
 
         try {
             const users = await this.service.getAll();

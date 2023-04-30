@@ -1,8 +1,8 @@
 import { IDatabase } from "../../interfaces/IDatabase";
 import queries from "../../sql/queries";
-import { LogLevel, logger } from "../../util/old_logger";
 import { IUserRepo } from "./IUserRepo";
 import { User } from "../model/User";
+import Logger from "../../util/Logger";
 
 /**
  * UserRepo class implements IUserRepo and provides methods to interact with user records in the database.
@@ -25,7 +25,7 @@ export class UserRepo implements IUserRepo {
      * @returns A Promise with the last ID of the insert operation.
      */
     async upsert(params: User[]): Promise<number> {
-        logger(`${this.name}: upserting users.`, LogLevel.DEBUG);
+        Logger.instance.debug(`${this.name}: upserting users.`);
 
         const placeholders = params.map(() => queries.users.placeholders).join(',');
         let query = `${queries.users.insert} ${placeholders} ${queries.users.onConflict}`;
@@ -38,7 +38,7 @@ export class UserRepo implements IUserRepo {
      * @returns A Promise with the requested users.
      */
     async selectAll(): Promise<User[]> {
-        logger(`${this.name}: selecting all users.`, LogLevel.DEBUG);
+        Logger.instance.debug(`${this.name}: selecting all users.`);
 
         return this._db.selectMany(queries.users.select_all);
     }
@@ -48,7 +48,7 @@ export class UserRepo implements IUserRepo {
      * @returns A Promise with the last user.
      */
     async getLast(): Promise<User> {
-        logger(`${this.name}: getting the last one.`, LogLevel.DEBUG);
+        Logger.instance.debug(`${this.name}: getting the last one.`);
 
         const query = queries.users.select_current_id;
         const result = await this._db.selectOne(query);

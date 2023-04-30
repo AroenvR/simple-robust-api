@@ -1,10 +1,10 @@
 import { IService } from "./IService";
 import { PubSub } from "../../util/PubSub";
 import { TaskProcessor } from "../../util/TaskProcessor";
-import { LogLevel, logger } from "../../util/old_logger";
 import { UserDTO } from "../dto/UserDTO";
 import { User } from "../model/User";
 import { UserRepo } from "../repo/UserRepo";
+import Logger from "../../util/Logger";
 
 /**
  * The UserService class provides methods for managing users in the application.
@@ -45,7 +45,7 @@ export class UserService implements IService {
 
             return result;
         } catch (error: Error | any) {
-            logger(`${this.name}: Error creating a user:`, LogLevel.ERROR, error);
+            Logger.instance.error(`${this.name}: Error creating a user:`, error);
             throw error;
         }
     }
@@ -55,7 +55,7 @@ export class UserService implements IService {
      * @returns {Promise<User[]>} - A promise that resolves to an array of users.
      */
     async getAll(): Promise<User[]> {
-        logger(`${this.name}: Getting all users.`, LogLevel.DEBUG);
+        Logger.instance.debug(`${this.name}: Getting all users.`);
 
         return this.repository.selectAll();
     }
