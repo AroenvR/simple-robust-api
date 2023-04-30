@@ -1,4 +1,5 @@
 import rateLimit from 'express-rate-limit';
+import Logger from '../util/Logger';
 
 /**
  * SECURITY
@@ -6,7 +7,9 @@ import rateLimit from 'express-rate-limit';
  * @param {any} config - Configuration object for the rate limiter middleware (currently unused).
  * @returns The rate limiter middleware with predefined settings.
  */
-export const configuredRateLimiter = (config: any) => {
+export const rateLimiterMiddleware = (config: any) => {
+    Logger.instance.debug('RateLimiter: Configuring rate limiter middleware.');
+
     const limiterOptions = {
         windowMs: 15 * 60 * 1000,
         max: 100,

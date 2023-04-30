@@ -32,11 +32,10 @@ export class UserService implements IService {
      * @param {UserDTO[]} userDtos - An array of user data transfer objects.
      * @returns {Promise<any>} - A promise that resolves to the result of the user creation operation.
      */
-    async upsert(userDtos: UserDTO | UserDTO[]): Promise<number> {
+    async upsert(userDtos: UserDTO[]): Promise<number> {
         let users: User[] = [];
 
-        if (Array.isArray(userDtos)) users = userDtos.map((userDto: UserDTO) => new User(0, userDto.uuid, userDto.name));
-        else users = [new User(0, userDtos.uuid, userDtos.name)];
+        users = userDtos.map((userDto: UserDTO) => new User(0, userDto.uuid, userDto.name));
 
         try {
             const result = await this.repository.upsert(users);
@@ -45,7 +44,7 @@ export class UserService implements IService {
 
             return result;
         } catch (error: Error | any) {
-            Logger.instance.error(`${this.name}: Error creating a user:`, error);
+            Logger.instance.error(`${this.name}: Error creating a users:`, error);
             throw error;
         }
     }
@@ -55,7 +54,7 @@ export class UserService implements IService {
      * @returns {Promise<User[]>} - A promise that resolves to an array of users.
      */
     async getAll(): Promise<User[]> {
-        Logger.instance.debug(`${this.name}: Getting all users.`);
+        Logger.instance.info(`${this.name}: Getting all users.`);
 
         return this.repository.selectAll();
     }

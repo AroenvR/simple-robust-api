@@ -10,6 +10,7 @@ F.ex.: PostgresSQL, MongoDB, SmartContract.
 
 # CORS config:
 The cors NPM package was chosen to handle CORS for the following reasion: // TODO
+
 ### Files:
 ```
 src/serverConfig.ts  
@@ -21,10 +22,11 @@ methods: ['GET', 'POST', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
 allowedHeaders: ['Content-Type', 'Authorization'],  
 exposedHeaders: [],  
 preflightContinue: false,  
-optionsSuccessStatus: 204,  
+optionsSuccessStatus: 204
 
 # HTTP Header config:
 Helmet was chosen because of the following reason: // TODO
+
 ### Files:
 ```
 src/serverConfig.ts  
@@ -34,13 +36,17 @@ referrerPolicy: { policy: 'no-referrer' }
 // TODO: Get default Helmet config from documentation
 
 # Sanitization:
-DOMPurify was chosen because of the following research
-- Most weekly NPM downloads for the sanitizer keyword.
-- NPM tends as of 04/23: https://npmtrends.com/dompurify-vs-sanitize-html-vs-xss
-- measurethat benchmark of 2022: https://www.measurethat.net/Benchmarks/Show/22327/0/dompurify-vs-sanitize-html-2022
+// TODO: Decide between XSS, html-sanitizer
+
+All incoming requests are sanitized before being processed.  
+All outgoing responses are sanitized before being sent.  
+
+# Body parsing
+// TODO: Config & Document
 
 # Data validation:
-TODO: Check out validator.js
+validator is being used to validate data throughout the application.  
+https://www.npmjs.com/package/validator
 
 # Rate limiting:
 express-rate-limit was chosen for the following reason: // TODO
@@ -49,7 +55,7 @@ express-rate-limit was chosen for the following reason: // TODO
 ```
 src/middleware/configuredRateLimit.ts
 ```
-
+```json
 {  
     windowMs: 15 * 60 * 1000,  
     max: 100,  
@@ -57,6 +63,7 @@ src/middleware/configuredRateLimit.ts
     legacyHeaders: false,  
     message: 'Too many requests, please try again later.',  
     statusCode: 429,  
-}  
+}
+```
 
 TODO: defaults...

@@ -1,11 +1,14 @@
 import helmet, { HelmetOptions } from 'helmet';
+import Logger from '../util/Logger';
 
 /**
  * SECURITY
  * @param config 
  * @returns 
  */
-export const configuredHelmet = (config: any) => {
+export const helmetMiddleware = (config: any) => {
+    Logger.instance.debug('Helmet: Configuring Helmet middleware.');
+
     // Create CSP Hash for meta tags: cat myscript.js | openssl dgst -sha256 -binary | openssl base64 -A
     // Check CSP strength: csp-evaluator.withgoogle.com
 

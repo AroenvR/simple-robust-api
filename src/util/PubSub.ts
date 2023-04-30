@@ -1,5 +1,5 @@
 import { ISubscriber } from "../interfaces/ISubscriber";
-import { LogLevel, logger } from "./old_logger";
+import Logger from "./Logger";
 
 /**
  * The PubSub class provides a simple publish-subscribe pattern implementation.
@@ -15,11 +15,11 @@ export class PubSub {
      */
     public async publish(eventType: string, event: any): Promise<void> {
         if (!eventType) {
-            logger(`Event type is falsy.`, LogLevel.ERROR);
+            Logger.instance.error(`Event type is falsy.`);
             return;
         }
 
-        logger(`PubSub: Publishing event of type ${eventType}`, LogLevel.DEBUG);
+        Logger.instance.debug(`PubSub: Publishing event of type ${eventType}`);
 
         this.subscribers.forEach((subscriber) => {
             if (subscriber.eventType === eventType) {

@@ -1,5 +1,7 @@
+import { UserDTO } from "../../api/dto/UserDTO";
 import App from "../../domain/App";
 import Container from "../../domain/Container";
+import { generateUUID } from "../../util/uuid";
 import { testServerConfig } from "../testServerConfig";
 import axios from "axios";
 
@@ -10,11 +12,6 @@ describe('Users API', () => {
     let app: App;
 
     beforeAll(async () => {
-        // Disable console.log methods before all tests
-        jest.spyOn(console, 'debug').mockImplementation(() => { });
-        jest.spyOn(console, 'info').mockImplementation(() => { });
-        jest.spyOn(console, 'log').mockImplementation(() => { });
-
         const iocContainer = new Container(testServerConfig);
         iocContainer.initContainer();
 
@@ -26,13 +23,37 @@ describe('Users API', () => {
         // Shut down the application after all tests.
         await app.stop();
 
-        // Re-enable console.log methods after all tests
         jest.restoreAllMocks();
     });
 
     // ----------------------------
 
     // TODO: Create users!
+
+    // ----------------------------
+
+    test('handles an HTTP POST request from whitelisted origin', async () => {
+        const origin = 'http://test.com';
+
+        const payload = [
+            {
+                uuid: generateUUID(),
+                name: 'John Doe'
+            },
+            {
+                uuid: generateUUID(),
+                name: 'Jane Doe'
+            }
+        ];
+        const response = await axios.post(`http://localhost:${testServerConfig.app.port}/users`, payload, {
+            headers: {
+                'Content-Type': 'application/json',
+                Origin: origin
+            }
+        });
+
+        expect(response.status).toBe(200);
+    });
 
     // ----------------------------
 
@@ -47,5 +68,4 @@ describe('Users API', () => {
 
         expect(response.status).toBe(200);
     });
-
 });

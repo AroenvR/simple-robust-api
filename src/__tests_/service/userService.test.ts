@@ -15,10 +15,6 @@ describe('UserService', () => {
     let userService: UserService;
 
     beforeAll(async () => {
-        jest.spyOn(console, 'debug').mockImplementation(() => { });
-        jest.spyOn(console, 'info').mockImplementation(() => { });
-        jest.spyOn(console, 'log').mockImplementation(() => { });
-
         // Create a new container instance with a mock database.
         container = new Container({ ...testServerConfig });
 
@@ -50,7 +46,7 @@ describe('UserService', () => {
         userDto.uuid = generateUUID();
         userDto.name = 'John Doe';
 
-        const result = await userService.upsert(userDto);
+        const result = await userService.upsert([userDto]);
         expect(result).toBe(1);
     });
 

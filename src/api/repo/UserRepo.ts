@@ -25,12 +25,18 @@ export class UserRepo implements IUserRepo {
      * @returns A Promise with the last ID of the insert operation.
      */
     async upsert(params: User[]): Promise<number> {
-        Logger.instance.debug(`${this.name}: upserting users.`);
+        Logger.instance.info(`${this.name}: upserting users.`);
 
         const placeholders = params.map(() => queries.users.placeholders).join(',');
         let query = `${queries.users.insert} ${placeholders} ${queries.users.onConflict}`;
 
-        return this._db.upsert(query, params);
+        try {
+            return this._db.upsert(query, params);
+
+        } catch (error: Error | any) {
+            Logger.instance.error(`${this.name}: Error upserting users:`, error);
+            throw error;
+        }
     }
 
     /**
@@ -38,7 +44,7 @@ export class UserRepo implements IUserRepo {
      * @returns A Promise with the requested users.
      */
     async selectAll(): Promise<User[]> {
-        Logger.instance.debug(`${this.name}: selecting all users.`);
+        Logger.instance.info(`${this.name}: selecting all users.`);
 
         return this._db.selectMany(queries.users.select_all);
     }

@@ -1,9 +1,11 @@
 import express from 'express';
 import { IAppConfig } from "../interfaces/IAppConfig";
-import { configuredCors } from '../middleware/configuredCors';
-import { configuredHelmet } from '../middleware/configuredHelmet';
-import { configuredRateLimiter } from '../middleware/configuredRateLimit';
+import { corsMiddleware } from '../middleware/corsMiddleware';
+import { helmetMiddleware } from '../middleware/helmetMiddleware';
+import { rateLimiterMiddleware } from '../middleware/rateLimiterMiddleware';
 import Logger from '../util/Logger';
+import { sanitizeMiddleware } from '../middleware/sanitize';
+import bodyParser from 'body-parser';
 
 /**
  * App class is the core of the application, responsible for starting and stopping the server,
@@ -31,13 +33,14 @@ export default class App {
             await this.initRoutes();
 
             Logger.instance.debug(`
-┌────────────────────────────────────┐
-│  -----      App Startup      ----- |
-├────────────────────────────────────┤
-│  Name: ${this.config.name.padEnd(22)}      │
-│  Time: ${new Date().toLocaleTimeString().padEnd(22)}      │
-│  Status: Successfully started!     │
-└────────────────────────────────────┘`);
+            ┌────────────────────────────────────┐
+            │  -----      App Startup      ----- |
+            ├────────────────────────────────────┤
+            │  Name: ${this.config.name.padEnd(22)}      │
+            │  Time: ${new Date().toLocaleTimeString().padEnd(22)}      │
+            │  Status: Successfully started!     │
+            └────────────────────────────────────┘`);
+
             Logger.instance.log(`App: ${this.config.name} listening on port ${this.config.port}.`);
         } catch (error: Error | any) {
             Logger.instance.error('App: Error starting the app:', error);
@@ -48,7 +51,7 @@ export default class App {
      * Stops the app.
      */
     async stop(): Promise<void> {
-        Logger.instance.debug(`App: ${this.config.name} shutting down...`);
+        Logger.instance.info(`App: ${this.config.name} shutting down...`);
 
         try {
             await Promise.all([
@@ -56,7 +59,7 @@ export default class App {
                 this.config.database.close(),
             ]);
 
-            Logger.instance.debug(`App: ${this.config.name} successfully shut down.`);
+            Logger.instance.log(`App: ${this.config.name} successfully shut down.`);
         } catch (error: Error | any) {
             Logger.instance.error('App: Error stopping the app:', error);
         }
@@ -87,11 +90,15 @@ export default class App {
     private async initServer(): Promise<void> {
         return new Promise(async (resolve, reject) => {
             try {
-                this.app.use(configuredCors(this.config.corsConfig)); // Enable CORS
-                this.app.use(configuredHelmet({}));                   // Enable HTTP Headers
-                this.app.use(configuredRateLimiter({}));              // Enable Rate Limiting
-
                 this.app.use(express.json()); // Enable JSON parsing
+
+                // Add middlewares
+                this.app.use(bodyParser.urlencoded({ extended: true })); // Body Parser
+                // this.app.use(sanitizeMiddleware);                        // Sanitization
+                this.app.use(corsMiddleware(this.config.corsConfig));    // CORS
+                this.app.use(helmetMiddleware({}));                      // HTTP Headers
+                this.app.use(rateLimiterMiddleware({}));                 // Rate Limiting
+
                 this.server = this.app.listen(this.config.port); // Start the server on the specified port
 
                 Logger.instance.debug(`App: ${this.config.name} successfully initialized the express server.`);

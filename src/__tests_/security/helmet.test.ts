@@ -9,12 +9,6 @@ describe('Helmet middleware', () => {
     let requestHeaders: any;
 
     beforeAll(async () => {
-        // Disable console.log methods before all tests
-        jest.spyOn(console, 'debug').mockImplementation(() => { });
-        jest.spyOn(console, 'info').mockImplementation(() => { });
-        jest.spyOn(console, 'log').mockImplementation(() => { });
-        jest.spyOn(console, 'warn').mockImplementation(() => { });
-
         const iocContainer = new Container(testServerConfig);
         iocContainer.initContainer();
 

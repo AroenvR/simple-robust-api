@@ -8,7 +8,9 @@ import Logger from '../util/Logger';
  * @param config The configuration options for CORS.
  * @return A middleware function that can be used by the server to enable CORS with the specified configuration.
  */
-export const configuredCors = (config: ICorsConfig) => {
+export const corsMiddleware = (config: ICorsConfig) => {
+    Logger.instance.debug('CORS: Configuring CORS middleware.');
+
     const allowList = config.originAllowList;
 
     const corsOptions: CorsOptions = {

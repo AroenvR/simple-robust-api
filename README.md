@@ -28,6 +28,19 @@ The application is structured using a Dependency Injection Container to manage d
 5. The repository executes a query on the database and returns the data to the controller.
 6. The controller processes the data and sends the response back to the client.
 
+## Logging
+
+The application includes a built-in logging system that categorizes logs based on severity. The log levels are as follows:
+
+- DEBUG: Only for developers, detailed information to help diagnose issues.
+- INFO: Possibly useful information, not critical but may be helpful to understand the application or a user's behavior.
+- LOG: Useful information, generally informative messages that highlight the progress of the application.
+- WARN: Should be paid attention to, could indicate potential problems or security risks.
+- ERROR: Should be looked at, as it could break something or be a security risk.
+- CRITICAL: This could break the application or be a severe security risk, requires immediate attention.
+
+Logs can be found in the designated log files or in the console, depending on the server configuration.
+
 <hr/>
 
 ## Getting Started

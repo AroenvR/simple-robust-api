@@ -1,21 +1,14 @@
 import Database from '../domain/Database';
+import Logger from '../util/Logger';
 import { testServerConfig } from './testServerConfig';
 
 describe('Database', () => {
     let database: Database;
-
-    beforeAll(() => {
-        jest.spyOn(console, 'debug').mockImplementation(() => { });
-        jest.spyOn(console, 'info').mockImplementation(() => { });
-        jest.spyOn(console, 'log').mockImplementation(() => { });
-    });
-
-    afterAll(() => {
-        jest.restoreAllMocks();
-    });
+    let logger: Logger;
 
     beforeEach(async () => {
         database = new Database({ ...testServerConfig.database });
+        logger = Logger.create({ ...testServerConfig.logger })
     });
 
     afterEach(async () => {

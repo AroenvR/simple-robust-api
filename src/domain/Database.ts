@@ -225,7 +225,7 @@ export default class Database implements IDatabase {
      * UPSERT query for SQLite3
      */
     private sqliteUpsert = async (query: string, params: any | any[]): Promise<number> => { // TODO: Intrerface?
-        Logger.instance.debug("Database: User executing SQLite upsert query.");
+        Logger.instance.info("Database: executing SQLite upsert query.");
 
         return new Promise((resolve, reject) => {
             const mappedParams: any[] = [];
@@ -244,6 +244,7 @@ export default class Database implements IDatabase {
                 if (err) {
                     reject(err);
                 } else {
+                    Logger.instance.info("Database: upsert query executed successfully.");
                     resolve(this.lastID);
                 }
             });
@@ -254,7 +255,7 @@ export default class Database implements IDatabase {
      * SELECT many rows for SQLite3
      */
     private sqliteSelectMany = async (query: string, params?: string[] | number[]): Promise<any[]> => {
-        Logger.instance.debug("Database: User executing SQLite get many query.");
+        Logger.instance.info("Database: executing SQLite get many query.");
 
         return new Promise((resolve, reject) => {
             if (!this.db) {
@@ -267,6 +268,7 @@ export default class Database implements IDatabase {
                 if (err) {
                     reject(err);
                 } else {
+                    Logger.instance.info("Database: get many query executed successfully.");
                     resolve(rows);
                 }
             });
@@ -277,7 +279,7 @@ export default class Database implements IDatabase {
      * SELECT one row for SQLite3
      */
     private sqliteGetOne = async (query: string, params?: string[] | number[]): Promise<number> => {
-        Logger.instance.debug("Database: User executing SQLite get one query.");
+        Logger.instance.debug("Database: executing SQLite get one query.");
 
 
         return new Promise((resolve, reject) => {
