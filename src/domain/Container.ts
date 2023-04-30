@@ -99,7 +99,7 @@ export default class Container {
 
         try {
             // Util
-            this.register(Logger, (c) => Logger.create({ ...c.getConfiguration().logger }));
+            this.services.set(Logger, this.logger); // Use the already initialized logger
             this.register(RouteInitEvent, () => new RouteInitEvent());
             this.register(PubSub, (c) => new PubSub());
             this.register(TaskProcessor, (c) => new TaskProcessor({ ...c.getConfiguration().tasks }));
