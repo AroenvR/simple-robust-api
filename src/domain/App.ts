@@ -30,7 +30,15 @@ export default class App {
 
             await this.initRoutes();
 
-            Logger.instance.log(`App: --- ${this.config.name} started successfully! ---\n`);
+            Logger.instance.debug(`
+┌────────────────────────────────────┐
+│  -----      App Startup      ----- |
+├────────────────────────────────────┤
+│  Name: ${this.config.name.padEnd(22)}      │
+│  Time: ${new Date().toLocaleTimeString().padEnd(22)}      │
+│  Status: Successfully started!     │
+└────────────────────────────────────┘`);
+            Logger.instance.log(`App: ${this.config.name} listening on port ${this.config.port}.`);
         } catch (error: Error | any) {
             Logger.instance.error('App: Error starting the app:', error);
         }
@@ -40,13 +48,15 @@ export default class App {
      * Stops the app.
      */
     async stop(): Promise<void> {
+        Logger.instance.debug(`App: ${this.config.name} shutting down...`);
+
         try {
             await Promise.all([
                 this.server.close(),
                 this.config.database.close(),
             ]);
 
-            Logger.instance.debug(`\n\nApp: ${this.config.name} stopped successfully.\n\n`);
+            Logger.instance.debug(`App: ${this.config.name} successfully shut down.`);
         } catch (error: Error | any) {
             Logger.instance.error('App: Error stopping the app:', error);
         }

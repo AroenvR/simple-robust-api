@@ -20,6 +20,7 @@ export class UserController implements IUserController {
 
             try {
                 const users = await this.selectAll();
+                Logger.instance.debug('UserController: GET /users - Success, returning:', users);
                 res.status(200).json(users);
             } catch (error) {
                 res.status(500).json({ message: 'Error getting users', error });

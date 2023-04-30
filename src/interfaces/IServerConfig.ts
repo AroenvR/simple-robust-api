@@ -19,6 +19,7 @@ export interface IServerConfig {
         console: boolean;
         http: boolean;
         file: boolean;
+        filePath?: string;
     };
     tasks: {
         timeout: number;

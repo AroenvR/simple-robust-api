@@ -9,7 +9,7 @@ describe('Logger', () => {
         console: false,
         http: false,
         file: false,
-        filePath: path.join(__dirname, './logs', `LOG-${new Date().toISOString().replace(/[:.]/g, '-')}.log`),
+        filePath: path.join(__dirname, './logs', `${new Date().toISOString().replace(/[:.]/g, '-')}.log`),
     };
 
     beforeAll(() => {

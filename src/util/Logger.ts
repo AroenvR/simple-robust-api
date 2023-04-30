@@ -4,7 +4,8 @@ import winston from 'winston';
 import { ILoggerConfig } from '../interfaces/ILoggerConfig';
 
 /**
- * Logger class to handle application logs.
+ * SECURITY  
+ * Logger class to handle application logs.  
  * It provides various log levels and supports different transports (console, HTTP, and file).
  */
 export default class Logger {
@@ -126,7 +127,8 @@ export default class Logger {
     }
 
     /**
-     * Configures the HTTP transport based on the ILoggerConfig.
+     * Configures the HTTP transport based on the ILoggerConfig.  
+     * **Does not log any debug logging level.**
      * @param config - ILoggerConfig object containing the logger configuration.
      * @returns A winston.transports.HttpTransportOptions instance.
      */

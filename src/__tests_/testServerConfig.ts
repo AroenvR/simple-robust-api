@@ -1,3 +1,4 @@
+import path from 'path';
 import { IServerConfig } from "../interfaces/IServerConfig";
 import { constants } from "../util/constants";
 
@@ -18,9 +19,10 @@ export const testServerConfig: IServerConfig = {
     },
     logger: {
         level: "debug",
-        console: true,
-        http: true,
+        console: false,
+        http: false,
         file: true,
+        filePath: path.join(__dirname, './logs', `${new Date().toISOString().replace(/[:.]/g, '-')}.log`),
     },
     tasks: {
         timeout: 50
