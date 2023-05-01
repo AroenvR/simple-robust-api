@@ -2,9 +2,11 @@ import axios from 'axios';
 import App from '../../domain/App';
 import Container from '../../domain/Container';
 import { testServerConfig } from '../testServerConfig';
+import { generateUUID } from '../../util/uuid';
+import { UserDTO } from '../../api/dto/UserDTO';
 
 //TODO: Fix
-describe.skip('sanitizeMiddleware', () => {
+describe('sanitizeMiddleware', () => {
     let app: App;
 
     beforeAll(async () => {
@@ -20,27 +22,52 @@ describe.skip('sanitizeMiddleware', () => {
         jest.restoreAllMocks();
     });
 
-    test('should sanitize request body and query', async () => {
-        const requestBody = {
-            key: '<script>alert("XSS")</script>',
-        };
-        const requestQuery = {
-            key: '<script>alert("XSS")</script>',
-        };
+    const uuid = generateUUID();
+    const unsanitizedName = '<script>alert("Hello John Doe!")</script>';
+    const sanitizedName = '&lt;script&gt;alert(\"Hello John Doe!\")&lt;/script&gt;';
 
-        const response = await axios.post(`http://localhost:${testServerConfig.app.port}/users`, requestBody, {
-            params: requestQuery,
+    // ----------------------------
+
+    test('should sanitize request body', async () => {
+        const payload = [
+            {
+                uuid: uuid,
+                name: unsanitizedName
+            }
+        ];
+        const response = await axios.post(`http://localhost:${testServerConfig.app.port}/users`, payload, {
+            headers: {
+                'Content-Type': 'application/json',
+                Origin: 'http://test.com'
+            }
+        });
+
+        expect(response.status).toBe(201);
+
+        const users = response.data;
+        expect(users[0].uuid).toBe(payload[0].uuid);
+        expect(users[0].name).toBe(sanitizedName);
+    });
+
+    // ----------------------------
+
+    test('should sanitize request query', async () => {
+        // Query the user using unsanitized name
+        const response = await axios.get(`http://localhost:${testServerConfig.app.port}/users`, {
+            params: {
+                name: unsanitizedName
+            },
+            headers: {
+                'Content-Type': 'application/json',
+                Origin: 'http://test.com'
+            }
         });
 
         expect(response.status).toBe(200);
-        expect(response.data.body.key).toBe('alert("XSS")');
-        expect(response.data.query.key).toBe('alert("XSS")');
-    });
 
-    test('should sanitize server response', async () => {
-        const response = await axios.get(`http://localhost:${testServerConfig.app.port}/sanitize-test-response`);
-
-        expect(response.status).toBe(200);
-        expect(response.data.key).toBe('alert("XSS")');
+        const users = response.data;
+        expect(users.length).toBe(1);
+        expect(users[0].uuid).toBe(uuid);
+        expect(users[0].name).toBe(sanitizedName);
     });
 });

@@ -4,7 +4,8 @@ import { corsMiddleware } from '../middleware/corsMiddleware';
 import { helmetMiddleware } from '../middleware/helmetMiddleware';
 import { rateLimiterMiddleware } from '../middleware/rateLimiterMiddleware';
 import Logger from '../util/Logger';
-import { sanitizeMiddleware } from '../middleware/sanitize';
+import { sanitizeMiddleware, sanitizeResponseMiddleware } from '../middleware/sanitize';
+import { errorHandlerMiddleware } from '../middleware/errorMiddleware';
 
 /**
  * App class is the core of the application, responsible for starting and stopping the server,
@@ -24,7 +25,7 @@ export default class App {
      */
     async start(): Promise<void> {
         try {
-            await Promise.all([
+            await Promise.allSettled([
                 this.initDatabase(),
                 this.initServer(),
             ]);
@@ -53,7 +54,7 @@ export default class App {
         Logger.instance.info(`App: ${this.config.name} shutting down...`);
 
         try {
-            await Promise.all([
+            await Promise.allSettled([
                 this.server.close(),
                 this.config.database.close(),
             ]);
@@ -68,18 +69,15 @@ export default class App {
      * Initializes the app database.
      */
     private async initDatabase(): Promise<void> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                await this.config.database.connect();
-                await this.config.database.setup();
+        try {
+            await this.config.database.connect();
+            await this.config.database.setup();
 
-                Logger.instance.debug(`App: ${this.config.name} successfully set up the database.`);
-                resolve();
-            } catch (error: Error | any) {
-                Logger.instance.critical('App: Error initializing the app database:', error);
-                reject(error);
-            }
-        });
+            Logger.instance.debug(`App: ${this.config.name} successfully set up the database.`);
+        } catch (error: Error | any) {
+            Logger.instance.critical('App: Error initializing the app database:', error);
+            throw error;
+        }
     }
 
     /**
@@ -87,27 +85,25 @@ export default class App {
      * Initializes the app server.
      */
     private async initServer(): Promise<void> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                this.app.use(express.json()); // Enable JSON parsing
-                this.app.use(urlencoded({ extended: true })); // body-parser is a core component of Express.js that parses incoming requests.
+        try {
+            this.app.use(express.json()); // Enable JSON parsing
+            this.app.use(urlencoded({ extended: true })); // body-parser is a core component of Express.js that parses incoming requests.
 
-                // Add middlewares
-                this.app.use(sanitizeMiddleware);                        // Sanitization
-                this.app.use(corsMiddleware(this.config.corsConfig));    // CORS
-                this.app.use(helmetMiddleware({}));                      // HTTP Headers
-                this.app.use(rateLimiterMiddleware({}));                 // Rate Limiting
+            // Add middlewares
+            this.app.use(sanitizeMiddleware);                        // Request Sanitization
+            this.app.use(corsMiddleware(this.config.corsConfig));    // CORS
+            this.app.use(helmetMiddleware({}));                      // HTTP Headers
+            this.app.use(rateLimiterMiddleware({}));                 // Rate Limiting
+            this.app.use(sanitizeResponseMiddleware);                // Response Sanitization
 
-                this.server = this.app.listen(this.config.port); // Start the server on the specified port
+            this.server = this.app.listen(this.config.port); // Start the server on the specified port
 
-                Logger.instance.debug(`App: ${this.config.name} successfully initialized the express server.`);
-                Logger.instance.debug(`App: ${this.config.name} live at => http://localhost:${this.config.port}/`)
-                resolve();
-            } catch (error: Error | any) {
-                Logger.instance.critical('App: Error initializing express:', error);
-                reject(error);
-            }
-        });
+            Logger.instance.debug(`App: ${this.config.name} successfully initialized the express server.`);
+            Logger.instance.debug(`App: ${this.config.name} live at => http://localhost:${this.config.port}/`);
+        } catch (error: Error | any) {
+            Logger.instance.critical('App: Error initializing express:', error);
+            throw error;
+        }
     }
 
     /**
@@ -119,7 +115,9 @@ export default class App {
         this.config.routeInitEvent.emitRouteInit(this.app);
 
         this.app.get('/', (req, res) => {
-            res.send(`Hello from ${this.app.name}!`);
+            res.status(200).json({ message: `Hello from ${this.app.name}!` });
         });
+
+        this.app.use(errorHandlerMiddleware); // Error handling middleware
     }
 }

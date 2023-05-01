@@ -38,7 +38,7 @@ describe('Users API', () => {
         const payload = [
             {
                 uuid: generateUUID(),
-                name: '<script>alert("Hello John Doe!")</script>'
+                name: 'John Doe'
             },
             {
                 uuid: generateUUID(),
@@ -53,7 +53,6 @@ describe('Users API', () => {
         });
 
         expect(response.status).toBe(200);
-        console.log(response.data);
     });
 
     // ----------------------------

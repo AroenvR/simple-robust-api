@@ -21,7 +21,7 @@ export const testServerConfig: IServerConfig = {
         level: "debug",
         console: false,
         http: false,
-        file: false,
+        file: true,
         filePath: path.join(__dirname, './logs', `${new Date().toISOString().replace(/[:.]/g, '-')}.log`),
     },
     tasks: {

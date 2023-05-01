@@ -8,6 +8,9 @@ import validator from 'validator';
 import { sanitizeObject, sanitizeValue } from '../../middleware/sanitize'; // Working on sanitization..
 import sanitizeHtml from 'sanitize-html';
 import xss from 'xss';
+import NotFoundError from '../../errors/NotFoundError';
+import { isTruthy } from '../../util/isTruthy';
+import ValidationError from '../../errors/ValidationError';
 
 export class UserController implements IUserController {
     readonly name = 'UserController';
@@ -16,46 +19,6 @@ export class UserController implements IUserController {
     constructor(service: UserService, routeInitEvent: RouteInitEvent) {
         this.service = service;
         routeInitEvent.onRouteInit(this.setupRoutes.bind(this));
-    }
-
-    private setupRoutes(app: express.Application): void {
-        app.get('/users', async (req, res) => {
-            Logger.instance.log('UserController: GET /users.');
-
-            try {
-                const users = await this.selectAll();
-                res.status(200).json(users);
-                Logger.instance.info('UserController: GET /users success.');
-                Logger.instance.debug('UserController: GET /users returning:', users);
-            } catch (error) {
-                res.status(500).json({ message: 'Error getting users', error });
-            }
-        });
-
-        app.post('/users', async (req, res) => {
-            Logger.instance.log('UserController: POST /users.');
-            Logger.instance.debug('UserController: POST /users received data:', req.body);
-
-            let userDtos = req.body;
-            if (!Array.isArray(userDtos)) userDtos = [userDtos];
-
-            if (!userDtos.every(this.isValid)) {
-                res.status(400).json({ message: 'Invalid request body' });
-                Logger.instance.error('UserController: POST /users Invalid request body.');
-                return;
-            }
-
-            try {
-                const result = await this.upsert(userDtos);
-
-                res.status(200).json(result);
-                Logger.instance.info('UserController: POST /users success.');
-                Logger.instance.debug('UserController: POST /users returning:', result);
-            } catch (error) {
-                res.status(500).json({ message: 'Error upserting users', error });
-                Logger.instance.error('UserController: POST /users error:', error);
-            }
-        });
     }
 
     /**
@@ -79,7 +42,7 @@ export class UserController implements IUserController {
      * Retrieves all users.
      * @returns {Promise<any[]>} - The array of users.
      */
-    public async selectAll(): Promise<any[]> {
+    public async getAll(): Promise<any[]> {
         Logger.instance.info(`${this.name}: Getting all users.`);
 
         try {
@@ -91,23 +54,130 @@ export class UserController implements IUserController {
         }
     }
 
+    public async getByUuids(uuids: string[]): Promise<UserDTO[]> {
+        Logger.instance.info(`${this.name}: Getting users by uuids.`);
+        Logger.instance.debug(`${this.name}: Getting users by uuids:`, uuids);
+
+        return await this.service.getByUuids(uuids);
+    }
+
     public async getLast(): Promise<any> {
         throw new Error('Method not implemented.');
     }
 
-    private isValid(user: UserDTO): boolean {
+    private setupRoutes(app: express.Application): void {
+        app.get('/users', async (req, res) => {
+            Logger.instance.log('UserController: GET /users.');
+
+            try {
+                const users = await this.getAll();
+                res.status(200).json(users);
+                Logger.instance.info('UserController: GET /users success.');
+                Logger.instance.debug('UserController: GET /users returned:', users);
+            } catch (error) {
+                Logger.instance.error('UserController: GET /users error:', error);
+                throw error;
+            }
+        });
+
+        app.get('/users/uuid', async (req, res, next) => {
+            Logger.instance.log('UserController: GET /users/uuid.');
+
+            if (!isTruthy(req.query.uuid) && !isTruthy(req.query.uuids)) {
+                Logger.instance.error('UserController: GET /users/uuid missing required query parameter: uuid or uuids');
+                res.status(400).json({ message: 'Missing required query parameter: uuid or uuids' });
+                return;
+            }
+
+            Logger.instance.debug('UserController: GET /users/uuid received query parameters:', req.query);
+
+            let uuids: any = [req.query.uuid];
+            if (!isTruthy(uuids)) uuids = req.query.uuids;
+
+            try {
+                for (const uuid of uuids) {
+                    if (!validator.isUUID(uuid)) {
+                        Logger.instance.error('UserController: GET /users/uuid invalid uuid:', uuid);
+                        throw new ValidationError(`Invalid uuid: ${uuid}`);
+                    }
+                }
+
+                const users = await this.getByUuids(uuids);
+                res.status(200).json(users);
+
+                Logger.instance.info('UserController: GET /users/uuid success.');
+                Logger.instance.debug('UserController: GET /users/uuid returned:', users);
+            } catch (error) {
+                Logger.instance.error('UserController: GET /users/uuid error:', error);
+                next(error);
+            }
+        });
+
+        app.post('/users', async (req, res, next) => {
+            Logger.instance.log('UserController: POST /users.');
+            Logger.instance.debug('UserController: POST /users received data:', req.body);
+
+            let userDtos = req.body;
+            if (!Array.isArray(userDtos)) userDtos = [userDtos];
+
+            try {
+                await this.checkUsers(userDtos);
+                const result = await this.upsert(userDtos);
+
+                Logger.instance.info('UserController: POST /users success.');
+                Logger.instance.debug('UserController: POST /users returned:', result);
+                res.status(201).json(result);
+            } catch (error) {
+                Logger.instance.error('UserController: POST /users error:', error);
+                next(error);
+            }
+        });
+    }
+
+    /**
+     * Asynchronously checks the validity of an array of users.
+     * @param users - An array of user objects to be validated.
+     * @returns A promise that resolves to `true` if all users are valid.
+     * @throws If any user fails validation, a ValidationError is thrown with a specific error message.
+     */
+    private async checkUsers(users: UserDTO[]): Promise<boolean> {
+        const promises: Promise<boolean>[] = [];
+
+        for (const user of users) {
+            promises.push(this.isValid(user));
+        }
+
+        await Promise.allSettled(promises)
+            .then((results) => {
+                results.forEach((result) => {
+                    if (result.status === 'rejected') {
+                        throw result.reason;
+                    }
+                });
+            });
+
+        return true;
+    }
+
+    /**
+     * Asynchronously validates a single user object.
+     * @param user - The user object to be validated.
+     * @returns A promise that resolves to `true` if the user is valid.
+     * @throws If the user fails validation, a ValidationError is thrown with a specific error message.
+     */
+    private async isValid(user: UserDTO): Promise<boolean> {
         Logger.instance.debug("isValid checking userDTO:", user);
 
         // Validate uuid
         if (typeof user.uuid !== 'string' || !validator.isUUID(user.uuid)) {
-            Logger.instance.debug("isValid failed on uuid:", user.uuid);
-            return false;
+            Logger.instance.error("isValid failed on uuid:", user.uuid);
+            throw new ValidationError('Invalid uuid');
         }
 
         // Validate name
         if (typeof user.name !== 'string' || !validator.isLength(user.name, { min: 3 })) {
-            Logger.instance.debug("isValid failed on name:", user.name);
-            return false;
+            Logger.instance.error("isValid failed on name:", user.name);
+            throw new ValidationError('Invalid name');
         }
 
         return true;

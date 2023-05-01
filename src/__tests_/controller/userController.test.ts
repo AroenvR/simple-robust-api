@@ -66,7 +66,7 @@ describe('UserController', () => {
     // ----------------------------
 
     test('get all users', async () => {
-        const result = await userController.selectAll();
+        const result = await userController.getAll();
         expect(result.length).toBe(2);
         expect(result[0].name).toBe('John Doe');
     });

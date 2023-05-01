@@ -44,7 +44,7 @@ describe('UserRepo', () => {
     });
 
     test('should get all users', async () => {
-        const users = await userRepo.selectAll();
+        const users = await userRepo.getAll();
 
         expect(users.length).toBe(2);
         expect(users[0].name).toBe('John Doe');
@@ -54,12 +54,12 @@ describe('UserRepo', () => {
     test('should not insert user with same UUID', async () => {
         const john = new User(0, johnUUID, "John Doe");
 
-        const users = await userRepo.selectAll();
+        const users = await userRepo.getAll();
         expect(users.length).toBe(2);
 
         await userRepo.upsert([john]);
 
-        const newUsers = await userRepo.selectAll();
+        const newUsers = await userRepo.getAll();
         expect(newUsers.length).toBe(2);
     });
 });

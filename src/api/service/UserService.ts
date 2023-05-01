@@ -5,6 +5,8 @@ import { UserDTO } from "../dto/UserDTO";
 import { User } from "../model/User";
 import { UserRepo } from "../repo/UserRepo";
 import Logger from "../../util/Logger";
+import NotFoundError from "../../errors/NotFoundError";
+import { isTruthy } from "../../util/isTruthy";
 
 /**
  * The UserService class provides methods for managing users in the application.
@@ -56,6 +58,18 @@ export class UserService implements IService {
     async getAll(): Promise<UserDTO[]> {
         Logger.instance.info(`${this.name}: Getting all users.`);
 
-        return this.repository.selectAll();
+        return this.repository.getAll();
+    }
+
+    /**
+     * Gets users by UUID's.
+     * @param uuids - An array of user UUID's.
+     * @returns A promise that resolves to an array of userDto's.
+     * @throws {NotFoundError} - If no users are found.
+     */
+    async getByUuids(uuids: string[]): Promise<UserDTO[]> {
+        Logger.instance.info(`${this.name}: Getting users by UUID's.`);
+
+        return await this.repository.selectByUuids(uuids);;
     }
 }

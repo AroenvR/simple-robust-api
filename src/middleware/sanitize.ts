@@ -18,7 +18,7 @@ export const sanitizeValue = async (val: any): Promise<any> => {
         sanitized = sanitizeHtml(sanitized).trim();
 
         if (sanitized !== val) {
-            Logger.instance.warn(`sanitizeValue: User triggered sanitization!`);
+            Logger.instance.warn(`sanitizeValue: sanitization was triggered!`);
             Logger.instance.debug(`PRE-sanitize: ${val}, POST-sanitize: ${sanitized}`);
         }
         return sanitized;
@@ -51,7 +51,8 @@ export const sanitizeObject = async (obj: any) => {
 };
 
 /**
- * Sanitizes incoming request data (body and query) and server responses.
+ * SECURITY
+ * Sanitizes incoming request data (body and query).
  * @param {Request} req - The incoming request object.
  * @param {Response} res - The response object.
  * @param {NextFunction} next - The next middleware function in the stack.
@@ -70,25 +71,42 @@ export const sanitizeMiddleware = async (req: Request, res: Response, next: Next
     next();
 };
 
-// TODO: Sanitize responses
-// /**
-//  * Sanitizes server responses
-//  * @param {Request} req - The incoming request object
-//  * @param {Response} res - The response object
-//  * @param {NextFunction} next - The next middleware function in the stack
-//  */
-// export const sanitizeResponseMiddleware = (req: Request, res: Response, next: NextFunction) => {
-//     const originalSend = res.send;
+/**
+ * SECURITY
+ * Middleware that sanitizes server responses by intercepting the `send` and `json` methods of the response object.
+ * @param {Request} req - The incoming request object.
+ * @param {Response} res - The response object.
+ * @param {NextFunction} next - The next middleware function in the stack.
+ */
+export const sanitizeResponseMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    const originalSend = res.send;
+    const originalJson = res.json;
 
-//     res.send = function sendOverride(body?: any) {
-//         if (isTruthy(body)) {
-//             Promise.resolve(sanitizeObject(body)).then((sanitizedBody) => {
-//                 originalSend.call(this, sanitizedBody);
-//             });
-//         } else {
-//             originalSend.call(this, body);
-//         }
-//     };
+    // @ts-ignore
+    res.send = async function sendOverride(this: Response, body?: any) {
+        if (isTruthy(body) && typeof body === 'string') {
+            try {
+                const parsedBody = JSON.parse(body);
+                const sanitizedBody = await sanitizeObject(parsedBody);
+                originalSend.call(this, JSON.stringify(sanitizedBody));
+            } catch (error) {
+                // Not a JSON string, send as-is
+                originalSend.call(this, body);
+            }
+        } else {
+            originalSend.call(this, body);
+        }
+    };
 
-//     next();
-// };
+    // @ts-ignore
+    res.json = async function jsonOverride(this: Response, body?: any) {
+        if (isTruthy(body)) {
+            const sanitizedBody = await sanitizeObject(body);
+            originalJson.call(this, sanitizedBody);
+        } else {
+            originalJson.call(this, body);
+        }
+    };
+
+    next();
+};

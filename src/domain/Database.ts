@@ -245,6 +245,7 @@ export default class Database implements IDatabase {
      */
     private sqliteUpsert = async (query: string, params: any | any[]): Promise<IInsertReturn> => { // TODO: Intrerface?
         Logger.instance.info("Database: executing SQLite upsert query.");
+        Logger.instance.debug(`Database: query: ${query} | params: ${params}`);
 
         return new Promise((resolve, reject) => {
             const mappedParams: any[] = [];
@@ -275,6 +276,7 @@ export default class Database implements IDatabase {
      */
     private sqliteSelectMany = async (query: string, params?: string[] | number[]): Promise<any[]> => {
         Logger.instance.info("Database: executing SQLite get many query.");
+        Logger.instance.debug(`Database: query: ${query} | params: ${params}`);
 
         return new Promise((resolve, reject) => {
             if (!this.db) {
@@ -302,6 +304,7 @@ export default class Database implements IDatabase {
      */
     private sqliteSelectFromIdToId = async (query: string, params?: string[] | number[]): Promise<any[]> => {
         Logger.instance.info("Database: executing SQLite select from id to id query.");
+        Logger.instance.debug(`Database: query: ${query} | params: ${params}`);
 
         return new Promise((resolve, reject) => {
             if (!this.db) {
@@ -326,6 +329,7 @@ export default class Database implements IDatabase {
      */
     private sqliteGetOne = async (query: string, params?: string[] | number[]): Promise<number> => {
         Logger.instance.debug("Database: executing SQLite get one query.");
+        Logger.instance.debug(`Database: query: ${query} | params: ${params}`);
 
         return new Promise((resolve, reject) => {
             if (!isTruthy(params)) params = [];

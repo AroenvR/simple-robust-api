@@ -5,6 +5,7 @@ import { User } from "../model/User";
 import Logger from "../../util/Logger";
 import { isTruthy } from "../../util/isTruthy";
 import { UserDTO } from "../dto/UserDTO";
+import NotFoundError from "../../errors/NotFoundError";
 
 /**
  * UserRepo class implements IUserRepo and provides methods to interact with user records in the database.
@@ -48,7 +49,7 @@ export class UserRepo implements IUserRepo {
      * Gets all users.
      * @returns A Promise with the requested users.
      */
-    async selectAll(): Promise<UserDTO[]> {
+    async getAll(): Promise<UserDTO[]> {
         Logger.instance.info(`${this.name}: selecting all users.`);
 
         return this._db.selectMany(queries.users.select_all);
@@ -63,7 +64,29 @@ export class UserRepo implements IUserRepo {
 
         const query = queries.users.select_from_to;
         const params = [from, to];
-        return this._db.selectFromIdToId(query, params);
+        const result = this._db.selectFromIdToId(query, params);
+        if (!isTruthy(result)) throw new NotFoundError('Error users not found by requested ids.');
+
+        return result;
+    }
+
+    /**
+     * Gets users by uuids.
+     * @param uuids - An array of uuids.
+     * @returns A Promise with the requested users.
+     */
+    async selectByUuids(uuids: string[]): Promise<UserDTO[]> {
+        Logger.instance.info(`${this.name}: selecting users by uuids.`);
+
+        const placeholders = uuids.map(() => '?').join(',');
+        const query = `${queries.users.select_by_uuids} (${placeholders})`;
+        Logger.instance.debug(`${this.name}: query:`, query);
+
+        const result = await this._db.selectMany(query, uuids);
+
+        if (!isTruthy(result)) throw new NotFoundError('Error users not found by requested uuids.');
+
+        return result;
     }
 
     /**
