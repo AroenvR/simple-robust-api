@@ -7,6 +7,7 @@ import { IDatabase } from '../interfaces/IDatabase';
 import { isTruthy } from "../util/isTruthy";
 import { constants } from "../util/constants";
 import Logger from "../util/Logger";
+import { IInsertReturn } from "../interfaces/IInsertReturn";
 
 /**
  * A class that manages a database connection and provides methods to query the database.
@@ -81,7 +82,7 @@ export default class Database implements IDatabase {
      * @returns The ID of the inserted row.
      * @throws {Error} - If the database is not connected or if an error occurs while executing the query.
      */
-    async upsert(query: string, params?: any | any[]): Promise<number> {
+    async upsert(query: string, params?: any | any[]): Promise<IInsertReturn> {
         if (!this.db) throw new Error('Database: Database not connected!');
 
         // TODO: Check against SQL injection.
@@ -110,6 +111,24 @@ export default class Database implements IDatabase {
         switch (this.config.type) {
             case constants.database.types.SQLITE3:
                 return this.sqliteSelectMany(query, params);
+
+            default:
+                throw new Error(`Database: Database type ${this.config.type} not supported!`);
+        }
+    }
+
+    /**
+     * 
+     * @param query 
+     * @param params 
+     * @returns 
+     */
+    async selectFromIdToId(query: string, params?: string[] | number[]): Promise<any[]> {
+        if (!this.db) throw new Error('Database: Database not connected!');
+
+        switch (this.config.type) {
+            case constants.database.types.SQLITE3:
+                return this.sqliteSelectFromIdToId(query, params);
 
             default:
                 throw new Error(`Database: Database type ${this.config.type} not supported!`);
@@ -224,7 +243,7 @@ export default class Database implements IDatabase {
     /**
      * UPSERT query for SQLite3
      */
-    private sqliteUpsert = async (query: string, params: any | any[]): Promise<number> => { // TODO: Intrerface?
+    private sqliteUpsert = async (query: string, params: any | any[]): Promise<IInsertReturn> => { // TODO: Intrerface?
         Logger.instance.info("Database: executing SQLite upsert query.");
 
         return new Promise((resolve, reject) => {
@@ -245,7 +264,7 @@ export default class Database implements IDatabase {
                     reject(err);
                 } else {
                     Logger.instance.info("Database: upsert query executed successfully.");
-                    resolve(this.lastID);
+                    resolve({ changes: this.changes, lastId: this.lastID });
                 }
             });
         });
@@ -264,7 +283,34 @@ export default class Database implements IDatabase {
             }
 
             if (!isTruthy(params)) params = [];
-            this.db.all(query, [], (err: Error | null, rows: any[]) => {
+            this.db.all(query, [], function (err: Error | null, rows: any[]) {
+                if (err) {
+                    reject(err);
+                } else {
+                    Logger.instance.info("Database: get many query executed successfully.");
+                    resolve(rows);
+                }
+            });
+        });
+    }
+
+    /**
+     * 
+     * @param query 
+     * @param params 
+     * @returns 
+     */
+    private sqliteSelectFromIdToId = async (query: string, params?: string[] | number[]): Promise<any[]> => {
+        Logger.instance.info("Database: executing SQLite select from id to id query.");
+
+        return new Promise((resolve, reject) => {
+            if (!this.db) {
+                reject(new Error('Database: Database not connected!'));
+                return;
+            }
+
+            if (!isTruthy(params)) params = [];
+            this.db.all(query, params, function (err: Error | null, rows: any[]) {
                 if (err) {
                     reject(err);
                 } else {
@@ -280,7 +326,6 @@ export default class Database implements IDatabase {
      */
     private sqliteGetOne = async (query: string, params?: string[] | number[]): Promise<number> => {
         Logger.instance.debug("Database: executing SQLite get one query.");
-
 
         return new Promise((resolve, reject) => {
             if (!isTruthy(params)) params = [];

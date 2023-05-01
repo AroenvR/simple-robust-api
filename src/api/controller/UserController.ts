@@ -5,8 +5,9 @@ import { IUserController } from "./IUserController";
 import { RouteInitEvent } from '../../util/RouteInitEvent';
 import Logger from '../../util/Logger';
 import validator from 'validator';
-import { sanitizeObject, sanitizeValue } from '../../middleware/sanitize';
+import { sanitizeObject, sanitizeValue } from '../../middleware/sanitize'; // Working on sanitization..
 import sanitizeHtml from 'sanitize-html';
+import xss from 'xss';
 
 export class UserController implements IUserController {
     readonly name = 'UserController';
@@ -95,14 +96,17 @@ export class UserController implements IUserController {
     }
 
     private isValid(user: UserDTO): boolean {
+        Logger.instance.debug("isValid checking userDTO:", user);
+
         // Validate uuid
         if (typeof user.uuid !== 'string' || !validator.isUUID(user.uuid)) {
+            Logger.instance.debug("isValid failed on uuid:", user.uuid);
             return false;
         }
 
-        // Sanitize and validate name
-        user.name = sanitizeHtml(user.name).trim();
+        // Validate name
         if (typeof user.name !== 'string' || !validator.isLength(user.name, { min: 3 })) {
+            Logger.instance.debug("isValid failed on name:", user.name);
             return false;
         }
 

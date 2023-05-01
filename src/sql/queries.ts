@@ -13,6 +13,7 @@ const queries = {
         // Read
         select_current_id: `SELECT * FROM ${USERS} ORDER BY id DESC LIMIT 1`,
         select_all: `SELECT * FROM ${USERS}`,
+        select_from_to: `SELECT * FROM ${USERS} WHERE id <= ? ORDER BY id DESC LIMIT ?`,
 
         // Update
 

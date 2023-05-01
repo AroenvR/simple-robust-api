@@ -2,6 +2,7 @@ import sanitizeHtml from 'sanitize-html';
 import Logger from "../util/Logger";
 import { Request, Response, NextFunction } from "express";
 import { isTruthy } from "../util/isTruthy";
+import xss from 'xss';
 
 /**
  * Recursively sanitizes the input value using DOMPurify. Supports strings, arrays, and objects.  
@@ -13,21 +14,14 @@ export const sanitizeValue = async (val: any): Promise<any> => {
     // TODO: get allowed tags and attributes from config / API
 
     if (typeof val === 'string') {
-        let sanitized = "";
-        if (val.includes('<') || val.includes('>')) {
-            sanitized = sanitizeHtml(val);
-        } else {
-            // sanitized = 
-        }
+        let sanitized = xss(val);
+        sanitized = sanitizeHtml(sanitized).trim();
 
         if (sanitized !== val) {
             Logger.instance.warn(`sanitizeValue: User triggered sanitization!`);
             Logger.instance.debug(`PRE-sanitize: ${val}, POST-sanitize: ${sanitized}`);
         }
         return sanitized;
-
-    } else if (Array.isArray(val)) {
-        return Promise.all(val.map(sanitizeValue));
 
     } else if (val !== null && typeof val === 'object') {
         return sanitizeObject(val);
@@ -43,10 +37,14 @@ export const sanitizeValue = async (val: any): Promise<any> => {
  * @returns the sanitized object.
  */
 export const sanitizeObject = async (obj: any) => {
+    if (Array.isArray(obj)) {
+        return await Promise.all(obj.map(sanitizeValue));
+    }
+
     const sanitizedObj: any = {};
 
     for (const [key, val] of Object.entries(obj)) {
-        sanitizedObj[key] = sanitizeValue(val);
+        sanitizedObj[key] = await sanitizeValue(val);
     }
 
     return sanitizedObj;

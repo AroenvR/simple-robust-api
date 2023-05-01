@@ -44,6 +44,13 @@ export interface IDatabase {
 
     // select by id
 
+    /**
+     * TODO: Document
+     * @param query 
+     * @param params 
+     */
+    selectFromIdToId(query: string, params?: string[] | number[]): Promise<any[]>;
+
     // update
 
     // delete

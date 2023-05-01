@@ -1,11 +1,10 @@
-import express from 'express';
+import express, { urlencoded } from 'express';
 import { IAppConfig } from "../interfaces/IAppConfig";
 import { corsMiddleware } from '../middleware/corsMiddleware';
 import { helmetMiddleware } from '../middleware/helmetMiddleware';
 import { rateLimiterMiddleware } from '../middleware/rateLimiterMiddleware';
 import Logger from '../util/Logger';
 import { sanitizeMiddleware } from '../middleware/sanitize';
-import bodyParser from 'body-parser';
 
 /**
  * App class is the core of the application, responsible for starting and stopping the server,
@@ -91,10 +90,10 @@ export default class App {
         return new Promise(async (resolve, reject) => {
             try {
                 this.app.use(express.json()); // Enable JSON parsing
+                this.app.use(urlencoded({ extended: true })); // body-parser is a core component of Express.js that parses incoming requests.
 
                 // Add middlewares
-                this.app.use(bodyParser.urlencoded({ extended: true })); // Body Parser
-                // this.app.use(sanitizeMiddleware);                        // Sanitization
+                this.app.use(sanitizeMiddleware);                        // Sanitization
                 this.app.use(corsMiddleware(this.config.corsConfig));    // CORS
                 this.app.use(helmetMiddleware({}));                      // HTTP Headers
                 this.app.use(rateLimiterMiddleware({}));                 // Rate Limiting
