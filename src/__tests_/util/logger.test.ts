@@ -13,7 +13,7 @@ describe('Logger', () => {
     };
 
     beforeAll(() => {
-        logger = Logger.create(testConfig);
+        logger = Logger.createLogger(testConfig);
     });
 
     test('log messages at different levels', async () => {

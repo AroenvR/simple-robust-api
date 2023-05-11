@@ -52,7 +52,7 @@ describe('Users API', () => {
             }
         });
 
-        expect(response.status).toBe(200);
+        expect(response.status).toBe(201);
     });
 
     // ----------------------------

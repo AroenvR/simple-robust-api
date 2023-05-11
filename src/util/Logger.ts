@@ -36,7 +36,7 @@ export default class Logger {
      * @param config ILoggerConfig object containing the logger configuration.
      * @returns The created Logger instance.
      */
-    public static create(config: ILoggerConfig): Logger {
+    public static createLogger(config: ILoggerConfig): Logger {
         if (!this._instance) {
             this._instance = new Logger(config);
         }
@@ -53,7 +53,7 @@ export default class Logger {
             critical: 0,
             error: 1,
             warn: 2,
-            verbose: 3,
+            verbose: 3, // log (log is used by winston)
             info: 4,
             debug: 5,
         };
@@ -158,6 +158,32 @@ export default class Logger {
             }),
             silent: config.http ? false : true,
         }
+    }
+
+    /**
+     * Starts a timer and logs the provided message at the **INFO** logging level.
+     * @param message - The message to log.
+     * @param extra - Optional extra data to log.
+     * @returns The start time of the timer.
+     */
+    public startTimerLog(message: string, extra?: any): number {
+        const startTime = performance.now();
+        this.info(message, extra);
+        return startTime;
+    }
+
+    /**
+     * Stops a timer, calculates the duration, and logs the provided message with the time taken at the **INFO** logging level.
+     * @param startTime - The start time of the timer.
+     * @param message - The message to log.
+     * @param extra - Optional extra data to log.
+     */
+    public async stopTimerLog(startTime: number, message: string, extra?: any): Promise<void> {
+        const endTime = performance.now();
+        const duration = endTime - startTime;
+        const durationInMs = duration.toFixed(3);
+
+        this.info(message + ` Time taken: ${durationInMs}ms`, extra);
     }
 
     /**

@@ -11,6 +11,7 @@ describe('UserRepo', () => {
     let userRepo: UserRepo;
 
     const johnUUID = generateUUID();
+    const janeUUID = generateUUID();
 
     beforeAll(async () => {
         // Create a new container instance with a mock database.
@@ -36,11 +37,22 @@ describe('UserRepo', () => {
 
     test('should upsert a user', async () => {
         const john = new User(0, johnUUID, "John Doe");
-        const jane = new User(0, generateUUID(), "Jane Doe");
+        const jane = new User(0, janeUUID, "Jane Doe");
 
-        const lastId = await userRepo.upsert([john, jane]);
+        const resp = await userRepo.upsert([john, jane]);
 
-        expect(lastId).toBe(2);
+        expect(resp).toEqual([
+            {
+                id: 2,
+                uuid: janeUUID,
+                name: 'Jane Doe'
+            },
+            {
+                id: 1,
+                uuid: johnUUID,
+                name: 'John Doe'
+            }
+        ]);
     });
 
     test('should get all users', async () => {

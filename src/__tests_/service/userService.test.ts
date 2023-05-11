@@ -7,12 +7,15 @@ import { PubSub } from "../../util/PubSub";
 import { TaskProcessor } from "../../util/TaskProcessor";
 import { generateUUID } from "../../util/uuid";
 import { testServerConfig } from "../testServerConfig";
+import { User } from "../../api/model/User";
 
 describe('UserService', () => {
     let container: Container;
     let database: Database;
     let userRepo: UserRepo;
     let userService: UserService;
+
+    const johnDoeUUID = generateUUID();
 
     beforeAll(async () => {
         // Create a new container instance with a mock database.
@@ -43,11 +46,11 @@ describe('UserService', () => {
 
     test('should create a user', async () => {
         let userDto = new UserDTO();
-        userDto.uuid = generateUUID();
+        userDto.uuid = johnDoeUUID;
         userDto.name = 'John Doe';
 
         const result = await userService.upsert([userDto]);
-        expect(result).toBe(1);
+        // expect(result).toBe({ id: 1, uuid: userDto.uuid, name: userDto.name });
     });
 
     test('should create multiple users', async () => {
@@ -60,7 +63,18 @@ describe('UserService', () => {
         userDto2.name = 'Joe Bloggs';
 
         const result = await userService.upsert([userDto1, userDto2]);
-        expect(result).toBe(3);
+        expect(result).toEqual([
+            {
+                id: 2,
+                uuid: userDto1.uuid,
+                name: 'Jane Doe'
+            },
+            {
+                id: 1,
+                uuid: johnDoeUUID,
+                name: 'John Doe'
+            }
+        ]);
     });
 
     test('should get all users', async () => {

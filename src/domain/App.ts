@@ -6,6 +6,7 @@ import { rateLimiterMiddleware } from '../middleware/rateLimiterMiddleware';
 import Logger from '../util/Logger';
 import { sanitizeMiddleware, sanitizeResponseMiddleware } from '../middleware/sanitize';
 import { errorHandlerMiddleware } from '../middleware/errorMiddleware';
+import { loggerMiddleware } from '../middleware/loggerMiddleware';
 
 /**
  * App class is the core of the application, responsible for starting and stopping the server,
@@ -95,6 +96,7 @@ export default class App {
             this.app.use(helmetMiddleware({}));                      // HTTP Headers
             this.app.use(rateLimiterMiddleware({}));                 // Rate Limiting
             this.app.use(sanitizeResponseMiddleware);                // Response Sanitization
+            this.app.use(loggerMiddleware)                           // Logging
 
             this.server = this.app.listen(this.config.port); // Start the server on the specified port
 

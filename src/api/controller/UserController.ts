@@ -11,6 +11,7 @@ import xss from 'xss';
 import NotFoundError from '../../errors/NotFoundError';
 import { isTruthy } from '../../util/isTruthy';
 import ValidationError from '../../errors/ValidationError';
+import ApiError from '../../errors/ApiError';
 
 export class UserController implements IUserController {
     readonly name = 'UserController';
@@ -66,17 +67,12 @@ export class UserController implements IUserController {
     }
 
     private setupRoutes(app: express.Application): void {
-        app.get('/users', async (req, res) => {
-            Logger.instance.log('UserController: GET /users.');
-
+        app.get('/users', async (req, res, next) => {
             try {
                 const users = await this.getAll();
                 res.status(200).json(users);
-                Logger.instance.info('UserController: GET /users success.');
-                Logger.instance.debug('UserController: GET /users returned:', users);
             } catch (error) {
-                Logger.instance.error('UserController: GET /users error:', error);
-                throw error;
+                next(error);
             }
         });
 

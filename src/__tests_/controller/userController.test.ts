@@ -9,6 +9,7 @@ import { RouteInitEvent } from "../../util/RouteInitEvent";
 import { TaskProcessor } from "../../util/TaskProcessor";
 import { generateUUID } from "../../util/uuid";
 import { testServerConfig } from "../testServerConfig";
+import { User } from "../../api/model/User";
 
 describe('UserController', () => {
     let container: Container;
@@ -60,7 +61,18 @@ describe('UserController', () => {
         const userDtos = [userDto1, userDto2];
 
         const result = await userController.upsert(userDtos);
-        expect(result).toEqual(2); // TODO: This should return DTO's.
+        expect(result).toEqual([
+            {
+                id: 2,
+                uuid: userDto2.uuid,
+                name: 'Jane Doe'
+            },
+            {
+                id: 1,
+                uuid: userDto1.uuid,
+                name: 'John Doe'
+            }
+        ]);
     });
 
     // ----------------------------

@@ -8,7 +8,7 @@ describe('Database', () => {
 
     beforeEach(async () => {
         database = new Database({ ...testServerConfig.database });
-        logger = Logger.create({ ...testServerConfig.logger })
+        logger = Logger.createLogger({ ...testServerConfig.logger })
     });
 
     afterEach(async () => {

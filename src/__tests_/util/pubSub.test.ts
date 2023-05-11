@@ -9,7 +9,7 @@ describe('PubSub', () => {
 
     beforeEach(() => {
         pubSub = new PubSub();
-        logger = Logger.create({ ...testServerConfig.logger })
+        logger = Logger.createLogger({ ...testServerConfig.logger })
     });
 
     // ------------------------------------

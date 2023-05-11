@@ -9,7 +9,7 @@ import Logger from "../util/Logger";
  * Middleware for handling API errors.
  */
 export const errorHandlerMiddleware = (err: ApiError, req: Request, res: Response, next: NextFunction) => {
-    Logger.instance.debug(`Error handler middleware was triggered with an error`, err);
+    Logger.instance.error(`${req.method} ${req.path} error:`, err);
 
     const { statusCode, message } = processError(err);
 

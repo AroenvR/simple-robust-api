@@ -80,7 +80,7 @@ export const sanitizeMiddleware = async (req: Request, res: Response, next: Next
  */
 export const sanitizeResponseMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const originalSend = res.send;
-    const originalJson = res.json;
+    res.locals.originalJson = res.locals.originalJson || res.json;
 
     // @ts-ignore
     res.send = async function sendOverride(this: Response, body?: any) {
@@ -102,9 +102,9 @@ export const sanitizeResponseMiddleware = (req: Request, res: Response, next: Ne
     res.json = async function jsonOverride(this: Response, body?: any) {
         if (isTruthy(body)) {
             const sanitizedBody = await sanitizeObject(body);
-            originalJson.call(this, sanitizedBody);
+            res.locals.originalJson.call(this, sanitizedBody);
         } else {
-            originalJson.call(this, body);
+            res.locals.originalJson.call(this, body);
         }
     };
 

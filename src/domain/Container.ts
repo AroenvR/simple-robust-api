@@ -43,7 +43,7 @@ export default class Container {
         this.services = new Map();
 
         // Initialize the logger first
-        this.logger = Logger.create({ ...config.logger });
+        this.logger = Logger.createLogger({ ...config.logger });
         this.logger.debug("Container: Container created successfully.");
     }
 
