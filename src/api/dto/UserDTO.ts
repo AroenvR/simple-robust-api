@@ -20,7 +20,7 @@ export class UserDTO extends DataTransferObject implements IUser {
     private _uuid: string | null = null;
     private _name: string | null = null;
 
-    constructor(user?: User) {
+    constructor(user?: IUser) {
         super();
 
         if (user) {

@@ -1,7 +1,6 @@
-import { IRepository } from "../repo/IRepository";
 import { IService } from "../service/IService";
 
-export interface IController extends IRepository {
+export interface IController {
     readonly name: string;
     service: IService
 }

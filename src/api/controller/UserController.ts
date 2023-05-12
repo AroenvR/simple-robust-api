@@ -5,13 +5,8 @@ import { IUserController } from "./IUserController";
 import { RouteInitEvent } from '../../util/RouteInitEvent';
 import Logger from '../../util/Logger';
 import validator from 'validator';
-import { sanitizeObject, sanitizeValue } from '../../middleware/sanitize'; // Working on sanitization..
-import sanitizeHtml from 'sanitize-html';
-import xss from 'xss';
-import NotFoundError from '../../errors/NotFoundError';
 import { isTruthy } from '../../util/isTruthy';
 import ValidationError from '../../errors/ValidationError';
-import ApiError from '../../errors/ApiError';
 
 export class UserController implements IUserController {
     readonly name = 'UserController';
