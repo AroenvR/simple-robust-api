@@ -50,7 +50,7 @@ describe('UserService', () => {
         userDto.name = 'John Doe';
 
         const result = await userService.upsert([userDto]);
-        // expect(result).toBe({ id: 1, uuid: userDto.uuid, name: userDto.name });
+        expect(result).toEqual([{ id: 1, uuid: userDto.uuid, name: userDto.name }]);
     });
 
     test('should create multiple users', async () => {
