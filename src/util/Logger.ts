@@ -2,6 +2,7 @@
 import path from 'path';
 import winston from 'winston';
 import { ILoggerConfig } from '../interfaces/ILoggerConfig';
+import { injectable } from 'inversify';
 
 /**
  * SECURITY  
@@ -36,7 +37,7 @@ export default class Logger {
      * @param config ILoggerConfig object containing the logger configuration.
      * @returns The created Logger instance.
      */
-    public static createLogger(config: ILoggerConfig): Logger {
+    public static create(config: ILoggerConfig): Logger {
         if (!this._instance) {
             this._instance = new Logger(config);
         }
@@ -192,7 +193,7 @@ export default class Logger {
      * @param message The log message.
      * @param extra Optional extra data to include in the log entry.
      */
-    private async create(level: string, message: string, extra?: any): Promise<void> {
+    private async handle(level: string, message: string, extra?: any): Promise<void> {
         this._logger.log(level, message, { metadata: extra });
     }
 
@@ -201,26 +202,26 @@ export default class Logger {
     */
 
     public async debug(message: string, extra?: any): Promise<void> {
-        this.create('debug', message, extra);
+        this.handle('debug', message, extra);
     }
 
     public async info(message: string, extra?: any): Promise<void> {
-        this.create('info', message, extra);
+        this.handle('info', message, extra);
     }
 
     public async log(message: string, extra?: any): Promise<void> {
-        this.create('verbose', message, extra);
+        this.handle('verbose', message, extra);
     }
 
     public async warn(message: string, extra?: any): Promise<void> {
-        this.create('warn', message, extra);
+        this.handle('warn', message, extra);
     }
 
     public async error(message: string, extra?: any): Promise<void> {
-        this.create('error', message, extra);
+        this.handle('error', message, extra);
     }
 
     public async critical(message: string, extra?: any): Promise<void> {
-        this.create('critical', message, extra);
+        this.handle('critical', message, extra);
     }
 }

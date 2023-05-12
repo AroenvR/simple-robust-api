@@ -1,4 +1,4 @@
-import Database from '../domain/Database';
+import Database from '../database/Database';
 import Logger from '../util/Logger';
 import { testServerConfig } from './testServerConfig';
 
@@ -8,7 +8,7 @@ describe('Database', () => {
 
     beforeEach(async () => {
         database = new Database({ ...testServerConfig.database });
-        logger = Logger.createLogger({ ...testServerConfig.logger })
+        logger = Logger.create({ ...testServerConfig.logger })
     });
 
     afterEach(async () => {

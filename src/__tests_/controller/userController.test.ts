@@ -1,5 +1,5 @@
 import Container from "../../domain/Container";
-import Database from "../../domain/Database";
+import Database from "../../database/Database";
 import { UserController } from "../../api/controller/UserController";
 import { UserDTO } from "../../api/dto/UserDTO";
 import { UserRepo } from "../../api/repo/UserRepo";

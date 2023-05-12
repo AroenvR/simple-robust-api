@@ -1,11 +1,13 @@
 import express from 'express';
 import { EventEmitter } from 'events';
+import { injectable } from 'inversify';
 
 /**
  * RouteInitEvent class extends EventEmitter and is used to emit and listen for route
  * initialization events. Controllers can subscribe to this event and set up their routes
  * accordingly.
  */
+@injectable()
 export class RouteInitEvent extends EventEmitter {
     public static readonly eventName = 'routeInit';
 

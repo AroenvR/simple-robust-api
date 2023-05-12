@@ -1,3 +1,4 @@
+import { injectable } from "inversify";
 import { ISubscriber } from "../interfaces/ISubscriber";
 import Logger from "./Logger";
 
@@ -5,15 +6,39 @@ import Logger from "./Logger";
  * The PubSub class provides a simple publish-subscribe pattern implementation.
  * It allows for publishing events and subscribing to them with callbacks.
  */
+@injectable()
 export class PubSub {
+    private static _instance: PubSub;
     private subscribers: ISubscriber[] = [];
+
+    /**
+     * Gets the PubSub instance.
+     * @throws Error if the instance is not created yet.
+     */
+    public static get instance(): PubSub {
+        if (!this._instance) {
+            throw new Error("PubSub instance not created. Call PubSub.create(config) first.");
+        }
+        return this._instance;
+    }
+
+    /**
+     * Creates a PubSub instance with the given configuration.
+     * @returns The created PubSub instance.
+     */
+    public static create(): PubSub {
+        if (!this._instance) {
+            this._instance = new PubSub();
+        }
+        return this._instance;
+    }
 
     /**
      * Publishes an event to all subscribers of the specified event type.
      * @param eventType - The type of event being published.
      * @param event - The event data.
      */
-    public async publish(eventType: string, event: any): Promise<void> {
+    public async publish(eventType: string, event?: any): Promise<void> {
         if (!eventType) {
             Logger.instance.error(`Event type is falsy.`);
             return;

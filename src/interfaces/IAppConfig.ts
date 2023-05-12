@@ -1,6 +1,6 @@
 import { RouteInitEvent } from "../util/RouteInitEvent";
 import { ICorsConfig } from "./ICorsConfig";
-import { IDatabase } from "./IDatabase";
+import { IDatabase } from "../database/IDatabase";
 
 /**
  * IAppConfig interface represents the configuration object for the App class.
@@ -9,7 +9,7 @@ import { IDatabase } from "./IDatabase";
 export interface IAppConfig {
     name: string;
     port: number;
-    database: IDatabase;
-    routeInitEvent: RouteInitEvent;
+    // database: IDatabase;
+    // routeInitEvent: RouteInitEvent;
     corsConfig: ICorsConfig;
 }

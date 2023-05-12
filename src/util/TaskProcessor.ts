@@ -1,3 +1,4 @@
+import { injectable } from "inversify";
 import { ITaskProcessorConfig } from "../interfaces/ITaskProcessorConfig";
 
 export type Task = () => void;
@@ -6,17 +7,42 @@ export type Task = () => void;
  * The TaskProcessor class is responsible for managing a queue of tasks,
  * enqueuing tasks, and processing them asynchronously at specified intervals.
  */
+@injectable()
 export class TaskProcessor {
+    private static _instance: TaskProcessor;
     private taskQueue: Task[] = [];
     private processingInterval: number;
     private processingTimer: NodeJS.Timeout | null = null;
 
     /**
      * Constructs a TaskProcessor instance with a specified processing interval.
-     * @param {number} processingInterval - The interval between processing tasks in milliseconds.
+     * @param config - ITaskProcessorConfig object containing the task processor configuration.
      */
     constructor(config: ITaskProcessorConfig) {
         this.processingInterval = config.timeout;
+    }
+
+    /**
+     * Gets the TaskProcessor instance.
+     * @throws Error if the instance is not created yet.
+     */
+    public static get instance(): TaskProcessor {
+        if (!this._instance) {
+            throw new Error("TaskProcessor instance not created. Call TaskProcessor.create(config) first.");
+        }
+        return this._instance;
+    }
+
+    /**
+     * Creates a TaskProcessor instance with the given configuration.
+     * @param config ITaskProcessorConfig object containing the TaskProcessor configuration.
+     * @returns The created TaskProcessor instance.
+     */
+    public static create(config: ITaskProcessorConfig): TaskProcessor {
+        if (!this._instance) {
+            this._instance = new TaskProcessor(config);
+        }
+        return this._instance;
     }
 
     /**

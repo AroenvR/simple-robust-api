@@ -2,26 +2,28 @@ import fs from "fs-extra";
 import path from 'path';
 import sqlite3 from 'sqlite3';
 import { Database as SQLiteDatabase } from 'sqlite3';
-import { IDatabaseConfig } from '../interfaces/IDatabaseConfig';
-import { IDatabase } from '../interfaces/IDatabase';
+import { IDatabaseConfig } from './IDatabaseConfig';
+import { IDatabase } from './IDatabase';
 import { isTruthy } from "../util/isTruthy";
 import { constants } from "../util/constants";
 import Logger from "../util/Logger";
 import { IInsertReturn } from "../interfaces/IInsertReturn";
+import { inject, injectable } from "inversify";
+import { TYPES } from "../ioc_container/IocTypes";
 
 /**
  * A class that manages a database connection and provides methods to query the database.
  * @implements {IDatabase}
  */
+@injectable()
 export default class Database implements IDatabase {
     private config: IDatabaseConfig;
     private db: SQLiteDatabase | null = null;
 
     /**
      * Creates an instance of the Database class.
-     * @param config - The configuration object for the database.
      */
-    constructor(config: IDatabaseConfig) {
+    constructor(@inject(TYPES.IDatabaseConfig) config: IDatabaseConfig) {
         this.config = config;
     }
 

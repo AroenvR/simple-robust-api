@@ -1,14 +1,21 @@
+import "reflect-metadata";
 import App from './domain/App';
-import Container from './domain/Container';
+import { ContainerWrapper } from './ioc_container/ContainerWrapper';
 import { serverConfig } from './serverConfig';
 import Logger from './util/Logger';
 
 console.log('--- Starting the application ---');
 
-const iocContainer = new Container(serverConfig);
-iocContainer.initContainer();
+// const iocContainer = new Container(serverConfig);
+// iocContainer.initContainer();
 
-const app = iocContainer.get(App);
+// const app = iocContainer.get(App);
+// app.start();
+
+const containerWrapper = new ContainerWrapper(serverConfig);
+containerWrapper.initContainer();
+
+const app = containerWrapper.getContainer().get(App);
 app.start();
 
 // Handle graceful shutdown

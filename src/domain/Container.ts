@@ -7,7 +7,7 @@ import { RouteInitEvent } from "../util/RouteInitEvent";
 import { TaskProcessor } from "../util/TaskProcessor";
 import Logger from "../util/Logger";
 import App from "./App";
-import Database from "./Database";
+import Database from "../database/Database";
 
 /**
  * A function that creates an instance of a service with the given container.
@@ -43,7 +43,7 @@ export default class Container {
         this.services = new Map();
 
         // Initialize the logger first
-        this.logger = Logger.createLogger({ ...config.logger });
+        this.logger = Logger.create({ ...config.logger });
         this.logger.debug("Container: Container created successfully.");
     }
 
@@ -117,7 +117,7 @@ export default class Container {
             this.register(UserController, (c) => new UserController(c.get(UserService), c.get(RouteInitEvent)));
 
             // App
-            this.register(App, (c) => new App({ ...c.getConfiguration().app, database: c.get(Database), routeInitEvent: c.get(RouteInitEvent) }));
+            // this.register(App, (c) => new App({ ...c.getConfiguration().app, database: c.get(Database), routeInitEvent: c.get(RouteInitEvent) }));
 
         } catch (error) {
             this.logger.error(`Container: Error initializing container!`);

@@ -5,12 +5,13 @@ import { UserDTO } from "../dto/UserDTO";
 import { User } from "../model/User";
 import { UserRepo } from "../repo/UserRepo";
 import Logger from "../../util/Logger";
-import NotFoundError from "../../errors/NotFoundError";
-import { isTruthy } from "../../util/isTruthy";
+import { inject, injectable } from "inversify";
+import { TYPES } from "../../ioc_container/IocTypes";
 
 /**
  * The UserService class provides methods for managing users in the application.
  */
+@injectable()
 export class UserService implements IService {
     readonly name = 'UserService';
     repository: UserRepo;
@@ -23,7 +24,7 @@ export class UserService implements IService {
      * @param {TaskProcessor} taskProcessor - The task processor instance.
      * @param {PubSub} pubSub - The pub/sub instance.
      */
-    constructor(repository: UserRepo, taskProcessor: TaskProcessor, pubSub: PubSub) {
+    constructor(@inject(TYPES.UserRepo) repository: UserRepo, @inject(TYPES.TaskProcessor) taskProcessor: TaskProcessor, @inject(TYPES.PubSub) pubSub: PubSub) {
         this.repository = repository;
         this.taskProcessor = taskProcessor;
         this.pubSub = pubSub;

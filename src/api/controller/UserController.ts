@@ -7,12 +7,15 @@ import Logger from '../../util/Logger';
 import validator from 'validator';
 import { isTruthy } from '../../util/isTruthy';
 import ValidationError from '../../errors/ValidationError';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '../../ioc_container/IocTypes';
 
+@injectable()
 export class UserController implements IUserController {
     readonly name = 'UserController';
     service: UserService;
 
-    constructor(service: UserService, routeInitEvent: RouteInitEvent) {
+    constructor(@inject(TYPES.UserService) service: UserService, @inject(TYPES.RouteInitEvent) routeInitEvent: RouteInitEvent) {
         this.service = service;
         routeInitEvent.onRouteInit(this.setupRoutes.bind(this));
     }

@@ -31,6 +31,10 @@ export const constants = {
     logging: {
         on: true,
     },
+
+    events: {
+        SERVER_STARTED: 'server_started',
+    }
 }
 
 /*

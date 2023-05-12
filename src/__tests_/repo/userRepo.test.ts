@@ -1,5 +1,5 @@
 import Container from "../../domain/Container";
-import Database from "../../domain/Database";
+import Database from "../../database/Database";
 import { UserRepo } from "../../api/repo/UserRepo";
 import { User } from "../../api/model/User";
 import { generateUUID } from "../../util/uuid";
