@@ -6,7 +6,9 @@
             "es6"
         ],
         "types": [
-            "reflect-metadata"
+            "reflect-metadata",
+            "node",
+            "jest"
         ],
         "allowJs": true,
         "jsx": "react",

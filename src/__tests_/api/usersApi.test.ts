@@ -1,9 +1,11 @@
-import { UserDTO } from "../../api/dto/UserDTO";
+import "reflect-metadata";
 import App from "../../domain/App";
 import Container from "../../domain/Container";
 import { generateUUID } from "../../util/uuid";
 import { testServerConfig } from "../testServerConfig";
 import axios from "axios";
+import { ContainerWrapper } from "../../ioc_container/ContainerWrapper";
+import { TYPES } from "../../ioc_container/IocTypes";
 
 /**
  * Integration test for the Users API.
@@ -12,10 +14,10 @@ describe('Users API', () => {
     let app: App;
 
     beforeAll(async () => {
-        const iocContainer = new Container(testServerConfig);
-        iocContainer.initContainer();
+        const containerWrapper = new ContainerWrapper(testServerConfig);
+        containerWrapper.initContainer();
 
-        app = iocContainer.get(App);
+        app = containerWrapper.getContainer().get<App>(TYPES.App);
         await app.start();
     });
 

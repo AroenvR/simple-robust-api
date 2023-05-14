@@ -16,6 +16,7 @@ export class UserController implements IUserController {
     service: UserService;
 
     constructor(@inject(TYPES.UserService) service: UserService, @inject(TYPES.RouteInitEvent) routeInitEvent: RouteInitEvent) {
+        Logger.instance.debug(`${this.name}: Starting up...`);
         this.service = service;
         routeInitEvent.onRouteInit(this.setupRoutes.bind(this));
     }

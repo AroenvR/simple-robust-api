@@ -24,6 +24,7 @@ export class ContainerWrapper {
     private logger: Logger;
     private pubSub: PubSub;
     private taskProcessor: TaskProcessor;
+    // private controllers: symbol[] = [];
 
     /**
      * Constructs a new instance of the `ContainerWrapper` class.
@@ -100,17 +101,15 @@ export class ContainerWrapper {
 
         this.container.bind<IAppConfig>(TYPES.IAppConfig).toConstantValue({ ...this.config.app });
         this.container.bind<App>(TYPES.App).to(App);
-
-        // Add a logging statement to check if the binding was successful
-        try {
-            const appBinding = this.container.get<App>(TYPES.App);
-            if (appBinding) {
-                this.logger.debug('Container: App binding was successful.');
-            } else {
-                this.logger.debug('Container: App binding failed.');
-            }
-        } catch (error) {
-            this.logger.error('Container: App binding failed.', error);
-        }
     }
+
+    // Add a getter to access the controllerTypes array
+    // public getControllers(): symbol[] {
+    //     return this.controllers;
+    // }
+
+    // private initController(controller: symbol, class: coass): void {
+    //     this.controllers.push(controller);
+    //     this.container.bind(controller).to(controller);
+    // }
 }
