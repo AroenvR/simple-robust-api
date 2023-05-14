@@ -1,4 +1,3 @@
-import Logger from '../../util/Logger';
 import { TaskProcessor } from '../../util/TaskProcessor';
 import { testServerConfig } from '../testServerConfig';
 

@@ -1,6 +1,5 @@
 import "reflect-metadata";
 import App from "../../domain/App";
-import Container from "../../domain/Container";
 import { generateUUID } from "../../util/uuid";
 import { testServerConfig } from "../testServerConfig";
 import axios from "axios";

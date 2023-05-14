@@ -90,6 +90,7 @@ export class ContainerWrapper {
     private initBusinessLogic(): void {
         this.logger.debug("Container: Initializing business logic.");
 
+        // Database
         this.container.bind<IDatabaseConfig>(TYPES.IDatabaseConfig).toConstantValue(this.config.database);
         this.container.bind<IDatabase>(TYPES.Database).to(Database).inSingletonScope();
 
@@ -108,14 +109,4 @@ export class ContainerWrapper {
         this.container.bind<IAppConfig>(TYPES.IAppConfig).toConstantValue({ ...this.config.app });
         this.container.bind<App>(TYPES.App).to(App);
     }
-
-    // Add a getter to access the controllerTypes array
-    // public getControllers(): symbol[] {
-    //     return this.controllers;
-    // }
-
-    // private initController(controller: symbol, class: coass): void {
-    //     this.controllers.push(controller);
-    //     this.container.bind(controller).to(controller);
-    // }
 }

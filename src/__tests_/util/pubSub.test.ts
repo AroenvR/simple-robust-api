@@ -1,15 +1,11 @@
 import { ISubscriber } from '../../interfaces/ISubscriber';
-import Logger from '../../util/Logger';
 import { PubSub } from '../../util/PubSub';
-import { testServerConfig } from '../testServerConfig';
 
 describe('PubSub', () => {
     let pubSub: PubSub;
-    let logger: Logger;
 
     beforeEach(() => {
         pubSub = new PubSub();
-        logger = Logger.create({ ...testServerConfig.logger })
     });
 
     // ------------------------------------
@@ -30,6 +26,8 @@ describe('PubSub', () => {
         expect(subscriber.callback).toHaveBeenCalledWith(eventData);
     });
 
+    // ------------------------------------
+
     test('unsubscribe', async () => {
         const eventType = 'testEvent';
 
@@ -45,6 +43,8 @@ describe('PubSub', () => {
 
         expect(subscriber.callback).not.toHaveBeenCalled();
     });
+
+    // ------------------------------------
 
     test('unsubscribeAll', async () => {
         const eventType1 = 'testEvent1';
@@ -71,6 +71,8 @@ describe('PubSub', () => {
         expect(subscriber.callback).not.toHaveBeenCalled();
         expect(subscriber2.callback).not.toHaveBeenCalled();
     });
+
+    // ------------------------------------
 
     test('getSubscribers', async () => {
         const eventType = 'testEvent';
