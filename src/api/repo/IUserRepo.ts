@@ -8,4 +8,5 @@ import { UserDTO } from "../dto/UserDTO";
  */
 export interface IUserRepo extends IRepository {
     upsert(params?: User[]): Promise<UserDTO[]>;
+    selectByUuids: (uuids: string[]) => Promise<UserDTO[]>;
 }

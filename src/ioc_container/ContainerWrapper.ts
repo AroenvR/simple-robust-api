@@ -13,6 +13,9 @@ import { IServerConfig } from "../interfaces/IServerConfig";
 import { IAppConfig } from "../interfaces/IAppConfig";
 import { IDatabase } from "../database/IDatabase";
 import { IDatabaseConfig } from "../database/IDatabaseConfig";
+import { IController } from "../api/controller/IController";
+import { IService } from "../api/service/IService";
+import { IRepository } from "../api/repo/IRepository";
 
 /**
  * `ContainerWrapper` is a class responsible for managing the application's dependencies using InversifyJS's container.  
@@ -72,6 +75,9 @@ export class ContainerWrapper {
     private initUtilities(): void {
         this.logger.debug("Container: Initializing utilities.");
 
+        // Bind the container itself
+        this.container.bind<Container>(TYPES.Container).toConstantValue(this.container);
+
         this.container.bind<Logger>(TYPES.Logger).toConstantValue(this.logger);
         this.container.bind<PubSub>(TYPES.PubSub).toConstantValue(this.pubSub);
         this.container.bind<TaskProcessor>(TYPES.TaskProcessor).toConstantValue(this.taskProcessor);
@@ -85,12 +91,12 @@ export class ContainerWrapper {
         this.logger.debug("Container: Initializing business logic.");
 
         this.container.bind<IDatabaseConfig>(TYPES.IDatabaseConfig).toConstantValue(this.config.database);
-        this.container.bind<IDatabase>(TYPES.Database).to(Database);
+        this.container.bind<IDatabase>(TYPES.Database).to(Database).inSingletonScope();
 
         // User layers
-        this.container.bind<UserRepo>(TYPES.UserRepo).to(UserRepo);
-        this.container.bind<UserService>(TYPES.UserService).to(UserService);
-        this.container.bind<UserController>(TYPES.UserController).to(UserController);
+        this.container.bind<IRepository>(TYPES.Repository).to(UserRepo);
+        this.container.bind<IService>(TYPES.Service).to(UserService);
+        this.container.bind<IController>(TYPES.Controller).to(UserController);
     }
 
     /**

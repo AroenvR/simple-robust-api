@@ -1,4 +1,7 @@
 export const TYPES = {
+    // Container
+    Container: Symbol.for("Container"),
+
     // Configs
     IDatabaseConfig: Symbol.for("IDatabaseConfig"),
     IAppConfig: Symbol.for("IAppConfig"),
@@ -11,9 +14,13 @@ export const TYPES = {
 
     // Business Logic
     Database: Symbol.for("Database"),
-    UserRepo: Symbol.for("UserRepo"),
-    UserService: Symbol.for("UserService"),
-    UserController: Symbol.for("UserController"),
+    // UserRepo: Symbol.for("UserRepo"),
+    // UserService: Symbol.for("UserService"),
+    // UserController: Symbol.for("UserController"),
+
+    Repository: Symbol.for("Repository"),
+    Service: Symbol.for("Service"),
+    Controller: Symbol.for("Controller"),
 
     // Application
     App: Symbol.for("App"),

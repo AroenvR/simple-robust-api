@@ -1,30 +1,27 @@
-import express from 'express';
+import { Router } from 'express';
 import { UserDTO } from "../dto/UserDTO";
 import { UserService } from "../service/UserService";
 import { IUserController } from "./IUserController";
-import { RouteInitEvent } from '../../util/RouteInitEvent';
 import Logger from '../../util/Logger';
 import validator from 'validator';
-import { isTruthy } from '../../util/isTruthy';
 import ValidationError from '../../errors/ValidationError';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../../ioc_container/IocTypes';
+import { IUserService } from '../service/IUserService';
 
 @injectable()
 export class UserController implements IUserController {
     readonly name = 'UserController';
-    service: UserService;
+    service: IUserService;
 
-    constructor(@inject(TYPES.UserService) service: UserService, @inject(TYPES.RouteInitEvent) routeInitEvent: RouteInitEvent) {
-        Logger.instance.debug(`${this.name}: Starting up...`);
+    constructor(@inject(TYPES.Service) service: IUserService) {
         this.service = service;
-        routeInitEvent.onRouteInit(this.setupRoutes.bind(this));
     }
 
     /**
      * Upserts users.
-     * @param {UserDTO[]} userDtos - The array of user data transfer objects.
-     * @returns {Promise<any>} - The result of the upsert operation.
+     * @param userDtos - The array of user data transfer objects.
+     * @returns The result of the upsert operation.
      */
     public async upsert(userDtos: UserDTO[]): Promise<any> {
         Logger.instance.info(`${this.name}: Upserting users.`);
@@ -40,7 +37,7 @@ export class UserController implements IUserController {
 
     /**
      * Retrieves all users.
-     * @returns {Promise<any[]>} - The array of users.
+     * @returns The array of users.
      */
     public async getAll(): Promise<any[]> {
         Logger.instance.info(`${this.name}: Getting all users.`);
@@ -65,8 +62,10 @@ export class UserController implements IUserController {
         throw new Error('Method not implemented.');
     }
 
-    private setupRoutes(app: express.Application): void {
-        app.get('/users', async (req, res, next) => {
+    public initRoutes(): Router {
+        const router = Router();
+
+        router.get('/users', async (req, res, next) => {
             try {
                 const users = await this.getAll();
                 res.status(200).json(users);
@@ -75,40 +74,7 @@ export class UserController implements IUserController {
             }
         });
 
-        app.get('/users/uuid', async (req, res, next) => {
-            Logger.instance.log('UserController: GET /users/uuid.');
-
-            if (!isTruthy(req.query.uuid) && !isTruthy(req.query.uuids)) {
-                Logger.instance.error('UserController: GET /users/uuid missing required query parameter: uuid or uuids');
-                res.status(400).json({ message: 'Missing required query parameter: uuid or uuids' });
-                return;
-            }
-
-            Logger.instance.debug('UserController: GET /users/uuid received query parameters:', req.query);
-
-            let uuids: any = [req.query.uuid];
-            if (!isTruthy(uuids)) uuids = req.query.uuids;
-
-            try {
-                for (const uuid of uuids) {
-                    if (!validator.isUUID(uuid)) {
-                        Logger.instance.error('UserController: GET /users/uuid invalid uuid:', uuid);
-                        throw new ValidationError(`Invalid uuid: ${uuid}`);
-                    }
-                }
-
-                const users = await this.getByUuids(uuids);
-                res.status(200).json(users);
-
-                Logger.instance.info('UserController: GET /users/uuid success.');
-                Logger.instance.debug('UserController: GET /users/uuid returned:', users);
-            } catch (error) {
-                Logger.instance.error('UserController: GET /users/uuid error:', error);
-                next(error);
-            }
-        });
-
-        app.post('/users', async (req, res, next) => {
+        router.post('/users', async (req, res, next) => {
             Logger.instance.log('UserController: POST /users.');
             Logger.instance.debug('UserController: POST /users received data:', req.body);
 
@@ -127,7 +93,73 @@ export class UserController implements IUserController {
                 next(error);
             }
         });
+
+        return router;
     }
+
+    // private setupRoutes(app: express.Application): void {
+    //     app.get('/users', async (req, res, next) => {
+    //         try {
+    //             const users = await this.getAll();
+    //             res.status(200).json(users);
+    //         } catch (error) {
+    //             next(error);
+    //         }
+    //     });
+
+    //     app.get('/users/uuid', async (req, res, next) => {
+    //         Logger.instance.log('UserController: GET /users/uuid.');
+
+    //         if (!isTruthy(req.query.uuid) && !isTruthy(req.query.uuids)) {
+    //             Logger.instance.error('UserController: GET /users/uuid missing required query parameter: uuid or uuids');
+    //             res.status(400).json({ message: 'Missing required query parameter: uuid or uuids' });
+    //             return;
+    //         }
+
+    //         Logger.instance.debug('UserController: GET /users/uuid received query parameters:', req.query);
+
+    //         let uuids: any = [req.query.uuid];
+    //         if (!isTruthy(uuids)) uuids = req.query.uuids;
+
+    //         try {
+    //             for (const uuid of uuids) {
+    //                 if (!validator.isUUID(uuid)) {
+    //                     Logger.instance.error('UserController: GET /users/uuid invalid uuid:', uuid);
+    //                     throw new ValidationError(`Invalid uuid: ${uuid}`);
+    //                 }
+    //             }
+
+    //             const users = await this.getByUuids(uuids);
+    //             res.status(200).json(users);
+
+    //             Logger.instance.info('UserController: GET /users/uuid success.');
+    //             Logger.instance.debug('UserController: GET /users/uuid returned:', users);
+    //         } catch (error) {
+    //             Logger.instance.error('UserController: GET /users/uuid error:', error);
+    //             next(error);
+    //         }
+    //     });
+
+    //     app.post('/users', async (req, res, next) => {
+    //         Logger.instance.log('UserController: POST /users.');
+    //         Logger.instance.debug('UserController: POST /users received data:', req.body);
+
+    //         let userDtos = req.body;
+    //         if (!Array.isArray(userDtos)) userDtos = [userDtos];
+
+    //         try {
+    //             await this.checkUsers(userDtos);
+    //             const result = await this.upsert(userDtos);
+
+    //             Logger.instance.info('UserController: POST /users success.');
+    //             Logger.instance.debug('UserController: POST /users returned:', result);
+    //             res.status(201).json(result);
+    //         } catch (error) {
+    //             Logger.instance.error('UserController: POST /users error:', error);
+    //             next(error);
+    //         }
+    //     });
+    // }
 
     /**
      * Asynchronously checks the validity of an array of users.

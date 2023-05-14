@@ -7,10 +7,10 @@ import Logger from '../util/Logger';
 import { sanitizeMiddleware, sanitizeResponseMiddleware } from '../middleware/sanitize';
 import { errorHandlerMiddleware } from '../middleware/errorMiddleware';
 import { loggerMiddleware } from '../middleware/loggerMiddleware';
-import { inject, injectable } from 'inversify';
+import { Container, inject, injectable } from 'inversify';
 import { TYPES } from '../ioc_container/IocTypes';
 import { IDatabase } from '../database/IDatabase';
-import { RouteInitEvent } from '../util/RouteInitEvent';
+import { IController } from '../api/controller/IController';
 
 /**
  * App class is the core of the application, responsible for starting and stopping the server,
@@ -19,19 +19,20 @@ import { RouteInitEvent } from '../util/RouteInitEvent';
 @injectable()
 export default class App {
     private config: IAppConfig;
+    private container: Container;
     private app: express.Application = express();
     private server: any;
     private database: IDatabase;
-    private routeInitEvent: RouteInitEvent;
+    // private routeInitEvent: RouteInitEvent;
 
     constructor(
         @inject(TYPES.IAppConfig) config: IAppConfig,
-        @inject(TYPES.Database) database: IDatabase,
-        @inject(TYPES.RouteInitEvent) routeInitEvent: RouteInitEvent
+        @inject(TYPES.Container) container: Container,
+        @inject(TYPES.Database) database: IDatabase
     ) {
         this.config = config;
         this.database = database;
-        this.routeInitEvent = routeInitEvent;
+        this.container = container;
     }
 
     /**
@@ -127,7 +128,12 @@ export default class App {
     private async initRoutes(): Promise<void> {
         Logger.instance.debug(`App: ${this.config.name} initializing API routes.`);
 
-        this.routeInitEvent.emitRouteInit(this.app);
+        const controllers = this.container.getAll<IController>(TYPES.Controller);
+
+        controllers.forEach((controller) => {
+            const router = controller.initRoutes();
+            this.app.use(router);
+        });
 
         this.app.get('/', (req, res) => {
             res.status(200).json({ message: `Hello from ${this.app.name}!` });
