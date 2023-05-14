@@ -30,7 +30,8 @@
     },
     "include": [
         "src/**/*.ts",
-        "jest.setup.ts"
+        "jest.setup.ts",
+        "default-test-environment.ts"
     ],
     "exclude": [
         "node_modules",

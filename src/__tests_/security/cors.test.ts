@@ -2,16 +2,27 @@ import axios from "axios";
 import App from "../../domain/App";
 import Container from "../../domain/Container";
 import { testServerConfig } from "../testServerConfig";
+import { ContainerWrapper } from "../../ioc_container/ContainerWrapper";
+import { TYPES } from "../../ioc_container/IocTypes";
 
 // SECURITY testing
 describe('CORS middleware', () => {
+    /*
+    let app: App;
+
+  beforeAll(() => {
+    app = global.app;
+  });
+    */
     let app: App;
 
     beforeAll(async () => {
-        const iocContainer = new Container(testServerConfig);
-        iocContainer.initContainer();
+        // Initialize the container
+        const containerWrapper = new ContainerWrapper(testServerConfig);
+        containerWrapper.initContainer();
 
-        app = iocContainer.get(App);
+        // Start the application
+        app = containerWrapper.getContainer().get<App>(TYPES.App);
         await app.start();
     });
 
