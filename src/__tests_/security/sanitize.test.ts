@@ -1,25 +1,23 @@
 import axios from 'axios';
 import App from '../../domain/App';
-import Container from '../../domain/Container';
 import { testServerConfig } from '../testServerConfig';
 import { generateUUID } from '../../util/uuid';
-import { UserDTO } from '../../api/dto/UserDTO';
+import { ContainerWrapper } from '../../ioc_container/ContainerWrapper';
+import { TYPES } from '../../ioc_container/IocTypes';
 
-//TODO: Fix
 describe('sanitizeMiddleware', () => {
     let app: App;
 
     beforeAll(async () => {
-        const iocContainer = new Container(testServerConfig);
-        iocContainer.initContainer();
+        const containerWrapper = new ContainerWrapper(testServerConfig);
+        containerWrapper.initContainer();
 
-        app = iocContainer.get(App);
+        app = containerWrapper.getContainer().get<App>(TYPES.App);
         await app.start();
     });
 
     afterAll(async () => {
         await app.stop();
-        jest.restoreAllMocks();
     });
 
     const uuid = generateUUID();
@@ -51,23 +49,24 @@ describe('sanitizeMiddleware', () => {
 
     // ----------------------------
 
-    test('should sanitize request query', async () => {
-        // Query the user using unsanitized name
-        const response = await axios.get(`http://localhost:${testServerConfig.app.port}/users`, {
-            params: {
-                name: unsanitizedName
-            },
-            headers: {
-                'Content-Type': 'application/json',
-                Origin: 'http://test.com'
-            }
-        });
+    // TODO: Re-enable this endpoint and test for sanitizing of query params.
 
-        expect(response.status).toBe(200);
+    // test('should sanitize request query', async () => {
+    //     const response = await axios.get(`http://localhost:${testServerConfig.app.port}/users`, {
+    //         params: {
+    //             name: unsanitizedName
+    //         },
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             Origin: 'http://test.com'
+    //         }
+    //     });
 
-        const users = response.data;
-        expect(users.length).toBe(1);
-        expect(users[0].uuid).toBe(uuid);
-        expect(users[0].name).toBe(sanitizedName);
-    });
+    //     expect(response.status).toBe(200);
+
+    //     const users = response.data;
+    //     expect(users.length).toBe(1);
+    //     expect(users[0].uuid).toBe(uuid);
+    //     expect(users[0].name).toBe(sanitizedName);
+    // });
 });

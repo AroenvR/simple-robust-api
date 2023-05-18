@@ -1,36 +1,29 @@
-import Container from "../../domain/Container";
-import Database from "../../database/Database";
 import { UserRepo } from "../../api/repo/UserRepo";
 import { User } from "../../api/model/User";
 import { generateUUID } from "../../util/uuid";
 import { testServerConfig } from "../testServerConfig";
+import App from "../../domain/App";
+import { ContainerWrapper } from "../../ioc_container/ContainerWrapper";
+import { TYPES } from "../../ioc_container/IocTypes";
 
 describe('UserRepo', () => {
-    let container: Container;
-    let database: Database;
+    let app: App;
     let userRepo: UserRepo;
 
     const johnUUID = generateUUID();
     const janeUUID = generateUUID();
 
     beforeAll(async () => {
-        // Create a new container instance with a mock database.
-        container = new Container({ ...testServerConfig });
+        const containerWrapper = new ContainerWrapper(testServerConfig);
+        containerWrapper.initContainer();
 
-        container.register(Database, () => new Database({ ...testServerConfig.database }));
-        container.register(UserRepo, (c) => new UserRepo(c.get(Database)));
-
-        database = container.get(Database);
-        userRepo = container.get(UserRepo);
-
-        await database.connect();
-        await database.setup();
+        app = containerWrapper.getContainer().get<App>(TYPES.App);
+        userRepo = containerWrapper.getContainer().get<UserRepo>(TYPES.Repository);
+        await app.start();
     });
 
     afterAll(async () => {
-        await database.close();
-
-        jest.restoreAllMocks();
+        await app.stop();
     });
 
     // ----------------------------
@@ -51,7 +44,7 @@ describe('UserRepo', () => {
                 id: 1,
                 uuid: johnUUID,
                 name: 'John Doe'
-            }
+            },
         ]);
     });
 

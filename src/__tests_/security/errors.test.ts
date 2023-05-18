@@ -1,25 +1,24 @@
 import App from "../../domain/App";
-import Container from "../../domain/Container";
+import { ContainerWrapper } from "../../ioc_container/ContainerWrapper";
+import { TYPES } from "../../ioc_container/IocTypes";
 import { generateUUID } from "../../util/uuid";
 import { testServerConfig } from "../testServerConfig";
 import axios from "axios";
 
+// TODO: Fix
 describe('Users API Error Handling', () => {
     let app: App;
 
     beforeAll(async () => {
-        const iocContainer = new Container(testServerConfig);
-        iocContainer.initContainer();
+        const containerWrapper = new ContainerWrapper(testServerConfig);
+        containerWrapper.initContainer();
 
-        app = iocContainer.get(App);
+        app = containerWrapper.getContainer().get<App>(TYPES.App);
         await app.start();
     });
 
     afterAll(async () => {
-        // Shut down the application after all tests.
         await app.stop();
-
-        jest.restoreAllMocks();
     });
 
     // ----------------------------
@@ -27,7 +26,7 @@ describe('Users API Error Handling', () => {
     test('handles an HTTP GET request for a non-existent user by UUID', async () => {
 
         try {
-            await axios.get(`http://localhost:${testServerConfig.app.port}/users/uuid/?uuid=${generateUUID()}`, {
+            await axios.get(`http://localhost:${testServerConfig.app.port}/users?uuids=${generateUUID()},${generateUUID()}`, {
                 headers: {
                     Origin: 'http://test.com'
                 }
@@ -40,31 +39,30 @@ describe('Users API Error Handling', () => {
 
     // ----------------------------
 
-    // test('handles an HTTP POST request with invalid UUID', async () => {
+    test('handles an HTTP POST request with invalid UUID', async () => {
+        const payload = [
+            {
+                uuid: 'invalid-uuid',
+                name: 'John Doe'
+            },
+            {
+                uuid: generateUUID(),
+                name: 'Jane Doe'
+            }
+        ];
 
-    //     const payload = [
-    //         {
-    //             uuid: 'invalid-uuid',
-    //             name: 'John Doe'
-    //         },
-    //         {
-    //             uuid: generateUUID(),
-    //             name: 'Jane Doe'
-    //         }
-    //     ];
+        try {
+            await axios.post(`http://localhost:${testServerConfig.app.port}/users`, payload, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Origin: 'http://test.com'
+                }
+            });
 
-    //     try {
-    //         await axios.post(`http://localhost:${testServerConfig.app.port}/users`, payload, {
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 Origin: 'http://test.com'
-    //             }
-    //         });
-
-    //         fail('The API call should have thrown an error, but it did not.');
-    //     } catch (error: any) {
-    //         expect(error.response.status).toBe(403);
-    //         expect(error.response.data.message).toBe('Validation failed.');
-    //     }
-    // });
+            fail('The API call should have thrown an error, but it did not.');
+        } catch (error: any) {
+            expect(error.response.status).toBe(403);
+            expect(error.response.data.message).toBe('Validation failed.');
+        }
+    });
 });

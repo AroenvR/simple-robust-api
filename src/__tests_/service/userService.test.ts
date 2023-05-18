@@ -1,52 +1,35 @@
-import Container from "../../domain/Container";
-import Database from "../../database/Database";
 import { UserDTO } from "../../api/dto/UserDTO";
-import { UserRepo } from "../../api/repo/UserRepo";
 import { UserService } from "../../api/service/UserService";
-import { PubSub } from "../../util/PubSub";
-import { TaskProcessor } from "../../util/TaskProcessor";
 import { generateUUID } from "../../util/uuid";
 import { testServerConfig } from "../testServerConfig";
-import { User } from "../../api/model/User";
+import App from "../../domain/App";
+import { TYPES } from "../../ioc_container/IocTypes";
+import { ContainerWrapper } from "../../ioc_container/ContainerWrapper";
 
 describe('UserService', () => {
-    let container: Container;
-    let database: Database;
-    let userRepo: UserRepo;
+    let app: App;
     let userService: UserService;
 
-    const johnDoeUUID = generateUUID();
+    const johnUUID = generateUUID();
 
     beforeAll(async () => {
-        // Create a new container instance with a mock database.
-        container = new Container({ ...testServerConfig });
+        const containerWrapper = new ContainerWrapper(testServerConfig);
+        containerWrapper.initContainer();
 
-        container.register(Database, () => new Database({ ...testServerConfig.database }));
-        container.register(UserRepo, (c) => new UserRepo(c.get(Database)));
-        container.register(TaskProcessor, () => new TaskProcessor({ ...testServerConfig.tasks }));
-        container.register(PubSub, () => new PubSub());
-
-        container.register(UserService, (c) => new UserService(c.get(UserRepo), c.get(TaskProcessor), c.get(PubSub)));
-
-        database = container.get(Database);
-        userRepo = container.get(UserRepo);
-        userService = container.get(UserService);
-
-        await database.connect();
-        await database.setup();
+        app = containerWrapper.getContainer().get<App>(TYPES.App);
+        userService = containerWrapper.getContainer().get<UserService>(TYPES.Service);
+        await app.start();
     });
 
     afterAll(async () => {
-        await database.close();
-
-        jest.restoreAllMocks();
+        await app.stop();
     });
 
     // ----------------------------
 
     test('should create a user', async () => {
         let userDto = new UserDTO();
-        userDto.uuid = johnDoeUUID;
+        userDto.uuid = johnUUID;
         userDto.name = 'John Doe';
 
         const result = await userService.upsert([userDto]);
@@ -71,9 +54,9 @@ describe('UserService', () => {
             },
             {
                 id: 1,
-                uuid: johnDoeUUID,
+                uuid: johnUUID,
                 name: 'John Doe'
-            }
+            },
         ]);
     });
 

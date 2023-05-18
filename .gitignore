@@ -4,6 +4,7 @@
 /coverage
 /tmp
 /logs
+src/documents
 
 # File extensions to ignore
 *.bak
@@ -18,3 +19,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Helpers to ignore
+helper.txt

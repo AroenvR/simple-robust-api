@@ -1,26 +1,23 @@
 import axios from "axios";
 import App from "../../domain/App";
-import Container from "../../domain/Container";
 import { testServerConfig } from "../testServerConfig";
+import { ContainerWrapper } from "../../ioc_container/ContainerWrapper";
+import { TYPES } from "../../ioc_container/IocTypes";
 
 // SECURITY testing
 describe('Rate limiter middleware', () => {
     let app: App;
 
     beforeAll(async () => {
-        const iocContainer = new Container(testServerConfig);
-        iocContainer.initContainer();
+        const containerWrapper = new ContainerWrapper(testServerConfig);
+        containerWrapper.initContainer();
 
-        app = iocContainer.get(App);
+        app = containerWrapper.getContainer().get<App>(TYPES.App);
         await app.start();
     });
 
     afterAll(async () => {
-        // Shut down the application after all tests.
         await app.stop();
-
-        // Re-enable console.log methods after all tests
-        jest.restoreAllMocks();
     });
 
     // ----------------------------

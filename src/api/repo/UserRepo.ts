@@ -38,7 +38,7 @@ export class UserRepo implements IUserRepo {
 
         try {
             const resp = await this._db.upsert(query, params);
-            if (!isTruthy(resp)) throw new Error('Error upserting users.');
+            if (!isTruthy(resp)) throw new Error(`${this.name}: Error upserting users.`);
 
             return await this.selectFromIdToId(resp.changes, resp.lastId);
 
