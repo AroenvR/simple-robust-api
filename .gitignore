@@ -4,6 +4,7 @@
 /coverage
 /tmp
 /logs
+src/documents
 
 # File extensions to ignore
 *.bak

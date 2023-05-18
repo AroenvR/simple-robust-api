@@ -1,7 +1,9 @@
 import DataTransferObject from "./DataTransferObject";
 import { isTruthy } from "../../util/isTruthy";
 import { IUser } from "../model/IUser";
-import { User } from "../model/User";
+import validator from 'validator';
+import Ajv from 'ajv';
+import userSchema from './UserSchema.json';
 
 /**
  * Data Transfer Object representing a User entity.
@@ -54,5 +56,28 @@ export class UserDTO extends DataTransferObject implements IUser {
         if (!isTruthy(value)) throw Error('UserDTO: Name must be a truthy string');
         if (isTruthy(this._name)) throw Error('UserDTO: Name is already set');
         this._name = value;
+    }
+
+    private validateDataTypes(): boolean {
+        return (
+            validator.isUUID(this.uuid) &&
+            validator.isLength(this.name, { min: 1 })
+        );
+    }
+
+    private validateSchema(): boolean {
+        const ajv = new Ajv();
+        const validate = ajv.compile(userSchema);
+        const valid = validate(this);
+
+        if (!valid) {
+            console.error(validate.errors);
+        }
+
+        return !!valid;
+    }
+
+    public async isValid(): Promise<boolean> {
+        return this.validateDataTypes() && this.validateSchema();
     }
 }
