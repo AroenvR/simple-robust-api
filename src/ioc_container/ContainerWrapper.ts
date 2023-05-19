@@ -4,7 +4,6 @@ import { RouteInitEvent } from "../util/RouteInitEvent";
 import { TYPES } from "./IocTypes";
 import { PubSub } from "../util/PubSub";
 import { TaskProcessor } from "../util/TaskProcessor";
-import Database from "../database/Database";
 import { UserRepo } from "../api/repo/UserRepo";
 import { UserService } from "../api/service/UserService";
 import { UserController } from "../api/controller/UserController";
@@ -12,10 +11,10 @@ import App from "../domain/App";
 import { IServerConfig } from "../interfaces/IServerConfig";
 import { IAppConfig } from "../interfaces/IAppConfig";
 import { IDatabase } from "../database/IDatabase";
-import { IDatabaseConfig } from "../database/IDatabaseConfig";
 import { IController } from "../api/controller/IController";
 import { IService } from "../api/service/IService";
 import { IRepository } from "../api/repo/IRepository";
+import DatabaseFactory from "../database/DatabaseFactory";
 
 /**
  * `ContainerWrapper` is a class responsible for managing the application's dependencies using InversifyJS's container.  
@@ -91,8 +90,9 @@ export class ContainerWrapper {
         this.logger.debug("Container: Initializing business logic.");
 
         // Database
-        this.container.bind<IDatabaseConfig>(TYPES.IDatabaseConfig).toConstantValue(this.config.database);
-        this.container.bind<IDatabase>(TYPES.Database).to(Database).inSingletonScope();
+        const databaseFactory = new DatabaseFactory();
+        const database = databaseFactory.createDatabase(this.config.database);
+        this.container.bind<IDatabase>(TYPES.Database).toConstantValue(database);
 
         // User layers
         this.container.bind<IRepository>(TYPES.Repository).to(UserRepo);

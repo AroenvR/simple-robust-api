@@ -1,169 +1,35 @@
 import fs from "fs-extra";
 import path from 'path';
+import { inject } from "inversify";
 import sqlite3 from 'sqlite3';
-import { Database as SQLiteDatabase } from 'sqlite3';
-import { IDatabaseConfig } from './IDatabaseConfig';
-import { IDatabase } from './IDatabase';
-import { isTruthy } from "../util/isTruthy";
-import { constants } from "../util/constants";
-import Logger from "../util/Logger";
-import { IInsertReturn } from "../interfaces/IInsertReturn";
-import { inject, injectable } from "inversify";
+import { IDatabase } from "./IDatabase";
 import { TYPES } from "../ioc_container/IocTypes";
+import { IDatabaseConfig } from "./IDatabaseConfig";
+import Logger from "../util/Logger";
+import { isTruthy } from "../util/isTruthy";
+import { IInsertReturn } from "../interfaces/IInsertReturn";
 
 /**
- * A class that manages a database connection and provides methods to query the database.
- * @implements {IDatabase}
+ * A class that represents a SQLite3 database.
  */
-@injectable()
-export default class Database implements IDatabase {
+export default class SQLiteDatabase implements IDatabase {
     private config: IDatabaseConfig;
-    private db: SQLiteDatabase | null = null;
+    private db: sqlite3.Database | null = null;
 
     /**
-     * Creates an instance of the Database class.
+     * Creates an instance of the SQLiteDatabase class.
+     * @param config - The database configuration.
      */
     constructor(@inject(TYPES.IDatabaseConfig) config: IDatabaseConfig) {
         this.config = config;
     }
 
-    // -----------------------
-    // |        SETUP        |
-    // -----------------------
-
     /**
-     * Connects to the database.
-     * @throws { Error } - If the database type is not supported.
+     * Connects to the SQLite3 database.
+     * @returns A promise that resolves when the connection is established.
+     * @throws If there is an error connecting to the database.
      */
     async connect(): Promise<void> {
-        switch (this.config.type) {
-            case constants.database.types.SQLITE3:
-                return this.sqliteConnect();
-
-            default:
-                throw new Error(`Database: Database type ${this.config.type} not supported!`);
-        }
-    }
-
-    /**
-     * Sets up the database by creating tables and enabling foreign keys.
-     * @throws { Error } - If the database type is not supported or if an error occurs while creating the schema.
-     */
-    async setup(): Promise<void> {
-        switch (this.config.type) {
-            case constants.database.types.SQLITE3:
-                return this.sqliteSetup();
-
-            default:
-                throw new Error(`Database: Database type ${this.config.type} not supported!`);
-        }
-    }
-
-    /**
-     * Closes the database connection.
-     * @throws { Error } - If the database type is not supported.
-     */
-    async close(): Promise<void> {
-        switch (this.config.type) {
-            case constants.database.types.SQLITE3:
-                return this.sqliteClose();
-
-            default:
-                throw new Error(`Database: Database type ${this.config.type} not supported!`);
-        }
-    }
-
-    // ---------------------
-    // |      QUERIES      |
-    // ---------------------
-
-    /**
-     * Executes an upsert query.
-     * @param query - The SQL query to execute.
-     * @param params - The query parameters.
-     * @returns The ID of the inserted row.
-     * @throws {Error} - If the database is not connected or if an error occurs while executing the query.
-     */
-    async upsert(query: string, params?: any | any[]): Promise<IInsertReturn> {
-        if (!this.db) throw new Error('Database: Database not connected!');
-
-        // TODO: Check against SQL injection.
-        // TODO: Sanitize params.
-
-        switch (this.config.type) {
-            case constants.database.types.SQLITE3:
-                return this.sqliteUpsert(query, params);
-
-            default:
-                throw new Error(`Database: Database type ${this.config.type} not supported!`);
-        }
-    }
-
-    /**
-     * Executes a select all query.
-     * @param {string} query - The SQL query to execute.
-     * @returns An array of objects representing the selected rows.
-     * @throws { Error } - If the database is not connected or if an error occurs while executing the query.
-     */
-    async selectMany(query: string, params?: string[] | number[]): Promise<any[]> {
-        if (!this.db) throw new Error('Database: Database not connected!');
-
-        // TODO: Check against SQL injection.
-
-        switch (this.config.type) {
-            case constants.database.types.SQLITE3:
-                return this.sqliteSelectMany(query, params);
-
-            default:
-                throw new Error(`Database: Database type ${this.config.type} not supported!`);
-        }
-    }
-
-    /**
-     * 
-     * @param query 
-     * @param params 
-     * @returns 
-     */
-    async selectFromIdToId(query: string, params?: string[] | number[]): Promise<any[]> {
-        if (!this.db) throw new Error('Database: Database not connected!');
-
-        switch (this.config.type) {
-            case constants.database.types.SQLITE3:
-                return this.sqliteSelectFromIdToId(query, params);
-
-            default:
-                throw new Error(`Database: Database type ${this.config.type} not supported!`);
-        }
-    }
-
-    /**
-     * Executes the provided query and returns a single row from the result set.
-     * @param query - The SQL query string to execute.
-     * @param params - Optional parameters to pass to the query.
-     * @returns A promise that resolves to a single row from the result set.
-     * @throws { Error } - If the database is not connected or if the database type is not supported.
-     */
-    async selectOne(query: string, params?: string[] | number[]): Promise<number> {
-        if (!this.db) throw new Error('Database: Database not connected!');
-
-        switch (this.config.type) {
-            case constants.database.types.SQLITE3:
-                return this.sqliteGetOne(query, params);
-
-            default:
-                throw new Error(`Database: Database type ${this.config.type} not supported!`);
-        }
-    }
-
-    // ---------------------
-    // |      SQLite3      |
-    // ---------------------
-
-    /**
-     * Connect to a SQLite3 database.
-     */
-    private sqliteConnect(): Promise<void> {
         Logger.instance.debug("Database: Connecting to SQLite database.");
 
         return new Promise((resolve, reject) => {
@@ -180,9 +46,11 @@ export default class Database implements IDatabase {
     }
 
     /**
-     * Setup a SQLite3 database.
+     * Setup an SQLite3 database.
+     * @returns A promise that resolves when the database is set up.
+     * @throws If there is an error setting up the database.
      */
-    private sqliteSetup(): Promise<void> {
+    async setup(): Promise<void> {
         Logger.instance.debug("Database: Setting up SQLite database.");
 
         return new Promise(async (resolve, reject) => {
@@ -218,9 +86,11 @@ export default class Database implements IDatabase {
     }
 
     /**
-     * Close the connection to a SQLite3 database.
+     * Closes the connection to the SQLite3 database.
+     * @returns A promise that resolves when the connection is closed.
+     * @throws If there is an error closing the connection.
      */
-    private sqliteClose(): Promise<void> {
+    async close(): Promise<void> {
         Logger.instance.debug("Database: Closing SQLite database connection.");
 
         return new Promise((resolve, reject) => {
@@ -245,7 +115,7 @@ export default class Database implements IDatabase {
     /**
      * UPSERT query for SQLite3
      */
-    private sqliteUpsert = async (query: string, params: any | any[]): Promise<IInsertReturn> => { // TODO: Intrerface?
+    public upsert = async (query: string, params: any | any[]): Promise<IInsertReturn> => { // TODO: Intrerface?
         Logger.instance.info("Database: executing SQLite upsert query.");
         Logger.instance.debug(`Database: query: ${query} | params: ${params}`);
 
@@ -276,7 +146,7 @@ export default class Database implements IDatabase {
     /**
      * SELECT many rows for SQLite3
      */
-    private sqliteSelectMany = async (query: string, params?: string[] | number[]): Promise<any[]> => {
+    public selectMany = async (query: string, params?: string[] | number[]): Promise<any[]> => {
         Logger.instance.info("Database: executing SQLite get many query.");
         Logger.instance.debug(`Database: query: ${query} | params: ${params}`);
 
@@ -304,7 +174,7 @@ export default class Database implements IDatabase {
      * @param params 
      * @returns 
      */
-    private sqliteSelectFromIdToId = async (query: string, params?: string[] | number[]): Promise<any[]> => {
+    public selectFromIdToId = async (query: string, params?: string[] | number[]): Promise<any[]> => {
         Logger.instance.info("Database: executing SQLite select from id to id query.");
         Logger.instance.debug(`Database: query: ${query} | params: ${params}`);
 
@@ -329,7 +199,7 @@ export default class Database implements IDatabase {
     /**
      * SELECT one row for SQLite3
      */
-    private sqliteGetOne = async (query: string, params?: string[] | number[]): Promise<number> => {
+    public selectOne = async (query: string, params?: string[] | number[]): Promise<number> => {
         Logger.instance.debug("Database: executing SQLite get one query.");
         Logger.instance.debug(`Database: query: ${query} | params: ${params}`);
 
