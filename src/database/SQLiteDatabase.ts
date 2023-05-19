@@ -10,7 +10,7 @@ import { isTruthy } from "../util/isTruthy";
 import { IInsertReturn } from "../interfaces/IInsertReturn";
 
 /**
- * A class that represents a SQLite3 database.
+ * A class that represents an SQLite3 database.
  */
 export default class SQLiteDatabase implements IDatabase {
     private config: IDatabaseConfig;
@@ -113,7 +113,11 @@ export default class SQLiteDatabase implements IDatabase {
     }
 
     /**
-     * UPSERT query for SQLite3
+     * Executes an upsert query.
+     * @param query - The SQL query to execute.
+     * @param params - The query parameters.
+     * @returns The ID of the inserted row.
+     * @throws If the database is not connected or if an error occurs while executing the query.
      */
     public upsert = async (query: string, params: any | any[]): Promise<IInsertReturn> => { // TODO: Intrerface?
         Logger.instance.info("Database: executing SQLite upsert query.");
@@ -144,7 +148,10 @@ export default class SQLiteDatabase implements IDatabase {
     }
 
     /**
-     * SELECT many rows for SQLite3
+     * Executes a select all query.
+     * @param query - The SQL query to execute.
+     * @returns An array of objects representing the selected rows.
+     * @throws If the database is not connected or if an error occurs while executing the query.
      */
     public selectMany = async (query: string, params?: string[] | number[]): Promise<any[]> => {
         Logger.instance.info("Database: executing SQLite get many query.");
@@ -169,10 +176,11 @@ export default class SQLiteDatabase implements IDatabase {
     }
 
     /**
-     * 
-     * @param query 
-     * @param params 
-     * @returns 
+     * Executes a SQLite SELECT query that selects rows from a table based on a range of IDs.
+     * @param query - The SELECT query to execute.
+     * @param params - An array of parameters to pass to the query.
+     * @returns A promise that resolves with an array of rows returned by the query.
+     * @throws If the database is not connected or if there is an error executing the query.
      */
     public selectFromIdToId = async (query: string, params?: string[] | number[]): Promise<any[]> => {
         Logger.instance.info("Database: executing SQLite select from id to id query.");
@@ -197,7 +205,11 @@ export default class SQLiteDatabase implements IDatabase {
     }
 
     /**
-     * SELECT one row for SQLite3
+     * Executes the provided query and returns a single row from the result set.
+     * @param query - The SQL query string to execute.
+     * @param params - Optional parameters to pass to the query.
+     * @returns A promise that resolves to a single row from the result set.
+     * @throws If the database is not connected or if the database type is not supported.
      */
     public selectOne = async (query: string, params?: string[] | number[]): Promise<number> => {
         Logger.instance.debug("Database: executing SQLite get one query.");

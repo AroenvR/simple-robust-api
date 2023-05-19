@@ -22,9 +22,9 @@ export interface IDatabase {
     close(): Promise<void>;
 
     /**
-     * TODO: Document
-     * @param table 
-     * @param params 
+     * Executes an upsert query.
+     * @param query - The SQL query to execute.
+     * @param params - The query parameters.
      */
     upsert(query: string, params?: any | any[]): Promise<any>;
 
