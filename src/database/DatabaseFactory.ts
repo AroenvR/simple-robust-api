@@ -18,15 +18,15 @@ export default class DatabaseFactory {
      * @throws If the database type is not supported.
      */
     createDatabase(config: IDatabaseConfig): IDatabase {
-        Logger.instance.debug('DatabaseFactory: Creating database of type: ' + config.type);
+        Logger.instance.debug('DatabaseFactory: Creating database of type: ' + config.driver);
 
-        switch(config.type) {
-            
+        switch (config.driver) {
+
             case constants.database.types.SQLITE3:
                 return new SQLiteDatabase(config);
 
             default:
-                throw new Error('DatabaseFactory: Unknown database type: ' + config.type);
+                throw new Error('DatabaseFactory: Unknown database type: ' + config.driver);
         }
     }
 }

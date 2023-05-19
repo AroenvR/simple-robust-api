@@ -8,6 +8,12 @@ import { UserDTO } from "../dto/UserDTO";
 import NotFoundError from "../../util/errors/NotFoundError";
 import { inject, injectable } from "inversify";
 import { TYPES } from "../../ioc/TYPES";
+import Knex from "knex";
+
+// TODO: Validate objects before inserting/updating.
+// TODO: Enforce objects (such as uuid should exist).
+// Caching?
+// Indexing? 
 
 /**
  * UserRepo class implements IUserRepo and provides methods to interact with user records in the database.
@@ -17,12 +23,19 @@ export class UserRepo implements IUserRepo {
     readonly name = 'UserRepo';
     private readonly TABLE = 'users';
     private _db: IDatabase;
+    private _knex: any;
 
     /**
      * @param db - The database object.
      */
     constructor(@inject(TYPES.Database) db: IDatabase) {
         this._db = db;
+
+        this._knex = Knex({
+            client: db.config.driver,
+            connection: db.getConnection(),
+            useNullAsDefault: true,
+        });
     }
 
     /**
@@ -33,14 +46,24 @@ export class UserRepo implements IUserRepo {
     async upsert(params: User[]): Promise<UserDTO[]> {
         Logger.instance.info(`${this.name}: upserting users.`);
 
-        const placeholders = params.map(() => queries.users.placeholders).join(',');
-        let query = `${queries.users.insert} ${placeholders} ${queries.users.onConflict}`;
+        // const placeholders = params.map(() => queries.users.placeholders).join(',');
+        // let query = `${queries.users.insert} ${placeholders} ${queries.users.onConflict}`;
 
         try {
-            const resp = await this._db.upsert(query, params);
-            if (!isTruthy(resp)) throw new Error(`${this.name}: Error upserting users.`);
+            const resp = await this._knex.transaction(async (trx: any) => {
+                const query = trx(this.TABLE)
+                    .insert(params)
+                    .onConflict('uuid')
+                    .ignore()
+                    .returning('*');
+                return await query;
+            });
 
-            return await this.selectFromIdToId(resp.changes, resp.lastId);
+            if (!resp || !resp.length) {
+                throw new Error(`${this.name}: Error upserting users.`);
+            }
+
+            return resp.map((row: any) => new UserDTO(row));
 
         } catch (error: Error | any) {
             Logger.instance.error(`${this.name}: Error upserting users:`, error);

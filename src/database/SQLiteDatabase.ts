@@ -13,7 +13,7 @@ import { IInsertReturn } from "./IInsertReturn";
  * A class that represents an SQLite3 database.
  */
 export default class SQLiteDatabase implements IDatabase {
-    private config: IDatabaseConfig;
+    readonly config: IDatabaseConfig;
     private db: sqlite3.Database | null = null;
 
     /**
@@ -43,6 +43,14 @@ export default class SQLiteDatabase implements IDatabase {
                 }
             });
         });
+    }
+
+    getConnection(): sqlite3.Database {
+        if (!this.db) {
+            throw new Error('Database: Database not connected!');
+        }
+
+        return this.db;
     }
 
     /**

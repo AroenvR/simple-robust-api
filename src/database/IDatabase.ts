@@ -1,8 +1,13 @@
+import { IDatabaseConfig } from "./IDatabaseConfig";
+
 /**
  * IDatabase interface represents the contract for a database class.
  * It defines the methods required for connecting, querying, closing, and setting up the database.
  */
 export interface IDatabase {
+    readonly config: IDatabaseConfig;
+    getConnection(): any;
+
     /**
      * Connects to the database.
      * @returns A promise that resolves when the connection is established, or rejects with an error if the connection fails.

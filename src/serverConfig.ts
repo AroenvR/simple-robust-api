@@ -12,7 +12,7 @@ export const serverConfig: IServerConfig = { // TODO: Provide a proper serverCon
     },
     database: {
         filename: ':memory:',
-        type: 'sqlite3'
+        driver: 'sqlite3'
     },
     logging: {
         level: "debug",

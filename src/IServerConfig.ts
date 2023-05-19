@@ -12,7 +12,7 @@ export interface IServerConfig {
     };
     database: {
         filename: string;
-        type: string;
+        driver: string;
     };
     logging: {
         level: string;

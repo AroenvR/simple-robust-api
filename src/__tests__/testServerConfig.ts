@@ -15,7 +15,7 @@ export const testServerConfig: IServerConfig = {
     },
     database: {
         filename: ':memory:',
-        type: constants.database.types.SQLITE3
+        driver: constants.database.types.SQLITE3
     },
     logging: {
         level: "debug",
