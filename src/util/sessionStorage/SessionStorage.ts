@@ -4,6 +4,7 @@ import { IStorage } from "./IStorage";
  * A utility class that provides a simple in-memory key-value storage that persists for the duration of the session.
  */
 export class SessionStorage {
+    private static _instance: SessionStorage;
     private _storage: IStorage;
 
     /**
@@ -11,6 +12,28 @@ export class SessionStorage {
      */
     constructor() {
         this._storage = {};
+    }
+
+    /**
+     * Gets the SessionStorage instance.
+     * @throws Error if the instance is not created yet.
+     */
+    public static get instance(): SessionStorage {
+        if (!this._instance) {
+            throw new Error("PubSub instance not created. Call PubSub.create(config) first.");
+        }
+        return this._instance;
+    }
+
+    /**
+     * Creates a SessionStorage instance.
+     * @returns The created SessionStorage instance.
+     */
+    public static create(): SessionStorage {
+        if (!this._instance) {
+            this._instance = new SessionStorage();
+        }
+        return this._instance;
     }
 
     /**

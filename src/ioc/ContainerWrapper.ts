@@ -14,6 +14,7 @@ import { IController } from "../api/controller/IController";
 import { IService } from "../api/service/IService";
 import { IRepository } from "../api/repo/IRepository";
 import DatabaseFactory from "../database/DatabaseFactory";
+import { SessionStorage } from "../util/sessionStorage/SessionStorage";
 
 /**
  * `ContainerWrapper` is a class responsible for managing the application's dependencies using InversifyJS's container.  
@@ -25,7 +26,7 @@ export class ContainerWrapper {
     private logger: Logger;
     private pubSub: PubSub;
     private taskProcessor: TaskProcessor;
-    // private controllers: symbol[] = [];
+    private sessionStorage: SessionStorage;
 
     /**
      * Constructs a new instance of the `ContainerWrapper` class.
@@ -38,6 +39,7 @@ export class ContainerWrapper {
         this.logger = Logger.create({ ...config.logging });
         this.pubSub = PubSub.create();
         this.taskProcessor = TaskProcessor.create({ ...config.tasks });
+        this.sessionStorage = SessionStorage.create();
     }
 
     /**
@@ -79,6 +81,7 @@ export class ContainerWrapper {
         this.container.bind<Logger>(TYPES.Logger).toConstantValue(this.logger);
         this.container.bind<PubSub>(TYPES.PubSub).toConstantValue(this.pubSub);
         this.container.bind<TaskProcessor>(TYPES.TaskProcessor).toConstantValue(this.taskProcessor);
+        this.container.bind<SessionStorage>(TYPES.SessionStorage).toConstantValue(this.sessionStorage);
     }
 
     /**

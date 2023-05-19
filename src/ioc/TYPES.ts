@@ -11,6 +11,7 @@ export const TYPES = {
     TaskProcessor: Symbol.for("TaskProcessor"),
     Logger: Symbol.for("Logger"),
     RouteInitEvent: Symbol.for("RouteInitEvent"),
+    SessionStorage: Symbol.for("SessionStorage"),
 
     // Business Logic
     Database: Symbol.for("Database"),
