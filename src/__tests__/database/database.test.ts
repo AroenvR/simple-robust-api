@@ -1,7 +1,7 @@
-import DatabaseFactory from '../database/DatabaseFactory';
-import { IDatabase } from '../database/IDatabase';
-import Logger from '../util/logging/Logger';
-import { testServerConfig } from './testServerConfig';
+import DatabaseFactory from '../../database/DatabaseFactory';
+import { IDatabase } from '../../database/IDatabase';
+import Logger from '../../util/logging/Logger';
+import { testServerConfig } from '../testServerConfig';
 
 describe('Database', () => {
     let database: IDatabase;
