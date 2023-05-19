@@ -1,40 +1,35 @@
 import axios from "axios";
 import App from "../../domain/App";
-import Container from "../../domain/Container";
 import { testServerConfig } from "../testServerConfig";
+import { ContainerWrapper } from "../../ioc_container/ContainerWrapper";
+import { TYPES } from "../../ioc_container/IocTypes";
 
 // SECURITY testing
 describe('Helmet middleware', () => {
     let app: App;
-    let requestHeaders: any;
 
     beforeAll(async () => {
-        const iocContainer = new Container(testServerConfig);
-        iocContainer.initContainer();
+        const containerWrapper = new ContainerWrapper(testServerConfig);
+        containerWrapper.initContainer();
 
-        app = iocContainer.get(App);
+        app = containerWrapper.getContainer().get<App>(TYPES.App);
         await app.start();
-
-        requestHeaders = {
-            'Origin': 'http://test.com',
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${process.env.TEST_BEARER_TOKEN}`,
-            'withCredentials': 'false',
-        };
     });
 
     afterAll(async () => {
-        // Shut down the application after all tests.
         await app.stop();
-
-        // Re-enable console.log methods after all tests
-        jest.restoreAllMocks();
     });
 
     // ----------------------------
 
     test('HTTP Headers should be configured', async () => {
+        const requestHeaders = {
+            'Origin': 'http://test.com',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${process.env.TEST_BEARER_TOKEN}`
+        };
+
         const response = await axios.get(`http://localhost:${testServerConfig.app.port}/users`, { headers: requestHeaders })
             .catch(err => {
                 return err.response;
@@ -43,7 +38,6 @@ describe('Helmet middleware', () => {
         expect(response.headers['content-security-policy']).toContain("default-src 'self'");
         expect(response.headers['x-frame-options']).toBe('SAMEORIGIN');
         expect(response.headers['x-xss-protection']).toBe('0');
-
     });
 
 });

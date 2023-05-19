@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { UserDTO } from "../dto/UserDTO";
-import { UserService } from "../service/UserService";
 import { IUserController } from "./IUserController";
 import Logger from '../../util/Logger';
 import validator from 'validator';
@@ -8,158 +7,105 @@ import ValidationError from '../../errors/ValidationError';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../../ioc_container/IocTypes';
 import { IUserService } from '../service/IUserService';
+import { isTruthy } from '../../util/isTruthy';
+import NotFoundError from '../../errors/NotFoundError';
 
 @injectable()
 export class UserController implements IUserController {
     readonly name = 'UserController';
     service: IUserService;
+    router: Router;
 
     constructor(@inject(TYPES.Service) service: IUserService) {
         this.service = service;
+        this.router = Router();
     }
 
-    /**
-     * Upserts users.
-     * @param userDtos - The array of user data transfer objects.
-     * @returns The result of the upsert operation.
-     */
-    public async upsert(userDtos: UserDTO[]): Promise<any> {
-        Logger.instance.info(`${this.name}: Upserting users.`);
+    public initRoutes(): Router {
+        /**
+         * GET /users
+         */
+        this.router.get('/users', async (req, res, next) => {
+            try {
+                let users = await this.handleGet(req.query);
 
-        try {
-            const result = await this.service.upsert(userDtos);
-            return result;
-        } catch (error) {
-            Logger.instance.error(`${this.name}: Error upserting users`, error);
-            throw error;
-        }
+                const toReturn = users.sort(user => user.id);
+                res.status(200).json(toReturn);
+            } catch (error) {
+                next(error);
+            }
+        });
+
+        /**
+         * POST /users
+         */
+        this.router.post('/users', async (req, res, next) => {
+            try {
+                const result = await this.upsert(req.body);
+
+                const toReturn = result.sort(user => user.id);
+                res.status(201).json(toReturn);
+            } catch (error) {
+                next(error);
+            }
+        });
+
+        return this.router;
     }
 
     /**
      * Retrieves all users.
      * @returns The array of users.
      */
-    public async getAll(): Promise<any[]> {
-        Logger.instance.info(`${this.name}: Getting all users.`);
-
-        try {
-            const users = await this.service.getAll();
-            return users;
-        } catch (error) {
-            console.error('UserController: Error getting all users', error);
-            throw error;
+    public async handleGet(query?: any): Promise<UserDTO[]> {
+        if (!isTruthy(query)) {
+            Logger.instance.info(`${this.name}: Getting all users.`);
+            return this.service.getAll();
         }
+
+        const ids = query!.ids as string;
+        const uuids = query!.uuids as string;
+
+        if (isTruthy(ids)) {
+            let idArray: number[] = ids.split(',').map((id) => parseInt(id));
+
+            return this.service.getByIds(idArray);
+        }
+
+        if (isTruthy(uuids)) {
+            let uuidArray: string[] = uuids.split(',');
+            return this.getByUuids(uuidArray);
+        }
+
+        throw new NotFoundError('Invalid query parameters.');
     }
 
-    public async getByUuids(uuids: string[]): Promise<UserDTO[]> {
+    /**
+     * Upserts users.
+     * @param userDtos The array of user data transfer objects.
+     * @returns The result of the upsert operation.
+     */
+    public async upsert(userDtos: UserDTO[]): Promise<UserDTO[]> {
+        Logger.instance.info(`${this.name}: Upserting users.`);
+
+        await this.checkUsers(userDtos);
+
+        return await this.service.upsert(userDtos);
+    }
+
+    public async getByUuids(uuids: string[]): Promise<UserDTO[]> { // TODO: test
         Logger.instance.info(`${this.name}: Getting users by uuids.`);
-        Logger.instance.debug(`${this.name}: Getting users by uuids:`, uuids);
 
-        return await this.service.getByUuids(uuids);
-    }
-
-    public async getLast(): Promise<any> {
-        throw new Error('Method not implemented.');
-    }
-
-    public initRoutes(): Router {
-        const router = Router();
-
-        router.get('/users', async (req, res, next) => {
-            try {
-                const users = await this.getAll();
-                res.status(200).json(users);
-            } catch (error) {
-                next(error);
+        for (const item of uuids) {
+            if (!validator.isUUID(item)) {
+                Logger.instance.error(`UserController: GET /users invalid uuid: ${item}`);
+                throw new ValidationError(`Invalid uuid: ${item}`);
             }
-        });
+        }
 
-        router.post('/users', async (req, res, next) => {
-            Logger.instance.log('UserController: POST /users.');
-            Logger.instance.debug('UserController: POST /users received data:', req.body);
-
-            let userDtos = req.body;
-            if (!Array.isArray(userDtos)) userDtos = [userDtos];
-
-            try {
-                await this.checkUsers(userDtos);
-                const result = await this.upsert(userDtos);
-
-                Logger.instance.info('UserController: POST /users success.');
-                Logger.instance.debug('UserController: POST /users returned:', result);
-                res.status(201).json(result);
-            } catch (error) {
-                Logger.instance.error('UserController: POST /users error:', error);
-                next(error);
-            }
-        });
-
-        return router;
+        return this.service.getByUuids(uuids);
     }
 
-    // private setupRoutes(app: express.Application): void {
-    //     app.get('/users', async (req, res, next) => {
-    //         try {
-    //             const users = await this.getAll();
-    //             res.status(200).json(users);
-    //         } catch (error) {
-    //             next(error);
-    //         }
-    //     });
-
-    //     app.get('/users/uuid', async (req, res, next) => {
-    //         Logger.instance.log('UserController: GET /users/uuid.');
-
-    //         if (!isTruthy(req.query.uuid) && !isTruthy(req.query.uuids)) {
-    //             Logger.instance.error('UserController: GET /users/uuid missing required query parameter: uuid or uuids');
-    //             res.status(400).json({ message: 'Missing required query parameter: uuid or uuids' });
-    //             return;
-    //         }
-
-    //         Logger.instance.debug('UserController: GET /users/uuid received query parameters:', req.query);
-
-    //         let uuids: any = [req.query.uuid];
-    //         if (!isTruthy(uuids)) uuids = req.query.uuids;
-
-    //         try {
-    //             for (const uuid of uuids) {
-    //                 if (!validator.isUUID(uuid)) {
-    //                     Logger.instance.error('UserController: GET /users/uuid invalid uuid:', uuid);
-    //                     throw new ValidationError(`Invalid uuid: ${uuid}`);
-    //                 }
-    //             }
-
-    //             const users = await this.getByUuids(uuids);
-    //             res.status(200).json(users);
-
-    //             Logger.instance.info('UserController: GET /users/uuid success.');
-    //             Logger.instance.debug('UserController: GET /users/uuid returned:', users);
-    //         } catch (error) {
-    //             Logger.instance.error('UserController: GET /users/uuid error:', error);
-    //             next(error);
-    //         }
-    //     });
-
-    //     app.post('/users', async (req, res, next) => {
-    //         Logger.instance.log('UserController: POST /users.');
-    //         Logger.instance.debug('UserController: POST /users received data:', req.body);
-
-    //         let userDtos = req.body;
-    //         if (!Array.isArray(userDtos)) userDtos = [userDtos];
-
-    //         try {
-    //             await this.checkUsers(userDtos);
-    //             const result = await this.upsert(userDtos);
-
-    //             Logger.instance.info('UserController: POST /users success.');
-    //             Logger.instance.debug('UserController: POST /users returned:', result);
-    //             res.status(201).json(result);
-    //         } catch (error) {
-    //             Logger.instance.error('UserController: POST /users error:', error);
-    //             next(error);
-    //         }
-    //     });
-    // }
 
     /**
      * Asynchronously checks the validity of an array of users.

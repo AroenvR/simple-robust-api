@@ -1,4 +1,3 @@
-import "reflect-metadata";
 import App from "../../domain/App";
 import { generateUUID } from "../../util/uuid";
 import { testServerConfig } from "../testServerConfig";
@@ -11,6 +10,8 @@ import { TYPES } from "../../ioc_container/IocTypes";
  */
 describe('Users API', () => {
     let app: App;
+    const johnUUID = generateUUID();
+    const janeUUID = generateUUID();
 
     beforeAll(async () => {
         const containerWrapper = new ContainerWrapper(testServerConfig);
@@ -21,15 +22,8 @@ describe('Users API', () => {
     });
 
     afterAll(async () => {
-        // Shut down the application after all tests.
         await app.stop();
-
-        jest.restoreAllMocks();
     });
-
-    // ----------------------------
-
-    // TODO: Create users!
 
     // ----------------------------
 
@@ -38,11 +32,11 @@ describe('Users API', () => {
 
         const payload = [
             {
-                uuid: generateUUID(),
+                uuid: johnUUID,
                 name: 'John Doe'
             },
             {
-                uuid: generateUUID(),
+                uuid: janeUUID,
                 name: 'Jane Doe'
             }
         ];
@@ -54,6 +48,18 @@ describe('Users API', () => {
         });
 
         expect(response.status).toBe(201);
+        expect(response.data).toEqual([
+            {
+                id: 2,
+                uuid: janeUUID,
+                name: 'Jane Doe'
+            },
+            {
+                id: 1,
+                uuid: johnUUID,
+                name: 'John Doe'
+            },
+        ]);
     });
 
     // ----------------------------
@@ -68,5 +74,17 @@ describe('Users API', () => {
         });
 
         expect(response.status).toBe(200);
+        expect(response.data).toEqual([
+            {
+                id: 1,
+                uuid: johnUUID,
+                name: 'John Doe'
+            },
+            {
+                id: 2,
+                uuid: janeUUID,
+                name: 'Jane Doe'
+            },
+        ]);
     });
 });

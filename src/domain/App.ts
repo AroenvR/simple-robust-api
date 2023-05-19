@@ -105,9 +105,9 @@ export default class App {
             this.app.use(urlencoded({ extended: true })); // body-parser is a core component of Express.js that parses incoming requests.
 
             // Add middlewares
+            this.app.use(helmetMiddleware({}));                      // HTTP Headers
             this.app.use(sanitizeMiddleware);                        // Request Sanitization
             this.app.use(corsMiddleware(this.config.corsConfig));    // CORS
-            this.app.use(helmetMiddleware({}));                      // HTTP Headers
             this.app.use(rateLimiterMiddleware({}));                 // Rate Limiting
             this.app.use(sanitizeResponseMiddleware);                // Response Sanitization
             this.app.use(loggerMiddleware)                           // Logging

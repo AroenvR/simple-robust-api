@@ -21,7 +21,7 @@ export const loggerMiddleware = (req: Request, res: Response, next: NextFunction
     // Override res.json to capture the response body
     // @ts-ignore
     res.json = function (body) {
-        Logger.instance.debug(`${req.method} ${req.path} returned:`, body);
+        Logger.instance.debug(`${req.method} ${req.path} returned status: ${res.statusCode}, body:`, body);
         res.locals.originalJson.call(res, body);
     };
 

@@ -2,7 +2,6 @@ import { PubSub } from "../../util/PubSub";
 import { TaskProcessor } from "../../util/TaskProcessor";
 import { UserDTO } from "../dto/UserDTO";
 import { User } from "../model/User";
-import { UserRepo } from "../repo/UserRepo";
 import Logger from "../../util/Logger";
 import { inject, injectable } from "inversify";
 import { TYPES } from "../../ioc_container/IocTypes";
@@ -64,6 +63,15 @@ export class UserService implements IUserService {
     }
 
     /**
+     * Gets users by id's.
+     * @param ids - An array of user id's.
+     */
+    async getByIds(ids: number[]): Promise<UserDTO[]> {
+        Logger.instance.info(`${this.name}: Getting users by id's.`);
+        throw new Error("Method not implemented.");
+    }
+
+    /**
      * Gets users by UUID's.
      * @param uuids - An array of user UUID's.
      * @returns A promise that resolves to an array of userDto's.
@@ -72,6 +80,6 @@ export class UserService implements IUserService {
     async getByUuids(uuids: string[]): Promise<UserDTO[]> {
         Logger.instance.info(`${this.name}: Getting users by UUID's.`);
 
-        return await this.repository.selectByUuids(uuids);;
+        return this.repository.selectByUuids(uuids);;
     }
 }
