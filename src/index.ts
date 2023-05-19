@@ -1,9 +1,9 @@
 import "reflect-metadata";
-import App from './domain/App';
-import { ContainerWrapper } from './ioc_container/ContainerWrapper';
+import App from './app/App';
+import { ContainerWrapper } from './ioc/ContainerWrapper';
 import { serverConfig } from './serverConfig';
-import Logger from './util/Logger';
-import { TYPES } from "./ioc_container/IocTypes";
+import Logger from './util/logging/Logger';
+import { TYPES } from "./ioc/TYPES";
 
 console.log('--- Index: Initializing application ---');
 

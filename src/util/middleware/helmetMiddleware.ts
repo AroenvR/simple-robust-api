@@ -1,5 +1,5 @@
 import helmet, { HelmetOptions } from 'helmet';
-import Logger from '../util/Logger';
+import Logger from '../logging/Logger';
 
 /**
  * SECURITY

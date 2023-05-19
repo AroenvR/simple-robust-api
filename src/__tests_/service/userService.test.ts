@@ -2,9 +2,9 @@ import { UserDTO } from "../../api/dto/UserDTO";
 import { UserService } from "../../api/service/UserService";
 import { generateUUID } from "../../util/uuid";
 import { testServerConfig } from "../testServerConfig";
-import App from "../../domain/App";
-import { TYPES } from "../../ioc_container/IocTypes";
-import { ContainerWrapper } from "../../ioc_container/ContainerWrapper";
+import App from "../../app/App";
+import { TYPES } from "../../ioc/TYPES";
+import { ContainerWrapper } from "../../ioc/ContainerWrapper";
 
 describe('UserService', () => {
     let app: App;

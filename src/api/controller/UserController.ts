@@ -1,14 +1,14 @@
 import { Router } from 'express';
 import { UserDTO } from "../dto/UserDTO";
 import { IUserController } from "./IUserController";
-import Logger from '../../util/Logger';
+import Logger from '../../util/logging/Logger';
 import validator from 'validator';
-import ValidationError from '../../errors/ValidationError';
+import ValidationError from '../../util/errors/ValidationError';
 import { inject, injectable } from 'inversify';
-import { TYPES } from '../../ioc_container/IocTypes';
+import { TYPES } from '../../ioc/TYPES';
 import { IUserService } from '../service/IUserService';
 import { isTruthy } from '../../util/isTruthy';
-import NotFoundError from '../../errors/NotFoundError';
+import NotFoundError from '../../util/errors/NotFoundError';
 
 @injectable()
 export class UserController implements IUserController {

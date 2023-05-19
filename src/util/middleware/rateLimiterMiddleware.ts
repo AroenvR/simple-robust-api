@@ -1,5 +1,5 @@
 import rateLimit from 'express-rate-limit';
-import Logger from '../util/Logger';
+import Logger from '../logging/Logger';
 
 /**
  * SECURITY

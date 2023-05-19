@@ -3,11 +3,11 @@ import path from 'path';
 import { inject } from "inversify";
 import sqlite3 from 'sqlite3';
 import { IDatabase } from "./IDatabase";
-import { TYPES } from "../ioc_container/IocTypes";
+import { TYPES } from "../ioc/TYPES";
 import { IDatabaseConfig } from "./IDatabaseConfig";
-import Logger from "../util/Logger";
+import Logger from "../util/logging/Logger";
 import { isTruthy } from "../util/isTruthy";
-import { IInsertReturn } from "../interfaces/IInsertReturn";
+import { IInsertReturn } from "./IInsertReturn";
 
 /**
  * A class that represents an SQLite3 database.
@@ -70,7 +70,7 @@ export default class SQLiteDatabase implements IDatabase {
             });
 
             // Read the schema from the file and create the database schema.
-            const schemaPath = path.join(__dirname, '..', 'sql', 'schema.sql');
+            const schemaPath = path.join(__dirname, './', 'sql', 'schema.sql');
             const schema = await fs.readFile(schemaPath, 'utf8');
 
             this.db.exec(schema, (err: Error | null) => {

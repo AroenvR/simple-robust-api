@@ -1,4 +1,4 @@
-import { TaskProcessor } from '../../util/TaskProcessor';
+import { TaskProcessor } from '../../util/taskProcessing/TaskProcessor';
 import { testServerConfig } from '../testServerConfig';
 
 describe('TaskProcessor', () => {

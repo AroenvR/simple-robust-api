@@ -1,5 +1,5 @@
-import { PubSub } from "../../util/PubSub";
-import { TaskProcessor } from "../../util/TaskProcessor";
+import { PubSub } from "../../util/pubSub/PubSub";
+import { TaskProcessor } from "../../util/taskProcessing/TaskProcessor";
 import { IRepository } from "../repo/IRepository";
 
 /**

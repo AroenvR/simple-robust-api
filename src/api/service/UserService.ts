@@ -1,10 +1,10 @@
-import { PubSub } from "../../util/PubSub";
-import { TaskProcessor } from "../../util/TaskProcessor";
+import { PubSub } from "../../util/pubSub/PubSub";
+import { TaskProcessor } from "../../util/taskProcessing/TaskProcessor";
 import { UserDTO } from "../dto/UserDTO";
 import { User } from "../model/User";
-import Logger from "../../util/Logger";
+import Logger from "../../util/logging/Logger";
 import { inject, injectable } from "inversify";
-import { TYPES } from "../../ioc_container/IocTypes";
+import { TYPES } from "../../ioc/TYPES";
 import { IUserService } from "./IUserService";
 import { IUserRepo } from "../repo/IUserRepo";
 

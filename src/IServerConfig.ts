@@ -14,7 +14,7 @@ export interface IServerConfig {
         filename: string;
         type: string;
     };
-    logger: {
+    logging: {
         level: string;
         console: boolean;
         http: boolean;

@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
-import { ISubscriber } from "../interfaces/ISubscriber";
-import Logger from "./Logger";
+import { ISubscriber } from "./ISubscriber";
+import Logger from "../logging/Logger";
 
 /**
  * The PubSub class provides a simple publish-subscribe pattern implementation.

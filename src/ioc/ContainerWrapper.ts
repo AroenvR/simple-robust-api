@@ -1,15 +1,14 @@
 import { Container } from "inversify";
-import Logger from "../util/Logger";
-import { RouteInitEvent } from "../util/RouteInitEvent";
-import { TYPES } from "./IocTypes";
-import { PubSub } from "../util/PubSub";
-import { TaskProcessor } from "../util/TaskProcessor";
+import Logger from "../util/logging/Logger";
+import { TYPES } from "./TYPES";
+import { PubSub } from "../util/pubSub/PubSub";
+import { TaskProcessor } from "../util/taskProcessing/TaskProcessor";
 import { UserRepo } from "../api/repo/UserRepo";
 import { UserService } from "../api/service/UserService";
 import { UserController } from "../api/controller/UserController";
-import App from "../domain/App";
-import { IServerConfig } from "../interfaces/IServerConfig";
-import { IAppConfig } from "../interfaces/IAppConfig";
+import App from "../app/App";
+import { IServerConfig } from "../IServerConfig";
+import { IAppConfig } from "../app/IAppConfig";
 import { IDatabase } from "../database/IDatabase";
 import { IController } from "../api/controller/IController";
 import { IService } from "../api/service/IService";
@@ -36,7 +35,7 @@ export class ContainerWrapper {
         this.config = config;
         this.container = new Container();
 
-        this.logger = Logger.create({ ...config.logger });
+        this.logger = Logger.create({ ...config.logging });
         this.pubSub = PubSub.create();
         this.taskProcessor = TaskProcessor.create({ ...config.tasks });
     }
@@ -80,7 +79,6 @@ export class ContainerWrapper {
         this.container.bind<Logger>(TYPES.Logger).toConstantValue(this.logger);
         this.container.bind<PubSub>(TYPES.PubSub).toConstantValue(this.pubSub);
         this.container.bind<TaskProcessor>(TYPES.TaskProcessor).toConstantValue(this.taskProcessor);
-        this.container.bind<RouteInitEvent>(TYPES.RouteInitEvent).to(RouteInitEvent);
     }
 
     /**

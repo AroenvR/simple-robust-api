@@ -1,5 +1,5 @@
 import { injectable } from "inversify";
-import { ITaskProcessorConfig } from "../interfaces/ITaskProcessorConfig";
+import { ITaskProcessorConfig } from "./ITaskProcessorConfig";
 
 export type Task = () => void;
 

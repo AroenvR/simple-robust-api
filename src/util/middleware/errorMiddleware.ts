@@ -3,7 +3,7 @@ import ApiError from "../errors/ApiError";
 import NotFoundError from "../errors/NotFoundError";
 import ValidationError from "../errors/ValidationError";
 import AuthorizationError from "../errors/AuthorizationError";
-import Logger from "../util/Logger";
+import Logger from "../logging/Logger";
 
 /**
  * Middleware for handling API errors.

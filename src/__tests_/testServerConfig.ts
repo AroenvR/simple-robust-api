@@ -1,5 +1,5 @@
 import path from 'path';
-import { IServerConfig } from "../interfaces/IServerConfig";
+import { IServerConfig } from "../IServerConfig";
 import { constants } from "../util/constants";
 
 export const testServerConfig: IServerConfig = {
@@ -17,7 +17,7 @@ export const testServerConfig: IServerConfig = {
         filename: ':memory:',
         type: constants.database.types.SQLITE3
     },
-    logger: {
+    logging: {
         level: "debug",
         console: false,
         http: false,

@@ -1,9 +1,9 @@
 import axios from 'axios';
-import App from '../../domain/App';
+import App from '../../app/App';
 import { testServerConfig } from '../testServerConfig';
 import { generateUUID } from '../../util/uuid';
-import { ContainerWrapper } from '../../ioc_container/ContainerWrapper';
-import { TYPES } from '../../ioc_container/IocTypes';
+import { ContainerWrapper } from '../../ioc/ContainerWrapper';
+import { TYPES } from '../../ioc/TYPES';
 
 describe('sanitizeMiddleware', () => {
     let app: App;

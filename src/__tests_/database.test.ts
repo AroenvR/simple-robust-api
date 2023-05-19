@@ -1,13 +1,13 @@
 import DatabaseFactory from '../database/DatabaseFactory';
 import { IDatabase } from '../database/IDatabase';
-import Logger from '../util/Logger';
+import Logger from '../util/logging/Logger';
 import { testServerConfig } from './testServerConfig';
 
 describe('Database', () => {
     let database: IDatabase;
 
     beforeEach(async () => {
-        Logger.create(testServerConfig.logger);
+        Logger.create(testServerConfig.logging);
         
         const databaseFactory = new DatabaseFactory();
         database = databaseFactory.createDatabase(testServerConfig.database);

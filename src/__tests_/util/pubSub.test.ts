@@ -1,14 +1,14 @@
-import { ISubscriber } from '../../interfaces/ISubscriber';
-import { PubSub } from '../../util/PubSub';
+import { ISubscriber } from '../../util/pubSub/ISubscriber';
+import { PubSub } from '../../util/pubSub/PubSub';
 import { testServerConfig } from '../testServerConfig';
-import Logger from '../../util/Logger';
+import Logger from '../../util/logging/Logger';
 
 describe('PubSub', () => {
     let pubSub: PubSub;
 
     beforeAll(() => {
         pubSub = new PubSub();
-        Logger.create(testServerConfig.logger);
+        Logger.create(testServerConfig.logging);
     });
 
     // ------------------------------------

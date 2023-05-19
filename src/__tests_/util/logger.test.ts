@@ -1,6 +1,6 @@
 import path from 'path';
-import { ILoggerConfig } from "../../interfaces/ILoggerConfig";
-import Logger from "../../util/Logger";
+import { ILoggerConfig } from "../../util/logging/ILoggerConfig";
+import Logger from "../../util/logging/Logger";
 
 describe('Logger', () => {
     let logger: Logger;

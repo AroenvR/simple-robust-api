@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import Logger from "../util/Logger";
+import Logger from "../logging/Logger";
 
 /**
  * Middleware that logs request and response information using startTimerLog and stopTimerLog methods.

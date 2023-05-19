@@ -1,13 +1,13 @@
 import { IDatabase } from "../../database/IDatabase";
-import queries from "../../sql/queries";
+import queries from "../../database/sql/queries";
 import { IUserRepo } from "./IUserRepo";
 import { User } from "../model/User";
-import Logger from "../../util/Logger";
+import Logger from "../../util/logging/Logger";
 import { isTruthy } from "../../util/isTruthy";
 import { UserDTO } from "../dto/UserDTO";
-import NotFoundError from "../../errors/NotFoundError";
+import NotFoundError from "../../util/errors/NotFoundError";
 import { inject, injectable } from "inversify";
-import { TYPES } from "../../ioc_container/IocTypes";
+import { TYPES } from "../../ioc/TYPES";
 
 /**
  * UserRepo class implements IUserRepo and provides methods to interact with user records in the database.

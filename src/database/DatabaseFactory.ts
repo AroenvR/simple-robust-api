@@ -2,7 +2,8 @@ import { injectable } from "inversify";
 import { IDatabase } from "./IDatabase";
 import { IDatabaseConfig } from "./IDatabaseConfig";
 import SQLiteDatabase from "./SQLiteDatabase";
-import Logger from "../util/Logger";
+import Logger from "../util/logging/Logger";
+import { constants } from "../util/constants";
 
 /**
  * A factory class that creates instances of the appropriate database class based on the configuration type.
@@ -21,7 +22,7 @@ export default class DatabaseFactory {
 
         switch(config.type) {
             
-            case 'sqlite3':
+            case constants.database.types.SQLITE3:
                 return new SQLiteDatabase(config);
 
             default:

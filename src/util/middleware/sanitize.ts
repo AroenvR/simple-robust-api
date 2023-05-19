@@ -1,7 +1,7 @@
 import sanitizeHtml from 'sanitize-html';
-import Logger from "../util/Logger";
+import Logger from "../logging/Logger";
 import { Request, Response, NextFunction } from "express";
-import { isTruthy } from "../util/isTruthy";
+import { isTruthy } from "../isTruthy";
 import xss from 'xss';
 
 /**

@@ -2,9 +2,9 @@ import { UserRepo } from "../../api/repo/UserRepo";
 import { User } from "../../api/model/User";
 import { generateUUID } from "../../util/uuid";
 import { testServerConfig } from "../testServerConfig";
-import App from "../../domain/App";
-import { ContainerWrapper } from "../../ioc_container/ContainerWrapper";
-import { TYPES } from "../../ioc_container/IocTypes";
+import App from "../../app/App";
+import { ContainerWrapper } from "../../ioc/ContainerWrapper";
+import { TYPES } from "../../ioc/TYPES";
 
 describe('UserRepo', () => {
     let app: App;

@@ -1,14 +1,14 @@
 import express, { urlencoded } from 'express';
-import { IAppConfig } from "../interfaces/IAppConfig";
-import { corsMiddleware } from '../middleware/corsMiddleware';
-import { helmetMiddleware } from '../middleware/helmetMiddleware';
-import { rateLimiterMiddleware } from '../middleware/rateLimiterMiddleware';
-import Logger from '../util/Logger';
-import { sanitizeMiddleware, sanitizeResponseMiddleware } from '../middleware/sanitize';
-import { errorHandlerMiddleware } from '../middleware/errorMiddleware';
-import { loggerMiddleware } from '../middleware/loggerMiddleware';
+import { IAppConfig } from "./IAppConfig";
+import { corsMiddleware } from '../util/middleware/corsMiddleware';
+import { helmetMiddleware } from '../util/middleware/helmetMiddleware';
+import { rateLimiterMiddleware } from '../util/middleware/rateLimiterMiddleware';
+import Logger from '../util/logging/Logger';
+import { sanitizeMiddleware, sanitizeResponseMiddleware } from '../util/middleware/sanitize';
+import { errorHandlerMiddleware } from '../util/middleware/errorMiddleware';
+import { loggerMiddleware } from '../util/middleware/loggerMiddleware';
 import { Container, inject, injectable } from 'inversify';
-import { TYPES } from '../ioc_container/IocTypes';
+import { TYPES } from '../ioc/TYPES';
 import { IDatabase } from '../database/IDatabase';
 import { IController } from '../api/controller/IController';
 
