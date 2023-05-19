@@ -11,7 +11,7 @@ export const serverConfig: IServerConfig = { // TODO: Provide a proper serverCon
         }
     },
     database: {
-        filename: ':memory:',
+        connection: ':memory:',
         driver: 'sqlite3'
     },
     logging: {

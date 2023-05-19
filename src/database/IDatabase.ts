@@ -6,7 +6,6 @@ import { IDatabaseConfig } from "./IDatabaseConfig";
  */
 export interface IDatabase {
     readonly config: IDatabaseConfig;
-    getConnection(): any;
 
     /**
      * Connects to the database.
@@ -31,7 +30,7 @@ export interface IDatabase {
      * @param query - The SQL query to execute.
      * @param params - The query parameters.
      */
-    upsert(query: string, params?: any | any[]): Promise<any>;
+    upsert(tableName: string, data: any | any[]): Promise<any>;
 
     /**
      * Executes a SELECT query by reading the query from a file.
@@ -39,13 +38,13 @@ export interface IDatabase {
      * @param {any[]} [params] - Optional parameters for the SQL query.
      * @returns A promise that resolves with the result rows, or rejects with an error if the query fails.
      */
-    selectMany(query: string, params?: string[] | number[]): Promise<any[]>;
+    selectMany(tableName: string, whereClause?: object): Promise<any[]>;
 
     /**
      * TODO: Document
      * @param query 
      */
-    selectOne(query: string, params?: string[] | number[]): Promise<any>;
+    selectOne(tableName: string, whereClause?: object, orderBy?: [string, 'asc' | 'desc']): Promise<any>;
 
     // select by id
 
@@ -54,7 +53,7 @@ export interface IDatabase {
      * @param query 
      * @param params 
      */
-    selectFromIdToId(query: string, params?: string[] | number[]): Promise<any[]>;
+    selectFromIdToId(tableName: string, fromId: number, toId: number): Promise<any[]>;
 
     // update
 

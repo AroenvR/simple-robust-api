@@ -1,0 +1,30 @@
+17:17:42.374 DEBUG - Container: Initializing dependencies. 
+17:17:42.375 DEBUG - Container: Initializing utilities. 
+17:17:42.375 DEBUG - Container: Initializing business logic. 
+17:17:42.376 DEBUG - DatabaseFactory: Creating database of type: sqlite3 
+17:17:42.377 DEBUG - Container: Initializing application. 
+17:17:42.377 LOG - Container: Initialized successfully. 
+17:17:42.414 DEBUG - Database: Connecting to SQLite database. 
+17:17:42.416 DEBUG - Helmet: Configuring Helmet middleware. 
+17:17:42.418 DEBUG - CORS: Configuring CORS middleware. 
+17:17:42.418 DEBUG - RateLimiter: Configuring rate limiter middleware. 
+17:17:42.421 DEBUG - App: Simple Robust API successfully initialized the Express server. 
+17:17:42.421 DEBUG - App: Simple Robust API live at => http://localhost:3000/ 
+17:17:42.424 DEBUG - Database: SQLite database connected. 
+17:17:42.425 DEBUG - Database: Setting up SQLite database. 
+17:17:42.430 DEBUG - Database: SQLite database foreign keys successfully enabled. 
+17:17:42.436 DEBUG - Database: SQLite database schema successfully created. 
+17:17:42.436 DEBUG - App: Simple Robust API successfully set up the database. 
+17:17:42.437 DEBUG - App: Simple Robust API initializing API routes. 
+17:17:42.497 DEBUG - 
+            ┌────────────────────────────────────┐
+            │  -----      App Startup      ----- |
+            ├────────────────────────────────────┤
+            │  Name: Simple Robust API           │
+            │  Time: 5:17:42 PM                  │
+            │  Status: Successfully started!     │
+            └────────────────────────────────────┘ 
+17:17:42.499 LOG - App: Simple Robust API listening on port 3000. 
+17:17:44.138 DEBUG - Process: Received SIGINT. Shutting down gracefully... 
+17:17:44.139 INFO - App: Simple Robust API shutting down... 
+17:17:44.144 DEBUG - Database: Closing SQLite database connection. 

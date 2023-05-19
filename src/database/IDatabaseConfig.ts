@@ -1,4 +1,4 @@
 export interface IDatabaseConfig {
-    filename: string;
+    connection: string;
     driver: string;
 }

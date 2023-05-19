@@ -7,7 +7,7 @@ describe('PubSub', () => {
     let pubSub: PubSub;
 
     beforeAll(() => {
-        pubSub = new PubSub();
+        pubSub = PubSub.create();
         Logger.create(testServerConfig.logging);
     });
 

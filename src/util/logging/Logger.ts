@@ -108,7 +108,7 @@ export default class Logger {
     private configureFileTransport(config: ILoggerConfig): winston.transports.FileTransportOptions {
         return {
             level: config.level,
-            filename: config.filePath ?? path.join(__dirname, '../logs', `${new Date().toISOString().replace(/[:.]/g, '-')}.log`),
+            filename: config.filePath ?? path.join(__dirname, '../', '../logs', `${new Date().toISOString().replace(/[:.]/g, '-')}.log`),
             format: winston.format.printf(({ level, message, metadata }) => {
                 const now = new Date();
                 const timestamp = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}.${now.getMilliseconds().toString().padStart(3, '0')}`;

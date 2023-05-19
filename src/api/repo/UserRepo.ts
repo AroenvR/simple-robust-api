@@ -1,5 +1,4 @@
 import { IDatabase } from "../../database/IDatabase";
-import queries from "../../database/sql/queries";
 import { IUserRepo } from "./IUserRepo";
 import { User } from "../model/User";
 import Logger from "../../util/logging/Logger";
@@ -8,7 +7,6 @@ import { UserDTO } from "../dto/UserDTO";
 import NotFoundError from "../../util/errors/NotFoundError";
 import { inject, injectable } from "inversify";
 import { TYPES } from "../../ioc/TYPES";
-import Knex from "knex";
 
 // TODO: Validate objects before inserting/updating.
 // TODO: Enforce objects (such as uuid should exist).
@@ -23,19 +21,12 @@ export class UserRepo implements IUserRepo {
     readonly name = 'UserRepo';
     private readonly TABLE = 'users';
     private _db: IDatabase;
-    private _knex: any;
 
     /**
      * @param db - The database object.
      */
     constructor(@inject(TYPES.Database) db: IDatabase) {
         this._db = db;
-
-        this._knex = Knex({
-            client: db.config.driver,
-            connection: db.getConnection(),
-            useNullAsDefault: true,
-        });
     }
 
     /**
@@ -46,24 +37,11 @@ export class UserRepo implements IUserRepo {
     async upsert(params: User[]): Promise<UserDTO[]> {
         Logger.instance.info(`${this.name}: upserting users.`);
 
-        // const placeholders = params.map(() => queries.users.placeholders).join(',');
-        // let query = `${queries.users.insert} ${placeholders} ${queries.users.onConflict}`;
-
         try {
-            const resp = await this._knex.transaction(async (trx: any) => {
-                const query = trx(this.TABLE)
-                    .insert(params)
-                    .onConflict('uuid')
-                    .ignore()
-                    .returning('*');
-                return await query;
-            });
+            const resp = await this._db.upsert(this.TABLE, params);
+            if (!isTruthy(resp)) throw new Error(`${this.name}: Error upserting users.`);
 
-            if (!resp || !resp.length) {
-                throw new Error(`${this.name}: Error upserting users.`);
-            }
-
-            return resp.map((row: any) => new UserDTO(row));
+            return await this.selectFromIdToId(resp.lastId - resp.changes + 1, resp.lastId);
 
         } catch (error: Error | any) {
             Logger.instance.error(`${this.name}: Error upserting users:`, error);
@@ -78,7 +56,7 @@ export class UserRepo implements IUserRepo {
     async getAll(): Promise<UserDTO[]> {
         Logger.instance.info(`${this.name}: selecting all users.`);
 
-        return this._db.selectMany(queries.users.select_all);
+        return this._db.selectMany(this.TABLE);
     }
 
     /**
@@ -88,9 +66,7 @@ export class UserRepo implements IUserRepo {
     async selectFromIdToId(from: number, to: number): Promise<UserDTO[]> {
         Logger.instance.info(`${this.name}: selecting users by ids.`);
 
-        const query = queries.users.select_from_to;
-        const params = [from, to];
-        const result = this._db.selectFromIdToId(query, params);
+        const result = await this._db.selectFromIdToId(this.TABLE, from, to);
         if (!isTruthy(result)) throw new NotFoundError('Error users not found by requested ids.');
 
         return result;
@@ -104,11 +80,8 @@ export class UserRepo implements IUserRepo {
     async selectByUuids(uuids: string[]): Promise<UserDTO[]> {
         Logger.instance.info(`${this.name}: selecting users by uuids.`);
 
-        const placeholders = uuids.map(() => '?').join(',');
-        const query = `${queries.users.select_by_uuids} (${placeholders})`;
-        Logger.instance.debug(`${this.name}: query:`, query);
-
-        const result = await this._db.selectMany(query, uuids);
+        const whereClause = { uuid: uuids };
+        const result = await this._db.selectMany(this.TABLE, whereClause);
 
         if (!isTruthy(result)) throw new NotFoundError('Error users not found by requested uuids.');
 
@@ -122,8 +95,7 @@ export class UserRepo implements IUserRepo {
     async getLast(): Promise<User> {
         Logger.instance.debug(`${this.name}: getting the last one.`);
 
-        const query = queries.users.select_current_id;
-        const result = await this._db.selectOne(query);
+        const result = await this._db.selectOne(this.TABLE, {}, ['id', 'desc']);
 
         return result;
     }

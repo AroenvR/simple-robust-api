@@ -11,7 +11,7 @@ export interface IServerConfig {
         };
     };
     database: {
-        filename: string;
+        connection: string;
         driver: string;
     };
     logging: {
