@@ -7,6 +7,6 @@ import { UserDTO } from "../dto/UserDTO";
  * It contains a specific method to upsert user records.
  */
 export interface IUserRepo extends IRepository {
-    upsert(params?: User[]): Promise<UserDTO[]>;
+    upsert(params?: UserDTO[]): Promise<UserDTO[]>;
     selectByUuids: (uuids: string[]) => Promise<UserDTO[]>;
 }

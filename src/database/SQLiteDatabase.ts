@@ -7,6 +7,8 @@ import { IDatabaseConfig } from "./IDatabaseConfig";
 import Logger from "../util/logging/Logger";
 import { IInsertReturn } from "./IInsertReturn";
 import { Knex, knex } from 'knex'
+import { knexSchemaBuilder } from "./sql/knexSchemaBuilder";
+import { IDTO } from "../api/dto/IDTO";
 
 
 /**
@@ -30,7 +32,7 @@ export default class SQLiteDatabase implements IDatabase {
      * @throws If there is an error connecting to the database.
      */
     async connect(): Promise<void> {
-        Logger.instance.debug("Database: Connecting to SQLite database.");
+        Logger.instance.debug("SQLiteDatabase: Connecting to SQLite database.");
 
         try {
             this.db = knex({
@@ -41,9 +43,9 @@ export default class SQLiteDatabase implements IDatabase {
                 useNullAsDefault: true
             });
 
-            Logger.instance.debug("Database: SQLite database connected.");
+            Logger.instance.debug("SQLiteDatabase: SQLite database connected.");
         } catch (err) {
-            Logger.instance.critical("Database: Error connecting to database:", err);
+            Logger.instance.critical("SQLiteDatabase: Error connecting to database:", err);
             throw err;
         }
     }
@@ -54,26 +56,21 @@ export default class SQLiteDatabase implements IDatabase {
      * @throws If there is an error setting up the database.
      */
     async setup(): Promise<void> {
-        Logger.instance.debug("Database: Setting up SQLite database.");
+        Logger.instance.debug("SQLiteDatabase: Setting up SQLite database.");
 
         if (!this.db) {
-            throw new Error('Database: Database not connected');
+            throw new Error('SQLiteDatabase: Database not connected');
         }
 
         try {
             // Enable foreign keys.
             await this.db.raw('PRAGMA foreign_keys = ON');
-            Logger.instance.debug("Database: SQLite database foreign keys successfully enabled.");
+            Logger.instance.debug("SQLiteDatabase: SQLite database foreign keys successfully enabled.");
 
-            // Read the schema from the file and create the database schema.
-            const schemaPath = path.join(__dirname, './', 'sql', 'schema.sql');
-            const schema = await fs.readFile(schemaPath, 'utf8');
-
-            await this.db.raw(schema);
-            Logger.instance.debug("Database: SQLite database schema successfully created.");
-
+            await knexSchemaBuilder(this.db);
+            Logger.instance.debug("SQLiteDatabase: SQLite database schema successfully created.");
         } catch (err) {
-            Logger.instance.critical("Database: Error setting up SQLite database:", err);
+            Logger.instance.critical("SQLiteDatabase: Error setting up SQLite database:", err);
             throw err;
         }
     }
@@ -84,19 +81,19 @@ export default class SQLiteDatabase implements IDatabase {
      * @throws If there is an error closing the connection.
      */
     async close(): Promise<void> {
-        Logger.instance.debug("Database: Closing SQLite database connection.");
+        Logger.instance.debug("SQLiteDatabase: Closing SQLite database connection.");
 
         if (!this.db) {
-            throw new Error('Database: Database not connected!');
+            throw new Error('SQLiteDatabase: Database not connected!');
         }
 
         await this.db.destroy()
             .then(() => {
                 this.db = null;
-                Logger.instance.debug("Database: SQLite database closed.");
+                Logger.instance.debug("SQLiteDatabase: SQLite database closed.");
             })
             .catch((err) => {
-                Logger.instance.error("Database: Error closing SQLite database:", err);
+                Logger.instance.error("SQLiteDatabase: Error closing SQLite database:", err);
                 throw err;
             });
     }
@@ -104,22 +101,20 @@ export default class SQLiteDatabase implements IDatabase {
     /**
      * Executes an upsert query.
      */
-    public upsert = async (tableName: string, data: any | any[]): Promise<IInsertReturn> => {
-        Logger.instance.info("Database: executing SQLite upsert query.");
-        Logger.instance.debug(`Database: table: ${tableName} | data:`, data);
-
-        if (!Array.isArray(data)) data = [data];
+    public upsert = async (tableName: string, data: any | any[]): Promise<any> => {
+        Logger.instance.info("SQLiteDatabase: executing SQLite upsert query.");
+        Logger.instance.debug(`SQLiteDatabase: table: ${tableName} | data:`, data);
 
         try {
-            const result = await this.db!(tableName).insert(data);
-            const changes = result.length;
-            const lastId = result[0];
+            const result = await this.db!(tableName).insert(data)
+                .onConflict('uuid').ignore()
+                .returning(['id', 'uuid', 'name']);
 
-            Logger.instance.info("Database: upsert query executed successfully.");
-            return { changes, lastId };
+            Logger.instance.debug("SQLiteDatabase: upsert query executed successfully. Returning result:", result);
+            return result;
 
         } catch (err) {
-            Logger.instance.error("Database: Error executing upsert query:", err);
+            Logger.instance.error("SQLiteDatabase: Error executing upsert query:", err);
             throw err;
         }
     }
@@ -128,25 +123,79 @@ export default class SQLiteDatabase implements IDatabase {
      * Executes a select all query.
      */
     public selectMany = async (tableName: string, whereClause?: object): Promise<any[]> => {
-        Logger.instance.info("Database: executing SQLite get many query.");
-        Logger.instance.debug(`Database: table: ${tableName} | whereClause: ${whereClause}`);
-
-        const queryBuilder = this.db!.select().from(tableName);
-
-        if (whereClause) {
-            queryBuilder.where(whereClause);
-        }
-
         try {
-            const rows = await queryBuilder;
+            let queryBuilder = this.db!.select().from(tableName);
 
-            Logger.instance.info("Database: get many query executed successfully.");
-            return rows;
+            if (whereClause) {
+                for (const [key, value] of Object.entries(whereClause)) {
+                    if (Array.isArray(value)) {
+                        queryBuilder = queryBuilder.whereIn(key, value);
+                    } else {
+                        queryBuilder = queryBuilder.where(key, value);
+                    }
+                }
+            }
+
+            const result = await queryBuilder;
+
+            Logger.instance.info("SQLiteDatabase: get many query executed successfully.");
+            Logger.instance.debug("SQLiteDatabase: returning rows:", result);
+            return result;
 
         } catch (err) {
-            Logger.instance.error("Database: Error executing get many query:", err);
+            Logger.instance.error("SQLiteDatabase: Error executing get many query:", err);
             throw err;
         }
+
+        // Logger.instance.info("SQLiteDatabase: executing SQLite get many query.");
+        // Logger.instance.debug(`SQLiteDatabase: table: ${tableName} | whereClause: ${JSON.stringify(whereClause) ?? ""}`);
+
+        // try {
+        //     let queryBuilder = this.db!.select().from(tableName);
+
+        //     if (whereClause) {
+        //         for (const [key, value] of Object.entries(whereClause)) {
+        //             queryBuilder = queryBuilder.where(key, value);
+        //         }
+        //     }
+
+        //     const result = await queryBuilder;
+
+        //     Logger.instance.info("SQLiteDatabase: get many query executed successfully.");
+        //     Logger.instance.debug("SQLiteDatabase: returning rows:", result);
+        //     return result;
+
+        // } catch (err) {
+        //     Logger.instance.error("SQLiteDatabase: Error executing get many query:", err);
+        //     throw err;
+        // }
+
+        // Logger.instance.info("SQLiteDatabase: executing SQLite get many query.");
+        // Logger.instance.debug(`SQLiteDatabase: table: ${tableName} | whereClause: ${JSON.stringify(whereClause) ?? ""}`);
+
+        // try {
+        //     if (whereClause) {
+        //         const key = Object.keys(whereClause)[0];
+        //         const value = Object.values(whereClause);
+
+        //         console.log(`key: ${key} | value: ${value}`)
+
+        //         const result = await this.db!.select().from(tableName).where(key, value);
+        //         Logger.instance.info("SQLiteDatabase: get many query executed successfully.");
+        //         Logger.instance.debug("SQLiteDatabase: returning rows:", result);
+        //         return result;
+        //     }
+
+        //     const result = this.db!.select().from(tableName);
+
+        //     Logger.instance.info("SQLiteDatabase: get many query executed successfully.");
+        //     Logger.instance.debug("SQLiteDatabase: returning rows:", result);
+        //     return result;
+
+        // } catch (err) {
+        //     Logger.instance.error("SQLiteDatabase: Error executing get many query:", err);
+        //     throw err;
+        // }
     }
 
     /**

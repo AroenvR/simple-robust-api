@@ -50,14 +50,14 @@ describe('Users API', () => {
         expect(response.status).toBe(201);
         expect(response.data).toEqual([
             {
-                id: 2,
-                uuid: janeUUID,
-                name: 'Jane Doe'
-            },
-            {
                 id: 1,
                 uuid: johnUUID,
                 name: 'John Doe'
+            },
+            {
+                id: 2,
+                uuid: janeUUID,
+                name: 'Jane Doe'
             },
         ]);
     });
@@ -86,5 +86,26 @@ describe('Users API', () => {
                 name: 'Jane Doe'
             },
         ]);
+    });
+
+    // ----------------------------
+
+    test('handles an HTTP GET request with uuids query', async () => {
+        const uuids = `${johnUUID},${janeUUID}`;
+        const response = await axios.get(`http://localhost:${testServerConfig.app.port}/users?uuids=${uuids}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                Origin: 'http://test.com'
+            }
+        });
+
+        expect(response.status).toBe(200);
+
+        const users = response.data;
+        expect(users.length).toBe(2);
+        expect(users[0].uuid).toBe(johnUUID);
+        expect(users[0].name).toBe('John Doe');
+        expect(users[1].uuid).toBe(janeUUID);
+        expect(users[1].name).toBe('Jane Doe');
     });
 });

@@ -9,6 +9,7 @@ import { TYPES } from '../../ioc/TYPES';
 import { IUserService } from '../service/IUserService';
 import { isTruthy } from '../../util/isTruthy';
 import NotFoundError from '../../util/errors/NotFoundError';
+import { allSettledWrapper } from '../../util/allSettledWrapper';
 
 @injectable()
 export class UserController implements IUserController {
@@ -29,7 +30,7 @@ export class UserController implements IUserController {
             try {
                 let users = await this.handleGet(req.query);
 
-                const toReturn = users.sort(user => user.id);
+                const toReturn = users.sort(user => user._id);
                 res.status(200).json(toReturn);
             } catch (error) {
                 next(error);
@@ -43,7 +44,7 @@ export class UserController implements IUserController {
             try {
                 const result = await this.upsert(req.body);
 
-                const toReturn = result.sort(user => user.id);
+                const toReturn = result.sort(user => user._id);
                 res.status(201).json(toReturn);
             } catch (error) {
                 next(error);
@@ -87,10 +88,16 @@ export class UserController implements IUserController {
      * @param userDtos The array of user data transfer objects.
      * @returns The result of the upsert operation.
      */
-    public async upsert(userDtos: UserDTO[]): Promise<UserDTO[]> {
+    public async upsert(data: any[]): Promise<UserDTO[]> {
         Logger.instance.info(`${this.name}: Upserting users.`);
+        Logger.instance.debug(`${this.name}: Upserting data:`, data);
 
-        await this.checkUsers(userDtos);
+        const userDtos = data.map((item: any) => {
+            const dto = new UserDTO();
+            dto.fromData(item);
+            dto.isValid();
+            return dto;
+        });
 
         return await this.service.upsert(userDtos);
     }
@@ -115,24 +122,17 @@ export class UserController implements IUserController {
      * @returns A promise that resolves to `true` if all users are valid.
      * @throws If any user fails validation, a ValidationError is thrown with a specific error message.
      */
-    private async checkUsers(users: UserDTO[]): Promise<boolean> {
-        const promises: Promise<boolean>[] = [];
+    // private async checkUsers(users: UserDTO[]): Promise<boolean> {
+    //     const promises: Promise<boolean>[] = [];
 
-        for (const user of users) {
-            promises.push(this.isValid(user));
-        }
+    //     for (const user of users) {
+    //         promises.push(this.isValid(user));
+    //     }
 
-        await Promise.allSettled(promises)
-            .then((results) => {
-                results.forEach((result) => {
-                    if (result.status === 'rejected') {
-                        throw result.reason;
-                    }
-                });
-            });
+    //     await allSettledWrapper(promises);
 
-        return true;
-    }
+    //     return true;
+    // }
 
     /**
      * Asynchronously validates a single user object.
@@ -140,21 +140,21 @@ export class UserController implements IUserController {
      * @returns A promise that resolves to `true` if the user is valid.
      * @throws If the user fails validation, a ValidationError is thrown with a specific error message.
      */
-    private async isValid(user: UserDTO): Promise<boolean> {
-        Logger.instance.debug("isValid checking userDTO:", user);
+    // private async isValid(user: UserDTO): Promise<boolean> {
+    //     Logger.instance.debug("isValid checking userDTO:", user);
 
-        // Validate uuid
-        if (typeof user.uuid !== 'string' || !validator.isUUID(user.uuid)) {
-            Logger.instance.error("isValid failed on uuid:", user.uuid);
-            throw new ValidationError('Invalid uuid');
-        }
+    //     // Validate uuid
+    //     if (typeof user._uuid !== 'string' || !validator.isUUID(user._uuid)) {
+    //         Logger.instance.error("isValid failed on uuid:", user._uuid);
+    //         throw new ValidationError('Invalid uuid');
+    //     }
 
-        // Validate name
-        if (typeof user.name !== 'string' || !validator.isLength(user.name, { min: 3 })) {
-            Logger.instance.error("isValid failed on name:", user.name);
-            throw new ValidationError('Invalid name');
-        }
+    //     // Validate name
+    //     if (typeof user._name !== 'string' || !validator.isLength(user._name, { min: 3 })) {
+    //         Logger.instance.error("isValid failed on name:", user._name);
+    //         throw new ValidationError('Invalid name');
+    //     }
 
-        return true;
-    };
+    //     return true;
+    // };
 }

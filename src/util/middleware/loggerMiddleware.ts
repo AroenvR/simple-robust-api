@@ -8,7 +8,7 @@ import Logger from "../logging/Logger";
  * @param next - The next middleware function in the stack.
  */
 export const loggerMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    const timer = Logger.instance.startTimerLog(`${req.method} ${req.path}`);
+    const timer = Logger.instance.startTimerLog(`loggerMiddleware: ${req.method} ${req.path}`);
 
     // Hook into the response 'finish' event
     res.on('finish', () => {

@@ -10,8 +10,6 @@ describe('UserService', () => {
     let app: App;
     let userService: UserService;
 
-    const johnUUID = generateUUID();
-
     beforeAll(async () => {
         const containerWrapper = new ContainerWrapper(testServerConfig);
         containerWrapper.initContainer();
@@ -29,33 +27,33 @@ describe('UserService', () => {
 
     test('should create a user', async () => {
         let userDto = new UserDTO();
-        userDto.uuid = johnUUID;
-        userDto.name = 'John Doe';
+        userDto._uuid = generateUUID();
+        userDto._name = 'John Doe';
 
         const result = await userService.upsert([userDto]);
-        expect(result).toEqual([{ id: 1, uuid: userDto.uuid, name: userDto.name }]);
+        expect(result).toEqual([{ id: 1, uuid: userDto._uuid, name: userDto._name }]);
     });
 
     test('should create multiple users', async () => {
         let userDto1 = new UserDTO();
-        userDto1.uuid = generateUUID();
-        userDto1.name = 'Jane Doe';
+        userDto1._uuid = generateUUID();
+        userDto1._name = 'Jane Doe';
 
         let userDto2 = new UserDTO();
-        userDto2.uuid = generateUUID();
-        userDto2.name = 'Joe Bloggs';
+        userDto2._uuid = generateUUID();
+        userDto2._name = 'Joe Bloggs';
 
         const result = await userService.upsert([userDto1, userDto2]);
         expect(result).toEqual([
             {
                 id: 2,
-                uuid: userDto1.uuid,
-                name: 'Jane Doe'
+                uuid: userDto1._uuid,
+                name: userDto1._name
             },
             {
-                id: 1,
-                uuid: johnUUID,
-                name: 'John Doe'
+                id: 3,
+                uuid: userDto2._uuid,
+                name: userDto2._name
             },
         ]);
     });
@@ -63,6 +61,6 @@ describe('UserService', () => {
     test('should get all users', async () => {
         const users = await userService.getAll();
         expect(users.length).toBe(3);
-        expect(users[0].name).toBe('John Doe');
+        expect(users[0]._name).toBe('John Doe');
     });
 });

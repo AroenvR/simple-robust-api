@@ -1,7 +1,8 @@
+import validator from 'validator';
 import DataTransferObject from "./DataTransferObject";
 import { isTruthy } from "../../util/isTruthy";
 import { IUser } from "../model/IUser";
-import { User } from "../model/User";
+import ValidationError from '../../util/errors/ValidationError';
 
 /**
  * Data Transfer Object representing a User entity.
@@ -17,42 +18,59 @@ import { User } from "../model/User";
  * user.name = "John Doe";
  */
 export class UserDTO extends DataTransferObject implements IUser {
-    private _uuid: string | null = null;
-    private _name: string | null = null;
+    private uuid: string | null = null;
+    private name: string | null = null;
 
     constructor(user?: IUser) {
         super();
 
         if (user) {
-            this.id = user.id;
-            this._uuid = user.uuid;
-            this._name = user.name;
+            this._id = user._id;
+            this.uuid = user._uuid;
+            this.name = user._name;
         }
     }
 
-    get uuid(): string {
-        if (this._uuid === null) {
+    get _uuid(): string {
+        if (this.uuid === null) {
             throw new Error('UserDTO: UUID is not set');
         }
-        return this._uuid;
+        return this.uuid;
     }
 
-    set uuid(value: string) {
+    set _uuid(value: string) {
         if (!isTruthy(value)) throw Error('UserDTO: UUID must be a truthy string');
-        if (isTruthy(this._uuid)) throw Error('UserDTO: UUID is already set');
-        this._uuid = value;
+        if (isTruthy(this.uuid)) throw Error('UserDTO: UUID is already set');
+        this.uuid = value;
     }
 
-    get name(): string {
-        if (this._name === null) {
+    get _name(): string {
+        if (this.name === null) {
             throw new Error('UserDTO: Name is not set');
         }
-        return this._name;
+        return this.name;
     }
 
-    set name(value: string) {
+    set _name(value: string) {
         if (!isTruthy(value)) throw Error('UserDTO: Name must be a truthy string');
-        if (isTruthy(this._name)) throw Error('UserDTO: Name is already set');
-        this._name = value;
+        if (isTruthy(this.name)) throw Error('UserDTO: Name is already set');
+        this.name = value;
+    }
+
+    public isValid(): boolean { // TODO: Json Schema! Figure out if during or before runtime.
+        if (!validator.isUUID(this.uuid || '', '4')) {
+            throw new ValidationError('UserDTO: UUID must be a valid UUID v4 string');
+        }
+        if (!validator.isLength(this.name || '', { min: 1, max: 255 })) {
+            throw new ValidationError('UserDTO: Name must be a non-empty string with a maximum length of 255 characters');
+        }
+        return true;
+    }
+
+    public fromData(data: any): UserDTO {
+        if (isTruthy(data.id)) this._id = data.id;
+        this._uuid = data.uuid;
+        this._name = data.name;
+        return this;
     }
 }

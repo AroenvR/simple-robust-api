@@ -36,16 +36,22 @@ export class UserService implements IUserService {
      * @returns {Promise<any>} - A promise that resolves to the result of the user creation operation.
      */
     async upsert(userDtos: UserDTO[]): Promise<UserDTO[]> {
-        let users: User[] = [];
-
-        users = userDtos.map((userDto: UserDTO) => new User(0, userDto.uuid, userDto.name));
+        Logger.instance.info(`${this.name}: Creating a users.`);
+        Logger.instance.debug(`${this.name}: userDTO's:`, userDtos);
 
         try {
-            const result = await this.repository.upsert(users);
+            const result = await this.repository.upsert(userDtos);
 
-            this.pubSub.publish('user-created', result);
+            const resultDtos = result.map((item: any) => {
+                const dto = new UserDTO();
+                dto.fromData(item);
+                dto.isValid();
+                return dto;
+            });
 
-            return result;
+            this.pubSub.publish('user-created', resultDtos);
+
+            return resultDtos;
         } catch (error: Error | any) {
             Logger.instance.error(`${this.name}: Error creating a users:`, error);
             throw error;
@@ -80,6 +86,6 @@ export class UserService implements IUserService {
     async getByUuids(uuids: string[]): Promise<UserDTO[]> {
         Logger.instance.info(`${this.name}: Getting users by UUID's.`);
 
-        return this.repository.selectByUuids(uuids);;
+        return this.repository.selectByUuids(uuids);
     }
 }

@@ -29,26 +29,26 @@ describe('UserController', () => {
 
     test('upsert users', async () => {
         let userDto1 = new UserDTO();
-        userDto1.uuid = johnUUID;
-        userDto1.name = 'John Doe';
+        userDto1._uuid = johnUUID;
+        userDto1._name = 'John Doe';
 
         let userDto2 = new UserDTO();
-        userDto2.uuid = janeUUID;
-        userDto2.name = 'Jane Doe';
+        userDto2._uuid = janeUUID;
+        userDto2._name = 'Jane Doe';
 
         const userDtos = [userDto1, userDto2];
 
         const result = await userController.upsert(userDtos);
         expect(result).toEqual([
             {
-                id: 2,
-                uuid: janeUUID,
-                name: 'Jane Doe'
-            },
-            {
                 id: 1,
                 uuid: johnUUID,
                 name: 'John Doe'
+            },
+            {
+                id: 2,
+                uuid: janeUUID,
+                name: 'Jane Doe'
             },
         ]);
     });

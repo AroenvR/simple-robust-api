@@ -34,14 +34,22 @@ export class UserRepo implements IUserRepo {
      * @param params Array of User objects.
      * @returns A Promise with the last ID of the insert operation.
      */
-    async upsert(params: User[]): Promise<UserDTO[]> {
+    async upsert(params: UserDTO[]): Promise<UserDTO[]> {
         Logger.instance.info(`${this.name}: upserting users.`);
+        Logger.instance.debug(`${this.name}: upserting users:`, params);
 
         try {
             const resp = await this._db.upsert(this.TABLE, params);
             if (!isTruthy(resp)) throw new Error(`${this.name}: Error upserting users.`);
 
-            return await this.selectFromIdToId(resp.lastId - resp.changes + 1, resp.lastId);
+            const userDtos = resp.map((item: any) => {
+                const dto = new UserDTO();
+                dto.fromData(item);
+                dto.isValid();
+                return dto;
+            });
+
+            return userDtos;
 
         } catch (error: Error | any) {
             Logger.instance.error(`${this.name}: Error upserting users:`, error);
@@ -56,7 +64,15 @@ export class UserRepo implements IUserRepo {
     async getAll(): Promise<UserDTO[]> {
         Logger.instance.info(`${this.name}: selecting all users.`);
 
-        return this._db.selectMany(this.TABLE);
+        const resp = await this._db.selectMany(this.TABLE);
+        const userDtos = resp.map((item: any) => {
+            const dto = new UserDTO();
+            dto.fromData(item);
+            dto.isValid();
+            return dto;
+        });
+
+        return userDtos;
     }
 
     /**
@@ -78,7 +94,7 @@ export class UserRepo implements IUserRepo {
      * @returns A Promise with the requested users.
      */
     async selectByUuids(uuids: string[]): Promise<UserDTO[]> {
-        Logger.instance.info(`${this.name}: selecting users by uuids.`);
+        Logger.instance.info(`${this.name}: selecting users by UUIDs.`);
 
         const whereClause = { uuid: uuids };
         const result = await this._db.selectMany(this.TABLE, whereClause);

@@ -2,19 +2,19 @@ import { IEntity } from "./IEntity";
 import { isTruthy } from "../../util/isTruthy";
 
 export default abstract class Entity implements IEntity {
-    private _id: number;
+    private id: number;
 
     constructor(id: number) {
-        this._id = id;
+        this.id = id;
     }
 
-    get id(): number {
-        return this._id;
+    get _id(): number {
+        return this.id;
     }
 
-    set id(value: number) {
+    set _id(value: number) {
         if (!isTruthy(value, false)) throw Error('User: ID must be a truthy and positive integer');
-        if (isTruthy(this._id)) throw Error('User: ID is already set');
-        this._id = value;
+        if (isTruthy(this.id)) throw Error('User: ID is already set');
+        this.id = value;
     }
 } 

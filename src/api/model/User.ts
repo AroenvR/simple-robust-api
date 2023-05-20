@@ -12,21 +12,21 @@ export class User extends Entity implements IUser {
         this._name = name;
     }
 
-    get uuid(): string {
+    get _uuid(): string {
         return this._uuid;
     }
 
-    set uuid(value: string) {
+    set _uuid(value: string) {
         if (!isTruthy(value)) throw Error('User: UUID must be a truthy string');
         if (isTruthy(this._uuid)) throw Error('User: UUID is already set');
         this._uuid = value;
     }
 
-    get name(): string {
+    get _name(): string {
         return this._name;
     }
 
-    set name(value: string) {
+    set _name(value: string) {
         if (!isTruthy(value)) throw Error('User: Name must be a truthy string');
         if (isTruthy(this._name)) throw Error('User: Name is already set');
         this._name = value;
