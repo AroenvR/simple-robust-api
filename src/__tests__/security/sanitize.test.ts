@@ -8,6 +8,14 @@ import { TYPES } from '../../ioc/TYPES';
 describe('sanitizeMiddleware', () => {
     let app: App;
 
+    const johnUUID = generateUUID();
+
+    const xssName = '<script>alert("Hello John Doe!")</script>';
+    const xssSanitized = '&lt;script&gt;alert(\"Hello John Doe!\")&lt;/script&gt;';
+
+    const sqlInjectionName = "' OR 1=1 --";
+    const sqlSanitized = "' OR 1=1 --"; // TOOD: Check if this is a problem. I know it's parameterized, but still doesn't seem right.
+
     beforeAll(async () => {
         const containerWrapper = new ContainerWrapper(testServerConfig);
         containerWrapper.initContainer();
@@ -19,14 +27,6 @@ describe('sanitizeMiddleware', () => {
     afterAll(async () => {
         await app.stop();
     });
-
-    const johnUUID = generateUUID();
-
-    const xssName = '<script>alert("Hello John Doe!")</script>';
-    const xssSanitized = '&lt;script&gt;alert(\"Hello John Doe!\")&lt;/script&gt;';
-
-    const sqlInjectionName = "' OR 1=1 --";
-    const sqlSanitized = "' OR 1=1 --";
 
     // ----------------------------
 
@@ -74,17 +74,28 @@ describe('sanitizeMiddleware', () => {
         expect(users[0].name).toBe(sqlSanitized);
     });
 
-    // TODO: Fix this test & test how it handles the dirty data.
-    test.skip('should sanitize request query', async () => {
+    // ----------------------------
+
+    test('should sanitize request query', async () => {
         const xssPayload = "<script>alert('xss');</script>";
         const sqlPayload = "'; DROP TABLE users; --";
-        const uuids = `${xssPayload},${sqlPayload}`;
 
-        const response = await axios.get(`http://localhost:${testServerConfig.app.port}/users?uuids=${uuids}`, {
-            headers: {
-                'Content-Type': 'application/json',
-                Origin: 'http://test.com'
-            }
-        });
+        const uuids = [xssPayload, sqlPayload];
+        const url = new URL(`http://localhost:${testServerConfig.app.port}/users`);
+        url.searchParams.set("uuids", uuids.join(","));
+
+        try {
+            await axios.get(url.toString(), {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Origin: 'http://test.com'
+                }
+            });
+
+            fail("Should have thrown a Validation error.");
+        } catch (error: any) {
+            expect(error.response.status).toBe(403);
+            expect(error.response.data.message).toBe('Validation failed.');
+        }
     });
 });

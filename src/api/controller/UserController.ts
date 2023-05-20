@@ -9,7 +9,6 @@ import { TYPES } from '../../ioc/TYPES';
 import { IUserService } from '../service/IUserService';
 import { isTruthy } from '../../util/isTruthy';
 import NotFoundError from '../../util/errors/NotFoundError';
-import { allSettledWrapper } from '../../util/allSettledWrapper';
 
 @injectable()
 export class UserController implements IUserController {

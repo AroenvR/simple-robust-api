@@ -10,6 +10,8 @@ import { TYPES } from "../../ioc/TYPES";
  */
 describe('Users API', () => {
     let app: App;
+
+    const origin = 'http://test.com';
     const johnUUID = generateUUID();
     const janeUUID = generateUUID();
 
@@ -28,8 +30,6 @@ describe('Users API', () => {
     // ----------------------------
 
     test('handles an HTTP POST request from whitelisted origin', async () => {
-        const origin = 'http://test.com';
-
         const payload = [
             {
                 uuid: johnUUID,
@@ -65,8 +65,6 @@ describe('Users API', () => {
     // ----------------------------
 
     test('handles an HTTP GET request from whitelisted origin', async () => {
-        const origin = 'http://test.com';
-
         const response = await axios.get(`http://localhost:${testServerConfig.app.port}/users`, {
             headers: {
                 Origin: origin
@@ -91,11 +89,14 @@ describe('Users API', () => {
     // ----------------------------
 
     test('handles an HTTP GET request with uuids query', async () => {
-        const uuids = `${johnUUID},${janeUUID}`;
-        const response = await axios.get(`http://localhost:${testServerConfig.app.port}/users?uuids=${uuids}`, {
+        const uuids = [johnUUID, janeUUID];
+        const url = new URL(`http://localhost:${testServerConfig.app.port}/users`);
+        url.searchParams.set("uuids", uuids.join(","));
+
+        const response = await axios.get(url.toString(), {
             headers: {
                 'Content-Type': 'application/json',
-                Origin: 'http://test.com'
+                Origin: origin
             }
         });
 

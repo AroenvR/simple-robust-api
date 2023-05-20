@@ -136,7 +136,7 @@ export default class SQLiteDatabase implements IDatabase {
                 }
             }
 
-            const result = await queryBuilder;
+            const result = await queryBuilder.orderBy("id").select();
 
             Logger.instance.info("SQLiteDatabase: get many query executed successfully.");
             Logger.instance.debug("SQLiteDatabase: returning rows:", result);
