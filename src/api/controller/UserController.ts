@@ -57,7 +57,7 @@ export class UserController implements IUserController {
      * Retrieves all users.
      * @returns The array of users.
      */
-    public async handleGet(query?: any): Promise<UserDTO[]> {
+    public async handleGet(query?: any): Promise<UserDTO[]> { // TODO: Enable multiple query parameters + filtering by name.
         Logger.instance.debug(`${this.name}: Getting users. Query:`, query);
 
         if (!isTruthy(query)) {

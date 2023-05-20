@@ -74,10 +74,9 @@ describe('UserController', () => {
 
     // ----------------------------
 
-    test.skip('get all users by uuids', async () => { // TODO: Fix!
-        const uuids: string = `${johnUUID},${janeUUID}`;
-        let uuidArray: string[] = uuids.split(',');
-        const result = await userController.getByUuids(uuidArray);
+    test('get all users by uuids', async () => {
+        const uuids: string[] = [johnUUID, janeUUID];
+        const result = await userController.getByUuids(uuids);
 
         expect(result.length).toBe(2);
         expect(result).toEqual([
