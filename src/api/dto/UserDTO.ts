@@ -69,8 +69,8 @@ export class UserDTO extends DataTransferObject implements IUser {
 
     public fromData(data: any): UserDTO {
         if (isTruthy(data.id)) this._id = data.id;
-        this._uuid = data.uuid;
-        this._name = data.name;
+        this.uuid = data.uuid;
+        this.name = data.name;
         return this;
     }
 }
