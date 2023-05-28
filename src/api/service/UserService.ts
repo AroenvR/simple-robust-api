@@ -8,6 +8,10 @@ import { TYPES } from "../../ioc/TYPES";
 import { IUserService } from "./IUserService";
 import { IUserRepo } from "../repo/IUserRepo";
 
+// TODO: Validate objects before inserting/updating. !!!!!!!
+// TODO: Enforce objects (such as uuid should exist).
+// Caching?
+
 /**
  * The UserService class provides methods for managing users in the application.
  */

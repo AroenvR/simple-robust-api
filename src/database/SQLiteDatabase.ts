@@ -99,98 +99,14 @@ export default class SQLiteDatabase implements IDatabase {
     }
 
     /**
-     * Executes an upsert query.
+     * Retrieves the instance of the Knex client connected to the SQLite database.
+     * @returns The Knex instance if the connection is established, null otherwise.
      */
-    public upsert = async (tableName: string, data: any | any[]): Promise<any> => {
-        Logger.instance.info("SQLiteDatabase: executing SQLite upsert query.");
-        Logger.instance.debug(`SQLiteDatabase: table: ${tableName} | data:`, data);
-
-        try {
-            const result = await this.db!(tableName).insert(data)
-                .onConflict('uuid').ignore()
-                .returning(['id', 'uuid', 'name']);
-
-            Logger.instance.debug("SQLiteDatabase: upsert query executed successfully. Returning result:", result);
-            return result;
-
-        } catch (err) {
-            Logger.instance.error("SQLiteDatabase: Error executing upsert query:", err);
-            throw err;
-        }
-    }
-
-    /**
-     * Executes a select all query.
-     */
-    public selectMany = async (tableName: string, whereClause?: object): Promise<any[]> => {
-        try {
-            let queryBuilder = this.db!.select().from(tableName);
-
-            if (whereClause) {
-                for (const [key, value] of Object.entries(whereClause)) {
-                    if (Array.isArray(value)) {
-                        queryBuilder = queryBuilder.whereIn(key, value);
-                    } else {
-                        queryBuilder = queryBuilder.where(key, value);
-                    }
-                }
-            }
-
-            const result = await queryBuilder.orderBy("id").select();
-
-            Logger.instance.info("SQLiteDatabase: get many query executed successfully.");
-            Logger.instance.debug("SQLiteDatabase: returning rows:", result);
-            return result;
-
-        } catch (err) {
-            Logger.instance.error("SQLiteDatabase: Error executing get many query:", err);
-            throw err;
-        }
-    }
-
-    /**
-     * Executes a SQLite SELECT query that selects rows from a table based on a range of IDs.
-     */
-    public selectFromIdToId = async (tableName: string, fromId: number, toId: number): Promise<any[]> => {
-        Logger.instance.info("Database: executing SQLite select from id to id query.");
-        Logger.instance.debug(`Database: table: ${tableName} | fromId: ${fromId} | toId: ${toId}`);
-
-        try {
-            const rows = await this.db!.select().from(tableName).whereBetween('id', [fromId, toId]);
-
-            Logger.instance.info("Database: get many query executed successfully.");
-            return rows;
-
-        } catch (err) {
-            Logger.instance.error("Database: Error executing get many query:", err);
-            throw err;
-        }
-    }
-
-    /**
-     * Executes the provided query and returns a single row from the result set.
-     */
-    public selectOne = async (tableName: string, whereClause?: object, orderBy?: [string, 'asc' | 'desc']): Promise<any> => {
-        Logger.instance.debug("Database: executing SQLite get one query.");
-
-        const queryBuilder = this.db!.select().from(tableName).limit(1);
-
-        if (whereClause) {
-            queryBuilder.where(whereClause);
+    getInstance(): Knex {
+        if (!this.db) {
+            throw new Error('SQLiteDatabase getInstance: Database not connected!');
         }
 
-        if (orderBy) {
-            queryBuilder.orderBy(...orderBy);
-        }
-
-        try {
-            const row = await queryBuilder;
-
-            return row[0];
-
-        } catch (err) {
-            Logger.instance.error("Database: Error executing get one query:", err);
-            throw err;
-        }
+        return this.db;
     }
 }
