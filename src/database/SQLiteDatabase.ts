@@ -146,56 +146,6 @@ export default class SQLiteDatabase implements IDatabase {
             Logger.instance.error("SQLiteDatabase: Error executing get many query:", err);
             throw err;
         }
-
-        // Logger.instance.info("SQLiteDatabase: executing SQLite get many query.");
-        // Logger.instance.debug(`SQLiteDatabase: table: ${tableName} | whereClause: ${JSON.stringify(whereClause) ?? ""}`);
-
-        // try {
-        //     let queryBuilder = this.db!.select().from(tableName);
-
-        //     if (whereClause) {
-        //         for (const [key, value] of Object.entries(whereClause)) {
-        //             queryBuilder = queryBuilder.where(key, value);
-        //         }
-        //     }
-
-        //     const result = await queryBuilder;
-
-        //     Logger.instance.info("SQLiteDatabase: get many query executed successfully.");
-        //     Logger.instance.debug("SQLiteDatabase: returning rows:", result);
-        //     return result;
-
-        // } catch (err) {
-        //     Logger.instance.error("SQLiteDatabase: Error executing get many query:", err);
-        //     throw err;
-        // }
-
-        // Logger.instance.info("SQLiteDatabase: executing SQLite get many query.");
-        // Logger.instance.debug(`SQLiteDatabase: table: ${tableName} | whereClause: ${JSON.stringify(whereClause) ?? ""}`);
-
-        // try {
-        //     if (whereClause) {
-        //         const key = Object.keys(whereClause)[0];
-        //         const value = Object.values(whereClause);
-
-        //         console.log(`key: ${key} | value: ${value}`)
-
-        //         const result = await this.db!.select().from(tableName).where(key, value);
-        //         Logger.instance.info("SQLiteDatabase: get many query executed successfully.");
-        //         Logger.instance.debug("SQLiteDatabase: returning rows:", result);
-        //         return result;
-        //     }
-
-        //     const result = this.db!.select().from(tableName);
-
-        //     Logger.instance.info("SQLiteDatabase: get many query executed successfully.");
-        //     Logger.instance.debug("SQLiteDatabase: returning rows:", result);
-        //     return result;
-
-        // } catch (err) {
-        //     Logger.instance.error("SQLiteDatabase: Error executing get many query:", err);
-        //     throw err;
-        // }
     }
 
     /**

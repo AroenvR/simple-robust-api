@@ -6,5 +6,4 @@ export interface IRepository {
     readonly name: string;
     upsert(params?: any[]): Promise<any>;
     getAll(): Promise<any[]>;
-    getLast(): Promise<any>;
 }

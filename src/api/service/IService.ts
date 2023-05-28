@@ -12,5 +12,5 @@ export interface IService {
     pubSub: PubSub;
 
     upsert(data: any | any[]): Promise<any>;
-    getAll(): Promise<any>;
+    select(): Promise<any>;
 }

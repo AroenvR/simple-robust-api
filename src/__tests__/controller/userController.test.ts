@@ -28,11 +28,11 @@ describe('UserController', () => {
     // ----------------------------
 
     test('upsert users', async () => {
-        let userDto1 = new UserDTO();
+        const userDto1 = new UserDTO();
         userDto1._uuid = johnUUID;
         userDto1._name = 'John Doe';
 
-        let userDto2 = new UserDTO();
+        const userDto2 = new UserDTO();
         userDto2._uuid = janeUUID;
         userDto2._name = 'Jane Doe';
 

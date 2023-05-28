@@ -11,7 +11,7 @@ describe('sanitizeMiddleware', () => {
     const johnUUID = generateUUID();
 
     const xssName = '<script>alert("Hello John Doe!")</script>';
-    const xssSanitized = '&lt;script&gt;alert(\"Hello John Doe!\")&lt;/script&gt;';
+    const xssSanitized = '&lt;script&gt;alert("Hello John Doe!")&lt;/script&gt;';
 
     const sqlInjectionName = "' OR 1=1 --";
     const sqlSanitized = "' OR 1=1 --"; // TOOD: Check if this is a problem. I know it's parameterized, but still doesn't seem right.

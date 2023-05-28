@@ -27,7 +27,7 @@ export class UserController implements IUserController {
          */
         this.router.get('/users', async (req, res, next) => {
             try {
-                let users = await this.handleGet(req.query);
+                const users = await this.handleGet(req.query);
 
                 const toReturn = users.sort(user => user._id);
                 res.status(200).json(toReturn);
@@ -62,20 +62,20 @@ export class UserController implements IUserController {
 
         if (!isTruthy(query)) {
             Logger.instance.info(`${this.name}: Getting all users.`);
-            return this.service.getAll();
+            return this.service.select();
         }
 
         const ids = query!.ids as string;
         const uuids = query!.uuids as string;
 
         if (isTruthy(ids)) {
-            let idArray: number[] = ids.split(',').map((id) => parseInt(id));
+            const idArray: number[] = ids.split(',').map((id) => parseInt(id));
 
             return this.service.getByIds(idArray);
         }
 
         if (isTruthy(uuids)) {
-            let uuidArray: string[] = uuids.split(',');
+            const uuidArray: string[] = uuids.split(',');
             return this.getByUuids(uuidArray);
         }
 
@@ -113,47 +113,4 @@ export class UserController implements IUserController {
 
         return this.service.getByUuids(uuids);
     }
-
-
-    /**
-     * Asynchronously checks the validity of an array of users.
-     * @param users - An array of user objects to be validated.
-     * @returns A promise that resolves to `true` if all users are valid.
-     * @throws If any user fails validation, a ValidationError is thrown with a specific error message.
-     */
-    // private async checkUsers(users: UserDTO[]): Promise<boolean> {
-    //     const promises: Promise<boolean>[] = [];
-
-    //     for (const user of users) {
-    //         promises.push(this.isValid(user));
-    //     }
-
-    //     await allSettledWrapper(promises);
-
-    //     return true;
-    // }
-
-    /**
-     * Asynchronously validates a single user object.
-     * @param user - The user object to be validated.
-     * @returns A promise that resolves to `true` if the user is valid.
-     * @throws If the user fails validation, a ValidationError is thrown with a specific error message.
-     */
-    // private async isValid(user: UserDTO): Promise<boolean> {
-    //     Logger.instance.debug("isValid checking userDTO:", user);
-
-    //     // Validate uuid
-    //     if (typeof user._uuid !== 'string' || !validator.isUUID(user._uuid)) {
-    //         Logger.instance.error("isValid failed on uuid:", user._uuid);
-    //         throw new ValidationError('Invalid uuid');
-    //     }
-
-    //     // Validate name
-    //     if (typeof user._name !== 'string' || !validator.isLength(user._name, { min: 3 })) {
-    //         Logger.instance.error("isValid failed on name:", user._name);
-    //         throw new ValidationError('Invalid name');
-    //     }
-
-    //     return true;
-    // };
 }

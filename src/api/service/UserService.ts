@@ -62,7 +62,7 @@ export class UserService implements IUserService {
      * Gets all users.
      * @returns {Promise<UserDTO[]>} - A promise that resolves to an array of users.
      */
-    async getAll(): Promise<UserDTO[]> {
+    async select(): Promise<UserDTO[]> {
         Logger.instance.info(`${this.name}: Getting all users.`);
 
         return this.repository.getAll();

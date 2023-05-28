@@ -82,7 +82,8 @@ export class UserRepo implements IUserRepo {
     async selectFromIdToId(from: number, to: number): Promise<UserDTO[]> {
         Logger.instance.info(`${this.name}: selecting users by ids.`);
 
-        const result = await this._db.selectFromIdToId(this.TABLE, from, to);
+        const whereClause = { id: { '>=': from, '<=': to } };
+        const result = await this._db.selectMany(this.TABLE, whereClause);
         if (!isTruthy(result)) throw new NotFoundError('Error users not found by requested ids.');
 
         return result;
@@ -105,14 +106,34 @@ export class UserRepo implements IUserRepo {
     }
 
     /**
-     * Gets the last user.
-     * @returns A Promise with the last user.
+     * Gets users by names.
+     * @param names - An array of names.
+     * @returns A Promise with the requested users.
      */
-    async getLast(): Promise<User> {
-        Logger.instance.debug(`${this.name}: getting the last one.`);
+    async selectByName(names: string[]): Promise<UserDTO[]> {
+        Logger.instance.info(`${this.name}: selecting users by names.`);
 
-        const result = await this._db.selectOne(this.TABLE, {}, ['id', 'desc']);
+        const whereClause = { name: names };
+        const result = await this._db.selectMany(this.TABLE, whereClause);
+
+        if (!isTruthy(result)) throw new NotFoundError('Error users not found by requested names.');
 
         return result;
     }
+
+    // /**
+    //  * Gets the last user.
+    //  * @returns A Promise with the last user.
+    //  */
+    // async getLast(): Promise<User> { // TODO: Look into this at some point?
+    //     Logger.instance.debug(`${this.name}: getting the last one.`);
+
+    //     const whereClause = {};
+    //     const orderBy = ['id', 'desc'];
+    //     const limit = 1;
+    //     const result = await this._db.selectMany(this.TABLE, whereClause, orderBy, limit);
+    //     if (!isTruthy(result)) throw new NotFoundError('Error getting the last user.');
+
+    //     return result[0];
+    // }
 }
