@@ -43,7 +43,7 @@ export class UserRepo extends Repository implements IUserRepo {
         }
     }
 
-    async getAll(): Promise<User[]> {
+    async selectAll(): Promise<User[]> {
         Logger.instance.info(`${this.name}: selecting all users.`);
 
         try {

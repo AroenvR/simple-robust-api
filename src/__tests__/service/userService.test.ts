@@ -59,7 +59,7 @@ describe('UserService', () => {
     });
 
     test('should get all users', async () => {
-        const users = await userService.select();
+        const users = await userService.getAll();
         expect(users.length).toBe(3);
         expect(users[0]._name).toBe('John Doe');
     });

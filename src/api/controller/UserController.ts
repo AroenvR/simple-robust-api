@@ -62,21 +62,27 @@ export class UserController implements IUserController {
 
         if (!isTruthy(query)) {
             Logger.instance.info(`${this.name}: Getting all users.`);
-            return this.service.select();
+            return this.service.getAll();
         }
 
         const ids = query!.ids as string;
         const uuids = query!.uuids as string;
+        const names = query!.names as string;
 
         if (isTruthy(ids)) {
-            const idArray: number[] = ids.split(',').map((id) => parseInt(id));
+            const idArr: number[] = ids.split(',').map((id) => parseInt(id));
 
-            return this.service.getByIds(idArray);
+            return this.service.getByIds(idArr);
         }
 
         if (isTruthy(uuids)) {
-            const uuidArray: string[] = uuids.split(',');
-            return this.getByUuids(uuidArray);
+            const uuidArr: string[] = uuids.split(',');
+            return this.getByUuids(uuidArr);
+        }
+
+        if (isTruthy(names)) {
+            const nameArr: string[] = names.split(',');
+            return this.getByNames(nameArr);
         }
 
         throw new NotFoundError('Invalid query parameters.');
@@ -101,6 +107,13 @@ export class UserController implements IUserController {
         return await this.service.upsert(userDtos);
     }
 
+    /**
+     * Retrieves users by their UUIDs.
+     * @param {string[]} uuids - An array of user UUIDs.
+     * @returns {Promise<UserDTO[]>} A Promise that resolves to an array of UserDTO objects.
+     * @throws {ValidationError} If any of the provided UUIDs are invalid.
+     * @throws {NotFoundError} If no users are found.
+     */
     public async getByUuids(uuids: string[]): Promise<UserDTO[]> { // TODO: test
         Logger.instance.info(`${this.name}: Getting users by uuids.`);
 
@@ -112,5 +125,25 @@ export class UserController implements IUserController {
         }
 
         return this.service.getByUuids(uuids);
+    }
+
+    /**
+     * Retrieves users by their names.
+     * @param {string[]} names - An array of user names.
+     * @returns {Promise<UserDTO[]>} A Promise that resolves to an array of UserDTO objects.
+     * @throws {ValidationError} If any of the provided names are invalid.
+     * @throws {NotFoundError} If no users are found.
+     */
+    public async getByNames(names: string[]): Promise<UserDTO[]> { // TODO: test
+        Logger.instance.info(`${this.name}: Getting users by names.`);
+
+        for (const name of names) {
+            if (!validator.isAlphanumeric(name)) {
+                Logger.instance.error(`UserController: GET /users invalid name: ${name}`);
+                throw new ValidationError(`Invalid name: ${name}`);
+            }
+        }
+
+        return this.service.getByNames(names);
     }
 }

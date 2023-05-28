@@ -7,7 +7,7 @@ import { User } from "../model/User";
  */
 export interface IUserRepo extends IRepository {
     upsert(params?: User[]): Promise<User[]>;
-    getAll(): Promise<User[]>;
+    selectAll(): Promise<User[]>;
 
     /**
      * Gets users by ids.

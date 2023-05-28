@@ -19,5 +19,5 @@ export interface IRepository {
      * @abstract
      * @returns A Promise that resolves to an array of objects representing the retrieved records.
      */
-    getAll(): Promise<any[]>;
+    selectAll(): Promise<any[]>;
 }

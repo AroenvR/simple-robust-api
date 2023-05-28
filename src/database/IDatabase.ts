@@ -1,5 +1,4 @@
 import { IDatabaseConfig } from "./IDatabaseConfig";
-import { Knex } from "knex";
 
 /**
  * IDatabase interface represents the contract for a database class.

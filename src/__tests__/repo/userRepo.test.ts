@@ -57,7 +57,7 @@ describe('UserRepo', () => {
     // ----------------------------
 
     test('should get all users', async () => {
-        const users = await userRepo.getAll();
+        const users = await userRepo.selectAll();
 
         expect(users.length).toBe(2);
         expect(users[0]._name).toBe('John Doe');
@@ -71,12 +71,12 @@ describe('UserRepo', () => {
         john._uuid = johnUUID;
         john._name = "John Doe";
 
-        const users = await userRepo.getAll();
+        const users = await userRepo.selectAll();
         expect(users.length).toBe(2);
 
         await expect(userRepo.upsert([john])).rejects.toThrowError('Error upserting users.');
 
-        const newUsers = await userRepo.getAll();
+        const newUsers = await userRepo.selectAll();
         expect(newUsers.length).toBe(2);
     });
 });

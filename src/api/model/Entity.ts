@@ -17,4 +17,6 @@ export default abstract class Entity implements IEntity {
         if (isTruthy(this.id)) throw Error('User: ID is already set');
         this.id = value;
     }
+
+
 } 
