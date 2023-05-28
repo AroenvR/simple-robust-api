@@ -40,7 +40,6 @@ export class UserDTO extends DataTransferObject implements IUser {
 
     set _uuid(value: string) {
         if (!isTruthy(value)) throw Error('UserDTO: UUID must be a truthy string');
-        if (isTruthy(this.uuid)) throw Error('UserDTO: UUID is already set');
         this.uuid = value;
     }
 
@@ -53,7 +52,6 @@ export class UserDTO extends DataTransferObject implements IUser {
 
     set _name(value: string) {
         if (!isTruthy(value)) throw Error('UserDTO: Name must be a truthy string');
-        if (isTruthy(this.name)) throw Error('UserDTO: Name is already set');
         this.name = value;
     }
 

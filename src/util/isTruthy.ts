@@ -19,7 +19,7 @@ export const isTruthyAsync = async (data: any, zero?: boolean, obj?: boolean): P
                 if (!await isTruthyAsync(value, zero, obj)) return false;
             }
         }
-        
+
         return Object.values(data).some(val => isTruthyAsync(val, zero));
     }
 
@@ -33,13 +33,13 @@ export const isTruthyAsync = async (data: any, zero?: boolean, obj?: boolean): P
         return false;
     }
 
-    if (typeof(data) === 'string' && data.length === 0) return false;
+    if (typeof (data) === 'string' && data.length === 0) return false;
 
-    if (typeof(data) === 'undefined' || data === null) return false;
+    if (typeof (data) === 'undefined' || data === null) return false;
 
     if (data === 0) {
         if (zero === false) return false; // If the zero parameter is false, then the value 0 is falsy.
-          
+
         return true;
     }
 
@@ -62,7 +62,7 @@ export const isTruthyAsync = async (data: any, zero?: boolean, obj?: boolean): P
                 }
             }
         }
-        
+
         return false;
     }
 
@@ -94,7 +94,7 @@ export const isTruthy = (data: any, zero?: boolean, obj?: boolean): boolean => {
                 if (!isTruthy(value, zero, obj)) return false;
             }
         }
-        
+
         return Object.values(data).some(val => isTruthy(val, zero));
     }
 
@@ -108,9 +108,9 @@ export const isTruthy = (data: any, zero?: boolean, obj?: boolean): boolean => {
         return false;
     }
 
-    if (typeof(data) === 'string' && data.length === 0) return false;
+    if (typeof (data) === 'string' && data.trim().length === 0) return false;
 
-    if (typeof(data) === 'undefined' || data === null) return false;
+    if (typeof (data) === 'undefined' || data === null) return false;
 
     if (data === 0) {
         if (zero === false) return false; // If the zero parameter is false, then the value 0 is falsy.
@@ -136,7 +136,7 @@ export const isTruthy = (data: any, zero?: boolean, obj?: boolean): boolean => {
                 }
             }
         }
-        
+
         return false;
     }
 
