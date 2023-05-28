@@ -15,8 +15,9 @@ describe('UserService', () => {
         containerWrapper.initContainer();
 
         app = containerWrapper.getContainer().get<App>(TYPES.App);
-        userService = containerWrapper.getContainer().get<UserService>(TYPES.Service);
         await app.start();
+
+        userService = containerWrapper.getContainer().get<UserService>(TYPES.Service);
     });
 
     afterAll(async () => {

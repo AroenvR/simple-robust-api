@@ -6,7 +6,7 @@ export class User extends Entity implements IUser {
     private uuid: string;
     private name: string;
 
-    constructor(id: number, uuid: string, name: string) {
+    constructor(id: number | null, uuid: string, name: string) {
         super(id);
         this.uuid = uuid;
         this.name = name;

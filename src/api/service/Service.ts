@@ -1,3 +1,4 @@
+import { injectable } from "inversify";
 import { PubSub } from "../../util/pubSub/PubSub";
 import { TaskProcessor } from "../../util/taskProcessing/TaskProcessor";
 import { IRepository } from "../repo/IRepository";
@@ -8,6 +9,7 @@ import { IService } from "./IService";
  * @abstract
  * @implements {IService}
  */
+@injectable()
 export abstract class Service<T extends IRepository> implements IService {
     public abstract readonly name: string;
     protected repository: T;

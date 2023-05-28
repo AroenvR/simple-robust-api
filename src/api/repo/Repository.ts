@@ -1,18 +1,20 @@
 import { Knex } from "knex";
 import { IRepository } from "./IRepository";
+import { injectable } from "inversify";
 
 /**
  * The base class for all repositories.
  * @abstract
  * @implements {IRepository}
  */
+@injectable()
 export abstract class Repository implements IRepository {
     public abstract readonly name: string;
     public abstract readonly TABLE: string;
-    protected queryBuilder: Knex.QueryBuilder;
+    protected db: Knex;
 
-    constructor(queryBuilder: Knex.QueryBuilder) {
-        this.queryBuilder = queryBuilder;
+    constructor(db: Knex) {
+        this.db = db;
     }
 
     public abstract upsert(params?: any[]): Promise<any[]>;

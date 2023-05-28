@@ -1,3 +1,5 @@
+import { Knex } from "knex";
+
 /**
  * IRepository interface represents the basic structure for a repository.  
  * It contains methods to upsert and select all from the database.

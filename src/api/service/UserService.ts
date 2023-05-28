@@ -2,7 +2,7 @@ import { PubSub } from "../../util/pubSub/PubSub";
 import { TaskProcessor } from "../../util/taskProcessing/TaskProcessor";
 import { UserDTO } from "../dto/UserDTO";
 import Logger from "../../util/logging/Logger";
-import { inject, injectable } from "inversify";
+import { inject } from "inversify";
 import { TYPES } from "../../ioc/TYPES";
 import { IUserService } from "./IUserService";
 import { IUserRepo } from "../repo/IUserRepo";
@@ -14,7 +14,6 @@ import { User } from "../model/User";
 /**
  * The UserService class provides methods for managing users in the application.
  */
-@injectable()
 export class UserService extends Service<IUserRepo> implements IUserService {
     readonly name = 'UserService';
 
@@ -38,7 +37,7 @@ export class UserService extends Service<IUserRepo> implements IUserService {
         Logger.instance.debug(`${this.name}: userDTO's:`, userDtos);
 
         try {
-            const users = userDtos.map((dto: UserDTO) => new User(dto._id, dto._uuid, dto._name));
+            const users = userDtos.map((dto: UserDTO) => new User(null, dto._uuid, dto._name));
             const result = await this.repository.upsert(users);
 
             const resultDtos = result.map((user: User) => {

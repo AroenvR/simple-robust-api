@@ -17,8 +17,9 @@ describe('UserController', () => {
         containerWrapper.initContainer();
 
         app = containerWrapper.getContainer().get<App>(TYPES.App);
-        userController = containerWrapper.getContainer().get<UserController>(TYPES.Controller);
         await app.start();
+
+        userController = containerWrapper.getContainer().get<UserController>(TYPES.Controller);
     });
 
     afterAll(async () => {

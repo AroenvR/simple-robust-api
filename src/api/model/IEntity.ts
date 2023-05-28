@@ -1,3 +1,3 @@
 export interface IEntity {
-    _id: number;
+    _id: number | null;
 }

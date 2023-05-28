@@ -4,21 +4,21 @@ import { IUserController } from "./IUserController";
 import Logger from '../../util/logging/Logger';
 import validator from 'validator';
 import ValidationError from '../../util/errors/ValidationError';
-import { inject, injectable } from 'inversify';
+import { inject } from 'inversify';
 import { TYPES } from '../../ioc/TYPES';
 import { IUserService } from '../service/IUserService';
 import { isTruthy } from '../../util/isTruthy';
 import NotFoundError from '../../util/errors/NotFoundError';
+import { Controller } from './Controller';
 
-@injectable()
-export class UserController implements IUserController {
+/**
+ * The controller for user-related operations.
+ */
+export class UserController extends Controller<IUserService> implements IUserController {
     readonly name = 'UserController';
-    service: IUserService;
-    router: Router;
 
     constructor(@inject(TYPES.Service) service: IUserService) {
-        this.service = service;
-        this.router = Router();
+        super(service);
     }
 
     public initRoutes(): Router {
@@ -71,7 +71,6 @@ export class UserController implements IUserController {
 
         if (isTruthy(ids)) {
             const idArr: number[] = ids.split(',').map((id) => parseInt(id));
-
             return this.service.getByIds(idArr);
         }
 
@@ -138,7 +137,13 @@ export class UserController implements IUserController {
         Logger.instance.info(`${this.name}: Getting users by names.`);
 
         for (const name of names) {
-            if (!validator.isAlphanumeric(name)) {
+            if (!validator.isLength(this.name, { min: 1, max: 255 })) {
+                Logger.instance.error(`UserController: GET /users invalid name: ${name}`);
+                throw new ValidationError(`Invalid name: ${name}`);
+            }
+
+            const noSpaces = name.replace(/\s/g, '');
+            if (!validator.isAlpha(noSpaces)) {
                 Logger.instance.error(`UserController: GET /users invalid name: ${name}`);
                 throw new ValidationError(`Invalid name: ${name}`);
             }

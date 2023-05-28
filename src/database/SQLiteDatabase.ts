@@ -1,14 +1,10 @@
-import fs from "fs-extra";
-import path from 'path';
 import { inject } from "inversify";
 import { IDatabase } from "./IDatabase";
 import { TYPES } from "../ioc/TYPES";
 import { IDatabaseConfig } from "./IDatabaseConfig";
 import Logger from "../util/logging/Logger";
-import { IInsertReturn } from "./IInsertReturn";
 import { Knex, knex } from 'knex'
 import { knexSchemaBuilder } from "./sql/knexSchemaBuilder";
-import { IDTO } from "../api/dto/IDTO";
 
 
 /**
@@ -40,7 +36,7 @@ export default class SQLiteDatabase implements IDatabase {
                 connection: {
                     filename: this.config.connection
                 },
-                useNullAsDefault: true
+                useNullAsDefault: true,
             });
 
             Logger.instance.debug("SQLiteDatabase: SQLite database connected.");

@@ -25,7 +25,7 @@ export class UserDTO extends DataTransferObject implements IUser {
         super();
 
         if (user) {
-            this._id = user._id;
+            this._id = user._id!;
             this.uuid = user._uuid;
             this.name = user._name;
         }
@@ -58,12 +58,20 @@ export class UserDTO extends DataTransferObject implements IUser {
     }
 
     public isValid(): boolean { // TODO: Json Schema! Figure out if during or before runtime.
-        if (!validator.isUUID(this.uuid || '', '4')) {
+        if (!isTruthy(this.uuid) || !isTruthy(this.name)) throw new ValidationError('UserDTO: UUID and Name must be set');
+
+        if (!validator.isUUID(this.uuid!, '4')) {
             throw new ValidationError('UserDTO: UUID must be a valid UUID v4 string');
         }
-        if (!validator.isLength(this.name || '', { min: 1, max: 255 })) {
+        if (!validator.isLength(this.name!, { min: 1, max: 255 })) {
             throw new ValidationError('UserDTO: Name must be a non-empty string with a maximum length of 255 characters');
         }
+
+        const noSpaces = this.name!.replace(/\s/g, '');
+        if (!validator.isAlpha(noSpaces)) {
+            throw new ValidationError('UserDTO: Name must be a non-empty alpha-only string.');
+        }
+
         return true;
     }
 
