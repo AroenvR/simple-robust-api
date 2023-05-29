@@ -4,7 +4,7 @@ import { TYPES } from "../ioc/TYPES";
 import { IDatabaseConfig } from "./IDatabaseConfig";
 import Logger from "../util/logging/Logger";
 import { Knex, knex } from 'knex'
-import { knexSchemaBuilder } from "./sql/knexSchemaBuilder";
+import { knexSchemaBuilder } from "./schema/knexSchemaBuilder";
 
 
 /**
