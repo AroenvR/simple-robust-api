@@ -4,21 +4,21 @@ import { IUserController } from "./IUserController";
 import Logger from '../../util/logging/Logger';
 import validator from 'validator';
 import ValidationError from '../../util/errors/ValidationError';
-import { inject, injectable } from 'inversify';
+import { inject } from 'inversify';
 import { TYPES } from '../../ioc/TYPES';
 import { IUserService } from '../service/IUserService';
 import { isTruthy } from '../../util/isTruthy';
 import NotFoundError from '../../util/errors/NotFoundError';
+import { Controller } from './Controller';
 
-@injectable()
-export class UserController implements IUserController {
+/**
+ * The controller for user-related operations.
+ */
+export class UserController extends Controller<IUserService> implements IUserController {
     readonly name = 'UserController';
-    service: IUserService;
-    router: Router;
 
     constructor(@inject(TYPES.Service) service: IUserService) {
-        this.service = service;
-        this.router = Router();
+        super(service);
     }
 
     public initRoutes(): Router {
@@ -27,7 +27,7 @@ export class UserController implements IUserController {
          */
         this.router.get('/users', async (req, res, next) => {
             try {
-                let users = await this.handleGet(req.query);
+                const users = await this.handleGet(req.query);
 
                 const toReturn = users.sort(user => user._id);
                 res.status(200).json(toReturn);
@@ -57,7 +57,7 @@ export class UserController implements IUserController {
      * Retrieves all users.
      * @returns The array of users.
      */
-    public async handleGet(query?: any): Promise<UserDTO[]> {
+    public async handleGet(query?: any): Promise<UserDTO[]> { // TODO: Enable multiple query parameters + filtering by name.
         Logger.instance.debug(`${this.name}: Getting users. Query:`, query);
 
         if (!isTruthy(query)) {
@@ -67,16 +67,21 @@ export class UserController implements IUserController {
 
         const ids = query!.ids as string;
         const uuids = query!.uuids as string;
+        const names = query!.names as string;
 
         if (isTruthy(ids)) {
-            let idArray: number[] = ids.split(',').map((id) => parseInt(id));
-
-            return this.service.getByIds(idArray);
+            const idArr: number[] = ids.split(',').map((id) => parseInt(id));
+            return this.service.getByIds(idArr);
         }
 
         if (isTruthy(uuids)) {
-            let uuidArray: string[] = uuids.split(',');
-            return this.getByUuids(uuidArray);
+            const uuidArr: string[] = uuids.split(',');
+            return this.getByUuids(uuidArr);
+        }
+
+        if (isTruthy(names)) {
+            const nameArr: string[] = names.split(',');
+            return this.getByNames(nameArr);
         }
 
         throw new NotFoundError('Invalid query parameters.');
@@ -101,6 +106,13 @@ export class UserController implements IUserController {
         return await this.service.upsert(userDtos);
     }
 
+    /**
+     * Retrieves users by their UUIDs.
+     * @param {string[]} uuids - An array of user UUIDs.
+     * @returns {Promise<UserDTO[]>} A Promise that resolves to an array of UserDTO objects.
+     * @throws {ValidationError} If any of the provided UUIDs are invalid.
+     * @throws {NotFoundError} If no users are found.
+     */
     public async getByUuids(uuids: string[]): Promise<UserDTO[]> { // TODO: test
         Logger.instance.info(`${this.name}: Getting users by uuids.`);
 
@@ -114,46 +126,29 @@ export class UserController implements IUserController {
         return this.service.getByUuids(uuids);
     }
 
-
     /**
-     * Asynchronously checks the validity of an array of users.
-     * @param users - An array of user objects to be validated.
-     * @returns A promise that resolves to `true` if all users are valid.
-     * @throws If any user fails validation, a ValidationError is thrown with a specific error message.
+     * Retrieves users by their names.
+     * @param {string[]} names - An array of user names.
+     * @returns {Promise<UserDTO[]>} A Promise that resolves to an array of UserDTO objects.
+     * @throws {ValidationError} If any of the provided names are invalid.
+     * @throws {NotFoundError} If no users are found.
      */
-    // private async checkUsers(users: UserDTO[]): Promise<boolean> {
-    //     const promises: Promise<boolean>[] = [];
+    public async getByNames(names: string[]): Promise<UserDTO[]> { // TODO: test
+        Logger.instance.info(`${this.name}: Getting users by names.`);
 
-    //     for (const user of users) {
-    //         promises.push(this.isValid(user));
-    //     }
+        for (const name of names) {
+            if (!validator.isLength(this.name, { min: 1, max: 255 })) {
+                Logger.instance.error(`UserController: GET /users invalid name: ${name}`);
+                throw new ValidationError(`Invalid name: ${name}`);
+            }
 
-    //     await allSettledWrapper(promises);
+            const noSpaces = name.replace(/\s/g, '');
+            if (!validator.isAlpha(noSpaces)) {
+                Logger.instance.error(`UserController: GET /users invalid name: ${name}`);
+                throw new ValidationError(`Invalid name: ${name}`);
+            }
+        }
 
-    //     return true;
-    // }
-
-    /**
-     * Asynchronously validates a single user object.
-     * @param user - The user object to be validated.
-     * @returns A promise that resolves to `true` if the user is valid.
-     * @throws If the user fails validation, a ValidationError is thrown with a specific error message.
-     */
-    // private async isValid(user: UserDTO): Promise<boolean> {
-    //     Logger.instance.debug("isValid checking userDTO:", user);
-
-    //     // Validate uuid
-    //     if (typeof user._uuid !== 'string' || !validator.isUUID(user._uuid)) {
-    //         Logger.instance.error("isValid failed on uuid:", user._uuid);
-    //         throw new ValidationError('Invalid uuid');
-    //     }
-
-    //     // Validate name
-    //     if (typeof user._name !== 'string' || !validator.isLength(user._name, { min: 3 })) {
-    //         Logger.instance.error("isValid failed on name:", user._name);
-    //         throw new ValidationError('Invalid name');
-    //     }
-
-    //     return true;
-    // };
+        return this.service.getByNames(names);
+    }
 }

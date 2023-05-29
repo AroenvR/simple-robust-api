@@ -17,8 +17,9 @@ describe('UserController', () => {
         containerWrapper.initContainer();
 
         app = containerWrapper.getContainer().get<App>(TYPES.App);
-        userController = containerWrapper.getContainer().get<UserController>(TYPES.Controller);
         await app.start();
+
+        userController = containerWrapper.getContainer().get<UserController>(TYPES.Controller);
     });
 
     afterAll(async () => {
@@ -28,11 +29,11 @@ describe('UserController', () => {
     // ----------------------------
 
     test('upsert users', async () => {
-        let userDto1 = new UserDTO();
+        const userDto1 = new UserDTO();
         userDto1._uuid = johnUUID;
         userDto1._name = 'John Doe';
 
-        let userDto2 = new UserDTO();
+        const userDto2 = new UserDTO();
         userDto2._uuid = janeUUID;
         userDto2._name = 'Jane Doe';
 
@@ -74,10 +75,9 @@ describe('UserController', () => {
 
     // ----------------------------
 
-    test.skip('get all users by uuids', async () => { // TODO: Fix!
-        const uuids: string = `${johnUUID},${janeUUID}`;
-        let uuidArray: string[] = uuids.split(',');
-        const result = await userController.getByUuids(uuidArray);
+    test('get all users by uuids', async () => {
+        const uuids: string[] = [johnUUID, janeUUID];
+        const result = await userController.getByUuids(uuids);
 
         expect(result.length).toBe(2);
         expect(result).toEqual([

@@ -104,9 +104,78 @@ describe('Users API', () => {
 
         const users = response.data;
         expect(users.length).toBe(2);
-        expect(users[0].uuid).toBe(johnUUID);
-        expect(users[0].name).toBe('John Doe');
-        expect(users[1].uuid).toBe(janeUUID);
-        expect(users[1].name).toBe('Jane Doe');
+        expect(users).toEqual([
+            {
+                id: 1,
+                uuid: johnUUID,
+                name: 'John Doe'
+            },
+            {
+                id: 2,
+                uuid: janeUUID,
+                name: 'Jane Doe'
+            },
+        ]);
+    });
+
+    // ----------------------------
+
+    test('handles an HTTP GET request with names query', async () => { // TODO: Enable.
+        const names = ['John Doe', 'Jane Doe'];
+        const url = new URL(`http://localhost:${testServerConfig.app.port}/users`);
+        url.searchParams.set("names", names.join(","));
+
+        const response = await axios.get(url.toString(), {
+            headers: {
+                'Content-Type': 'application/json',
+                Origin: origin
+            }
+        });
+
+        expect(response.status).toBe(200);
+
+        const users = response.data;
+        expect(users.length).toBe(2);
+        expect(users).toEqual([
+            {
+                id: 1,
+                uuid: johnUUID,
+                name: 'John Doe'
+            },
+            {
+                id: 2,
+                uuid: janeUUID,
+                name: 'Jane Doe'
+            },
+        ]);
+    });
+
+    // ----------------------------
+
+    test.skip('handles an HTTP GET request with uuids and names query', async () => { // TODO: Enable.
+        const uuids = [johnUUID];
+        const names = ['John Doe'];
+        const url = new URL(`http://localhost:${testServerConfig.app.port}/users`);
+        url.searchParams.set("uuids", uuids.join(","));
+        url.searchParams.set("names", names.join(","));
+
+        const response = await axios.get(url.toString(), {
+            headers: {
+                'Content-Type': 'application/json',
+                Origin: origin
+            }
+        });
+
+        expect(response.status).toBe(200);
+
+        const users = response.data;
+        expect(users.length).toBe(1);
+        expect(users).toEqual([
+            {
+                id: 1,
+                uuid: johnUUID,
+                name: 'John Doe'
+            },
+        ]);
     });
 });

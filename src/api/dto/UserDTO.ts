@@ -25,7 +25,7 @@ export class UserDTO extends DataTransferObject implements IUser {
         super();
 
         if (user) {
-            this._id = user._id;
+            this._id = user._id!;
             this.uuid = user._uuid;
             this.name = user._name;
         }
@@ -40,7 +40,6 @@ export class UserDTO extends DataTransferObject implements IUser {
 
     set _uuid(value: string) {
         if (!isTruthy(value)) throw Error('UserDTO: UUID must be a truthy string');
-        if (isTruthy(this.uuid)) throw Error('UserDTO: UUID is already set');
         this.uuid = value;
     }
 
@@ -53,24 +52,31 @@ export class UserDTO extends DataTransferObject implements IUser {
 
     set _name(value: string) {
         if (!isTruthy(value)) throw Error('UserDTO: Name must be a truthy string');
-        if (isTruthy(this.name)) throw Error('UserDTO: Name is already set');
         this.name = value;
     }
 
     public isValid(): boolean { // TODO: Json Schema! Figure out if during or before runtime.
-        if (!validator.isUUID(this.uuid || '', '4')) {
+        if (!isTruthy(this.uuid) || !isTruthy(this.name)) throw new ValidationError('UserDTO: UUID and Name must be set');
+
+        if (!validator.isUUID(this.uuid!, '4')) {
             throw new ValidationError('UserDTO: UUID must be a valid UUID v4 string');
         }
-        if (!validator.isLength(this.name || '', { min: 1, max: 255 })) {
+        if (!validator.isLength(this.name!, { min: 1, max: 255 })) {
             throw new ValidationError('UserDTO: Name must be a non-empty string with a maximum length of 255 characters');
         }
+
+        const noSpaces = this.name!.replace(/\s/g, '');
+        if (!validator.isAlpha(noSpaces)) {
+            throw new ValidationError('UserDTO: Name must be a non-empty alpha-only string.');
+        }
+
         return true;
     }
 
     public fromData(data: any): UserDTO {
         if (isTruthy(data.id)) this._id = data.id;
-        this._uuid = data.uuid;
-        this._name = data.name;
+        this.uuid = data.uuid;
+        this.name = data.name;
         return this;
     }
 }

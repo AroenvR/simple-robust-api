@@ -12,8 +12,8 @@
         ],
         "allowJs": true,
         "jsx": "react",
-        "outDir": "build",
         "rootDir": "src",
+        "outDir": "dist",
         "composite": true,
         "removeComments": true,
         "strict": true,
@@ -26,17 +26,17 @@
         "esModuleInterop": true,
         "resolveJsonModule": true,
         "experimentalDecorators": true,
-        "emitDecoratorMetadata": true
+        "emitDecoratorMetadata": true,
+        "forceConsistentCasingInFileNames": true,
+        "skipLibCheck": false,
+        "sourceMap": false
     },
     "include": [
-        "src/**/*.ts",
-        "jest.setup.ts",
-        "default-test-environment.ts"
+        "src/**/*.ts"
     ],
     "exclude": [
         "node_modules",
         "**/*.spec.ts",
-        "build/**/*",
-        "jest.setup.ts"
+        "dist/**/*",
     ]
 }

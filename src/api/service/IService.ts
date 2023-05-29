@@ -1,16 +1,22 @@
-import { PubSub } from "../../util/pubSub/PubSub";
-import { TaskProcessor } from "../../util/taskProcessing/TaskProcessor";
-import { IRepository } from "../repo/IRepository";
-
 /**
- * TODO: Document.
+ * The interface for all services.
+ * @interface
  */
 export interface IService {
     readonly name: string;
-    repository: IRepository;
-    taskProcessor: TaskProcessor;
-    pubSub: PubSub;
 
-    upsert(data: any | any[]): Promise<any>;
-    getAll(): Promise<any>;
+    /**
+     * Inserts or updates one or more records in the database.
+     * @abstract
+     * @param params - An array of objects representing the records to insert or update.
+     * @returns A Promise that resolves to an array of objects representing the inserted or updated records.
+     */
+    upsert(params?: any[]): Promise<any[]>;
+
+    /**
+     * Retrieves all records from the database.
+     * @abstract
+     * @returns A Promise that resolves to an array of objects representing the retrieved records.
+     */
+    getAll(): Promise<any[]>;
 }

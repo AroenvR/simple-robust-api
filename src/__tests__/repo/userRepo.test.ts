@@ -5,7 +5,6 @@ import { testServerConfig } from "../testServerConfig";
 import App from "../../app/App";
 import { ContainerWrapper } from "../../ioc/ContainerWrapper";
 import { TYPES } from "../../ioc/TYPES";
-import { UserDTO } from "../../api/dto/UserDTO";
 
 describe('UserRepo', () => {
     let app: App;
@@ -19,8 +18,9 @@ describe('UserRepo', () => {
         containerWrapper.initContainer();
 
         app = containerWrapper.getContainer().get<App>(TYPES.App);
-        userRepo = containerWrapper.getContainer().get<UserRepo>(TYPES.Repository);
         await app.start();
+
+        userRepo = containerWrapper.getContainer().get<UserRepo>(TYPES.Repository);
     });
 
     afterAll(async () => {
@@ -30,13 +30,8 @@ describe('UserRepo', () => {
     // ----------------------------
 
     test('should upsert a user', async () => {
-        const john = new UserDTO();
-        john._uuid = johnUUID;
-        john._name = "John Doe";
-
-        const jane = new UserDTO();
-        jane._uuid = janeUUID;
-        jane._name = "Jane Doe";
+        const john = new User(null, johnUUID, "John Doe");
+        const jane = new User(null, janeUUID, "Jane Doe");
 
         const resp = await userRepo.upsert([john, jane]);
 
@@ -57,26 +52,34 @@ describe('UserRepo', () => {
     // ----------------------------
 
     test('should get all users', async () => {
-        const users = await userRepo.getAll();
+        const users = await userRepo.selectAll();
 
         expect(users.length).toBe(2);
-        expect(users[0]._name).toBe('John Doe');
-        expect(users[1]._name).toBe('Jane Doe');
+        expect(users).toEqual([
+            {
+                id: 1,
+                uuid: johnUUID,
+                name: 'John Doe'
+            },
+            {
+                id: 2,
+                uuid: janeUUID,
+                name: 'Jane Doe'
+            },
+        ]);
     });
 
     // ----------------------------
 
     test('should not insert user with same UUID', async () => {
-        const john = new UserDTO();
-        john._uuid = johnUUID;
-        john._name = "John Doe";
+        const john = new User(null, johnUUID, "John Doe");
 
-        const users = await userRepo.getAll();
+        const users = await userRepo.selectAll();
         expect(users.length).toBe(2);
 
-        await expect(userRepo.upsert([john])).rejects.toThrowError('Error upserting users.');
+        await userRepo.upsert([john]);
 
-        const newUsers = await userRepo.getAll();
+        const newUsers = await userRepo.selectAll();
         expect(newUsers.length).toBe(2);
     });
 });

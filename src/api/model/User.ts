@@ -3,32 +3,32 @@ import { isTruthy } from "../../util/isTruthy";
 import { IUser } from "./IUser";
 
 export class User extends Entity implements IUser {
-    private _uuid: string;
-    private _name: string;
+    private uuid: string;
+    private name: string;
 
-    constructor(id: number, uuid: string, name: string) {
+    constructor(id: number | null, uuid: string, name: string) {
         super(id);
-        this._uuid = uuid;
-        this._name = name;
+        this.uuid = uuid;
+        this.name = name;
     }
 
     get _uuid(): string {
-        return this._uuid;
+        return this.uuid;
     }
 
     set _uuid(value: string) {
         if (!isTruthy(value)) throw Error('User: UUID must be a truthy string');
         if (isTruthy(this._uuid)) throw Error('User: UUID is already set');
-        this._uuid = value;
+        this.uuid = value;
     }
 
     get _name(): string {
-        return this._name;
+        return this.name;
     }
 
     set _name(value: string) {
         if (!isTruthy(value)) throw Error('User: Name must be a truthy string');
-        if (isTruthy(this._name)) throw Error('User: Name is already set');
-        this._name = value;
+        if (isTruthy(this.name)) throw Error('User: Name is already set');
+        this.name = value;
     }
 }

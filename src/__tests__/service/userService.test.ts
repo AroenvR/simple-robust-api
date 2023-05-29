@@ -15,8 +15,9 @@ describe('UserService', () => {
         containerWrapper.initContainer();
 
         app = containerWrapper.getContainer().get<App>(TYPES.App);
-        userService = containerWrapper.getContainer().get<UserService>(TYPES.Service);
         await app.start();
+
+        userService = containerWrapper.getContainer().get<UserService>(TYPES.Service);
     });
 
     afterAll(async () => {
@@ -26,7 +27,7 @@ describe('UserService', () => {
     // ----------------------------
 
     test('should create a user', async () => {
-        let userDto = new UserDTO();
+        const userDto = new UserDTO();
         userDto._uuid = generateUUID();
         userDto._name = 'John Doe';
 
@@ -35,11 +36,11 @@ describe('UserService', () => {
     });
 
     test('should create multiple users', async () => {
-        let userDto1 = new UserDTO();
+        const userDto1 = new UserDTO();
         userDto1._uuid = generateUUID();
         userDto1._name = 'Jane Doe';
 
-        let userDto2 = new UserDTO();
+        const userDto2 = new UserDTO();
         userDto2._uuid = generateUUID();
         userDto2._name = 'Joe Bloggs';
 

@@ -1,4 +1,3 @@
-import { IEntity } from "../model/IEntity";
 import { isTruthy } from "../../util/isTruthy";
 import { IDTO } from "./IDTO";
 

@@ -2,117 +2,138 @@ import { IDatabase } from "../../database/IDatabase";
 import { IUserRepo } from "./IUserRepo";
 import { User } from "../model/User";
 import Logger from "../../util/logging/Logger";
-import { isTruthy } from "../../util/isTruthy";
-import { UserDTO } from "../dto/UserDTO";
-import NotFoundError from "../../util/errors/NotFoundError";
-import { inject, injectable } from "inversify";
+import { inject } from "inversify";
 import { TYPES } from "../../ioc/TYPES";
+import { Repository } from "./Repository";
+import { Knex } from "knex";
 
-// TODO: Validate objects before inserting/updating.
-// TODO: Enforce objects (such as uuid should exist).
-// Caching?
-// Indexing? 
+// TODO: Indexing?
 
 /**
- * UserRepo class implements IUserRepo and provides methods to interact with user records in the database.
+ * UserRepo class provides methods to interact with user records in the database.
+ * @extends {Repository}
+ * @implements {IRepository}
  */
-@injectable()
-export class UserRepo implements IUserRepo {
+export class UserRepo extends Repository implements IUserRepo {
     readonly name = 'UserRepo';
-    private readonly TABLE = 'users';
-    private _db: IDatabase;
+    readonly TABLE = 'users';
 
-    /**
-     * @param db - The database object.
-     */
     constructor(@inject(TYPES.Database) db: IDatabase) {
-        this._db = db;
+        super(db.getInstance());
     }
 
-    /**
-     * Inserts a new user.
-     * @param params Array of User objects.
-     * @returns A Promise with the last ID of the insert operation.
-     */
-    async upsert(params: UserDTO[]): Promise<UserDTO[]> {
+    private getQueryBuilder(): Knex.QueryBuilder {
+        return this.db<User>(this.TABLE);
+    }
+
+    async upsert(params: User[]): Promise<User[]> {
         Logger.instance.info(`${this.name}: upserting users.`);
         Logger.instance.debug(`${this.name}: upserting users:`, params);
 
         try {
-            const resp = await this._db.upsert(this.TABLE, params);
-            if (!isTruthy(resp)) throw new Error(`${this.name}: Error upserting users.`);
+            const result = await this.getQueryBuilder()
+                .insert(params)
+                .onConflict('uuid').ignore()
+                .returning(['id', 'uuid', 'name']);
 
-            const userDtos = resp.map((item: any) => {
-                const dto = new UserDTO();
-                dto.fromData(item);
-                dto.isValid();
-                return dto;
-            });
+            Logger.instance.debug(`${this.name} upserted. Returning result:`, result);
+            return result;
 
-            return userDtos;
-
-        } catch (error: Error | any) {
-            Logger.instance.error(`${this.name}: Error upserting users:`, error);
-            throw error;
+        } catch (err) {
+            Logger.instance.error(`${this.name}: Error upserting users:`, err);
+            throw err;
         }
     }
 
-    /**
-     * Gets all users.
-     * @returns A Promise with the requested users.
-     */
-    async getAll(): Promise<UserDTO[]> {
+    async selectAll(): Promise<User[]> {
         Logger.instance.info(`${this.name}: selecting all users.`);
 
-        const resp = await this._db.selectMany(this.TABLE);
-        const userDtos = resp.map((item: any) => {
-            const dto = new UserDTO();
-            dto.fromData(item);
-            dto.isValid();
-            return dto;
-        });
+        try {
+            const result = await this.getQueryBuilder()
+                .select('*')
+                .orderBy('id', 'asc');
 
-        return userDtos;
+            Logger.instance.debug(`${this.name}: selected all users. Returning result:`, result);
+            return result;
+
+        } catch (err) {
+            Logger.instance.error(`${this.name}: Error selecting all users:`, err);
+            throw err;
+        }
     }
 
-    /**
-     * Gets users by ids.
-     * @returns A Promise with the requested users.
-     */
-    async selectFromIdToId(from: number, to: number): Promise<UserDTO[]> {
+    async selectFromIdToId(from: number, to: number): Promise<User[]> {
         Logger.instance.info(`${this.name}: selecting users by ids.`);
+        Logger.instance.debug(`${this.name}: selecting users by ids from: ${from} | to: ${to}`);
 
-        const result = await this._db.selectFromIdToId(this.TABLE, from, to);
-        if (!isTruthy(result)) throw new NotFoundError('Error users not found by requested ids.');
+        try {
+            const result = await this.getQueryBuilder()
+                .select('*')
+                .whereBetween('id', [from, to])
+                .orderBy('id', 'asc');
 
-        return result;
+            Logger.instance.debug(`${this.name}: selected users by ids. Result:`, result);
+            return result;
+
+        } catch (err) {
+            Logger.instance.error(`${this.name}: Error selecting users by ids:`, err);
+            throw err;
+        }
     }
 
-    /**
-     * Gets users by uuids.
-     * @param uuids - An array of uuids.
-     * @returns A Promise with the requested users.
-     */
-    async selectByUuids(uuids: string[]): Promise<UserDTO[]> {
+    async selectByUuids(uuids: string[]): Promise<User[]> {
         Logger.instance.info(`${this.name}: selecting users by UUIDs.`);
+        Logger.instance.debug(`${this.name}: selecting users by UUIDs:`, uuids);
 
-        const whereClause = { uuid: uuids };
-        const result = await this._db.selectMany(this.TABLE, whereClause);
+        try {
+            const result = await this.getQueryBuilder()
+                .select('*')
+                .whereIn('uuid', uuids)
+                .orderBy('id', 'asc');
 
-        if (!isTruthy(result)) throw new NotFoundError('Error users not found by requested uuids.');
+            Logger.instance.debug(`${this.name}: selected users by UUIDs. Result:`, result);
+            return result;
 
-        return result;
+        } catch (err) {
+            Logger.instance.error(`${this.name}: Error selecting users by UUIDs:`, err);
+            throw err;
+        }
     }
 
-    /**
-     * Gets the last user.
-     * @returns A Promise with the last user.
-     */
-    async getLast(): Promise<User> {
-        Logger.instance.debug(`${this.name}: getting the last one.`);
+    async selectByNames(names: string[]): Promise<User[]> {
+        Logger.instance.info(`${this.name}: selecting users by names.`);
+        Logger.instance.info(`${this.name}: selecting users by names:`, names);
 
-        const result = await this._db.selectOne(this.TABLE, {}, ['id', 'desc']);
+        try {
+            const result = await this.getQueryBuilder()
+                .select('*')
+                .whereIn('name', names)
+                .orderBy('id', 'asc');
 
-        return result;
+            Logger.instance.debug(`${this.name}: selected users by names. Result:`, result);
+            return result;
+
+        } catch (err) {
+            Logger.instance.error(`${this.name}: Error selecting users by names:`, err);
+            throw err;
+        }
+    }
+
+    async selectLast(): Promise<User> {
+        Logger.instance.info(`${this.name}: selecting the last user.`);
+
+        try {
+            const result = await this.getQueryBuilder()
+                .select('*')
+                .orderBy('id', 'desc')
+                .limit(1);
+
+            Logger.instance.debug(`${this.name}: selected the last user. Result:`, result);
+            return result;
+
+        } catch (err) {
+            Logger.instance.error(`${this.name}: Error selecting the last user:`, err);
+            throw err;
+        }
     }
 }
