@@ -1,7 +1,7 @@
 import { injectable } from "inversify";
 import { IDatabase } from "./IDatabase";
 import { IDatabaseConfig } from "./IDatabaseConfig";
-import SQLiteDatabase from "./SQLiteDatabase";
+import Database from "./Database";
 import Logger from "../util/logging/Logger";
 import { constants } from "../util/constants";
 
@@ -23,7 +23,20 @@ export default class DatabaseFactory {
         switch (config.driver) {
 
             case constants.database.types.SQLITE3:
-                return new SQLiteDatabase(config);
+                return new Database(config);
+
+            /*
+                In theory, the following database connections should be supported:
+                - SQLite3
+                - MySQL
+                - PostgreSQL
+                - CockroachDB
+                - MariaDB
+                - Better-SQLite3
+                - Oracle
+                - Amazon Redshift
+                - MSSQL (Microsoft SQL Server)
+            */
 
             default:
                 throw new Error('DatabaseFactory: Unknown database type: ' + config.driver);

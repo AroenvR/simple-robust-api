@@ -10,7 +10,7 @@ import { knexSchemaBuilder } from "./sql/knexSchemaBuilder";
 /**
  * A class that represents an SQLite3 database.
  */
-export default class SQLiteDatabase implements IDatabase {
+export default class Database implements IDatabase {
     readonly config: IDatabaseConfig;
     private db: Knex | null = null;
 
