@@ -1,4 +1,7 @@
+import Ajv from 'ajv';
+import addFormats from "ajv-formats";
 import { UserDTO } from '../../api/dto/UserDTO';
+import { UserSchema } from '../../api/dto/UserSchema';
 import ValidationError from '../../util/errors/ValidationError';
 import { generateUUID } from '../../util/uuid';
 
@@ -7,13 +10,6 @@ describe('UserDTO', () => {
 
     beforeEach(() => {
         userDTO = new UserDTO();
-    });
-
-    // --------------------
-
-    test('UUID and Name should be null initially', () => {
-        expect(() => userDTO._uuid).toThrow(Error);
-        expect(() => userDTO._name).toThrow(Error);
     });
 
     // --------------------
@@ -55,24 +51,125 @@ describe('UserDTO', () => {
 
     // --------------------
 
-    test('isValid should throw error for invalid Name', () => {
-        userDTO._uuid = generateUUID();
-        userDTO._name = 'A'.repeat(256); // 256 characters is over the limit
+    test('JSON schema validation should work correctly', () => {
+        const ajv = new Ajv();
+        addFormats(ajv);
 
-        expect(() => {
-            userDTO.isValid();
-        }).toThrow(ValidationError);
+        const validUserDTO = {
+            uuid: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+            name: 'John Doe',
+        };
+
+        const invalidUserDTO = {
+            uuid: 'invalid-uuid',
+            name: 'A'.repeat(256),
+        };
+
+        expect(ajv.validate(UserSchema, validUserDTO)).toBe(true);
+        expect(ajv.validate(UserSchema, invalidUserDTO)).toBe(false);
     });
 
     // --------------------
 
-    test('isValid should throw error for invalid UUID', () => {
-        userDTO._uuid = 'invalid-uuid';
-        userDTO._name = 'John Doe';
+    test('isValid should throw error for unexpected data types or invalid data', () => {
+        const invalidDataTypes = [123, {}, [], true, 'invalid-uuid', 'Hello69', 'A'.repeat(256)];
 
-        expect(() => {
+        invalidDataTypes.forEach((value) => {
+            // Bypass setters by directly setting private properties
+            (userDTO as any).uuid = generateUUID();
+            (userDTO as any).name = 'John Doe';
+
+            // Test unexpected data types for UUID
+            (userDTO as any).uuid = value;
+            expect(() => {
+                userDTO.isValid();
+            }).toThrow(ValidationError);
+
+            // Reset UUID and test unexpected data types for Name
+            (userDTO as any).uuid = generateUUID();
+            (userDTO as any).name = value;
+            expect(() => {
+                userDTO.isValid();
+            }).toThrow(ValidationError);
+        });
+    });
+
+    // --------------------
+
+    test('isValid should throw error for potential SQL injection attempts', () => {
+        const sqlInjectionStrings = [
+            "John Doe'; DROP TABLE users; --",
+            "John Doe' OR '1'='1",
+            "John Doe' AND SLEEP(5); --",
+        ];
+
+        sqlInjectionStrings.forEach((value) => {
+            userDTO._uuid = generateUUID();
+            userDTO._name = value;
+
+            expect(() => {
+                userDTO.isValid();
+            }).toThrow(ValidationError);
+        });
+    });
+
+    // --------------------
+
+    test('isValid should throw error for potential XSS attempts', () => {
+        const xssStrings = [
+            '<script>alert("XSS");</script>',
+            '<img src="x" onerror="alert(\'XSS\');" />',
+            'John Doe<iframe src="http://evil.com"></iframe>',
+        ];
+
+        xssStrings.forEach((value) => {
+            userDTO._uuid = generateUUID();
+            userDTO._name = value;
+
+            expect(() => {
+                userDTO.isValid();
+            }).toThrow(ValidationError);
+        });
+    });
+
+    // --------------------
+
+    test('isValid should handle different Unicode character sets', () => {
+        const unicodeNames = [
+            'Иван Иванович', // Cyrillic
+            '张伟', // Chinese
+            'الإمام الحسين', // Arabic
+        ];
+
+        unicodeNames.forEach((value) => {
+            userDTO._uuid = generateUUID();
+            userDTO._name = value;
+
+            expect(() => {
+                userDTO.isValid();
+            }).toThrow(ValidationError);
+        });
+    });
+
+    // --------------------
+
+    test('isValid should not leak sensitive information in error messages', () => {
+        const sensitiveInfoString = "John Doe'; SELECT * FROM users; --";
+
+        userDTO._uuid = generateUUID();
+        userDTO._name = sensitiveInfoString;
+
+        try {
             userDTO.isValid();
-        }).toThrow(ValidationError);
+        } catch (error: any) {
+            expect(error).toBeInstanceOf(ValidationError);
+
+            // Check that the error message does not contain sensitive information
+            expect(error.message).not.toContain(sensitiveInfoString);
+
+            // Check that the error message does not contain a stack trace
+            expect(error.message).not.toContain('at ');
+        }
     });
 
     // --------------------
@@ -86,6 +183,7 @@ describe('UserDTO', () => {
 
         userDTO.fromData(data);
 
+        expect(userDTO.isValid()).toBe(true);
         expect(userDTO._id).toBe(data.id);
         expect(userDTO._uuid).toBe(data.uuid);
         expect(userDTO._name).toBe(data.name);

@@ -27,5 +27,5 @@ export default abstract class DataTransferObject implements IDTO {
      */
     public abstract isValid(): boolean;
 
-    public abstract fromData(data: any): DataTransferObject;
+    public abstract fromData(data: any): IDTO;
 }

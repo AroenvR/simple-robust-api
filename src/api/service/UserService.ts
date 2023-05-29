@@ -41,8 +41,9 @@ export class UserService extends Service<IUserRepo> implements IUserService {
             const result = await this.repository.upsert(users);
 
             const resultDtos = result.map((user: User) => {
-                const dto = new UserDTO();
-                dto.fromData(user);
+                Logger.instance.debug(`${this.name}: Creating user DTO from user:`, user);
+
+                const dto = new UserDTO(user);
                 dto.isValid();
                 return dto;
             });
@@ -69,8 +70,7 @@ export class UserService extends Service<IUserRepo> implements IUserService {
             const result = await this.repository.selectAll();
 
             const resultDtos = result.map((user: User) => {
-                const dto = new UserDTO();
-                dto.fromData(user);
+                const dto = new UserDTO(user);
                 dto.isValid();
                 return dto;
             });
@@ -106,8 +106,8 @@ export class UserService extends Service<IUserRepo> implements IUserService {
             const result = await this.repository.selectByUuids(uuids);
 
             const resultDtos = result.map((user: User) => {
-                const dto = new UserDTO();
-                dto.fromData(user);
+                Logger.instance.debug(`${this.name}: getByUuids user:`, user);
+                const dto = new UserDTO(user);
                 dto.isValid();
                 return dto;
             });
@@ -134,8 +134,7 @@ export class UserService extends Service<IUserRepo> implements IUserService {
             const result = await this.repository.selectByNames(names);
 
             const resultDtos = result.map((user: User) => {
-                const dto = new UserDTO();
-                dto.fromData(user);
+                const dto = new UserDTO(user);
                 dto.isValid();
                 return dto;
             });
