@@ -4,8 +4,6 @@ import { UserDTO } from '../../api/dto/UserDTO';
 import { UserSchema } from '../../api/dto/UserSchema';
 import ValidationError from '../../util/errors/ValidationError';
 import { generateUUID } from '../../util/uuid';
-import Logger from '../../util/logging/Logger';
-import { testServerConfig } from '../testServerConfig';
 
 describe('UserDTO', () => {
     let userDTO: UserDTO;
