@@ -8,6 +8,7 @@ import { IUserService } from "./IUserService";
 import { IUserRepo } from "../repo/IUserRepo";
 import { Service } from "./Service";
 import { User } from "../model/User";
+import { IUser } from "../model/IUser";
 
 // TODO: Caching?
 
@@ -40,11 +41,11 @@ export class UserService extends Service<IUserRepo> implements IUserService {
             const users = userDtos.map((dto: UserDTO) => new User(null, dto._uuid, dto._name));
             const result = await this.repository.upsert(users);
 
-            const resultDtos = result.map((user: User) => {
+            const resultDtos = result.map((user: IUser) => {
                 Logger.instance.debug(`${this.name}: Creating user DTO from user:`, user);
 
-                const dto = new UserDTO(user);
-                dto.isValid();
+                const dto = new UserDTO();
+                dto.fromData(user);
                 return dto;
             });
 
@@ -70,8 +71,8 @@ export class UserService extends Service<IUserRepo> implements IUserService {
             const result = await this.repository.selectAll();
 
             const resultDtos = result.map((user: User) => {
-                const dto = new UserDTO(user);
-                dto.isValid();
+                const dto = new UserDTO();
+                dto.fromData(user);
                 return dto;
             });
 
@@ -107,8 +108,8 @@ export class UserService extends Service<IUserRepo> implements IUserService {
 
             const resultDtos = result.map((user: User) => {
                 Logger.instance.debug(`${this.name}: getByUuids user:`, user);
-                const dto = new UserDTO(user);
-                dto.isValid();
+                const dto = new UserDTO();
+                dto.fromData(user);
                 return dto;
             });
 
@@ -134,8 +135,8 @@ export class UserService extends Service<IUserRepo> implements IUserService {
             const result = await this.repository.selectByNames(names);
 
             const resultDtos = result.map((user: User) => {
-                const dto = new UserDTO(user);
-                dto.isValid();
+                const dto = new UserDTO();
+                dto.fromData(user);
                 return dto;
             });
 

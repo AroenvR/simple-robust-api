@@ -99,7 +99,6 @@ export class UserController extends Controller<IUserService> implements IUserCon
         const userDtos = data.map((item: any) => {
             const dto = new UserDTO();
             dto.fromData(item);
-            dto.isValid();
             return dto;
         });
 

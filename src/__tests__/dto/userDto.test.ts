@@ -4,6 +4,8 @@ import { UserDTO } from '../../api/dto/UserDTO';
 import { UserSchema } from '../../api/dto/UserSchema';
 import ValidationError from '../../util/errors/ValidationError';
 import { generateUUID } from '../../util/uuid';
+import Logger from '../../util/logging/Logger';
+import { testServerConfig } from '../testServerConfig';
 
 describe('UserDTO', () => {
     let userDTO: UserDTO;
@@ -46,7 +48,9 @@ describe('UserDTO', () => {
         userDTO._uuid = generateUUID();
         userDTO._name = 'John Doe';
 
-        expect(userDTO.isValid()).toBe(true);
+        const dtoCopy = { ...userDTO };
+
+        expect(userDTO.isValid(dtoCopy)).toBe(true);
     });
 
     // --------------------
@@ -82,14 +86,16 @@ describe('UserDTO', () => {
             // Test unexpected data types for UUID
             (userDTO as any).uuid = value;
             expect(() => {
-                userDTO.isValid();
+                const dtoCopy = { ...userDTO };
+                userDTO.isValid(dtoCopy);
             }).toThrow(ValidationError);
 
             // Reset UUID and test unexpected data types for Name
             (userDTO as any).uuid = generateUUID();
             (userDTO as any).name = value;
             expect(() => {
-                userDTO.isValid();
+                const dtoCopy = { ...userDTO };
+                userDTO.isValid(dtoCopy);
             }).toThrow(ValidationError);
         });
     });
@@ -108,7 +114,8 @@ describe('UserDTO', () => {
             userDTO._name = value;
 
             expect(() => {
-                userDTO.isValid();
+                const dtoCopy = { ...userDTO };
+                userDTO.isValid(dtoCopy);
             }).toThrow(ValidationError);
         });
     });
@@ -127,7 +134,8 @@ describe('UserDTO', () => {
             userDTO._name = value;
 
             expect(() => {
-                userDTO.isValid();
+                const dtoCopy = { ...userDTO };
+                userDTO.isValid(dtoCopy);
             }).toThrow(ValidationError);
         });
     });
@@ -146,7 +154,8 @@ describe('UserDTO', () => {
             userDTO._name = value;
 
             expect(() => {
-                userDTO.isValid();
+                const dtoCopy = { ...userDTO };
+                userDTO.isValid(dtoCopy);
             }).toThrow(ValidationError);
         });
     });
@@ -158,9 +167,10 @@ describe('UserDTO', () => {
 
         userDTO._uuid = generateUUID();
         userDTO._name = sensitiveInfoString;
+        const dtoCopy = { ...userDTO };
 
         try {
-            userDTO.isValid();
+            userDTO.isValid(dtoCopy);
         } catch (error: any) {
             expect(error).toBeInstanceOf(ValidationError);
 
@@ -181,9 +191,8 @@ describe('UserDTO', () => {
             name: 'John Doe',
         };
 
-        userDTO.fromData(data);
+        expect(userDTO.fromData(data)).toBeInstanceOf(UserDTO);
 
-        expect(userDTO.isValid()).toBe(true);
         expect(userDTO._id).toBe(data.id);
         expect(userDTO._uuid).toBe(data.uuid);
         expect(userDTO._name).toBe(data.name);
