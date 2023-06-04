@@ -1,4 +1,4 @@
-import { IEntity } from "./IEntity";
+import { IEntity } from "../IEntity";
 
 export interface IUser extends IEntity {
     _uuid: string;

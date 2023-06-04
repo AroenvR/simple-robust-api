@@ -1,6 +1,6 @@
 import DataTransferObject from "./DataTransferObject";
 import { UserSchema } from './UserSchema';
-import { IUser } from "../model/IUser";
+import { IUser } from "../model/users/IUser";
 import { isTruthy } from "../../util/isTruthy";
 import ValidationError from '../../util/errors/ValidationError';
 import { validNumber, validString, validUUID } from '../../util/isValidUtil';

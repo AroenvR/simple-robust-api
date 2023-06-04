@@ -1,11 +1,13 @@
 import { Client, GatewayIntentBits, Events, Message } from 'discord.js';
-import Entity from "./Entity";
+import Entity from "../Entity";
 import { IDiscordBot } from './IDiscordBot';
-import Logger from '../../util/logging/Logger';
+import Logger from '../../../util/logging/Logger';
+import { PubSub } from '../../../util/pubSub/PubSub';
 
-/*  [
-        GatewayIntentBits.Guilds, 
-        GatewayIntentBits.GuildMessages, 
+/* Minimum necessary intents:
+    [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent
     ] */
 
@@ -13,6 +15,9 @@ export class DiscordBot extends Entity implements IDiscordBot {
     private name: string;
     private tag: string;
     private token: string;
+
+    // Not upserted into the database
+    private subscriber: boolean | null = null;
     private client: Client;
     private timeout: NodeJS.Timeout | null = null;
 
@@ -22,9 +27,9 @@ export class DiscordBot extends Entity implements IDiscordBot {
         this.tag = tag;
         this.token = token;
 
-        this.client = new Client({ intents: intents }); // TODO: Check other possible intents
+        this.client = new Client({ intents: intents });
 
-        // client = new Client({ check for other possible intents?
+        // client = new Client({ TODO: Check for other possible intents?
         //     intents: [
         //         GatewayIntentBits.GUILDS,
         //         GatewayIntentBits.GUILD_MESSAGES,
@@ -37,7 +42,40 @@ export class DiscordBot extends Entity implements IDiscordBot {
         // });
     }
 
-    public async setup() {
+    get _name(): string {
+        return this.name;
+    }
+
+    get _tag(): string {
+        return this.tag;
+    }
+
+    get _token(): string {
+        return this.token;
+    }
+
+    // get _client(): Client {
+    //     return this.client;
+    // }
+
+    public async setup(listener?: boolean) {
+        if (listener) {
+            if (!this.subscriber) {
+                PubSub.instance.subscribe({
+                    name: this.name,
+                    eventType: 'message',
+                    callback: () => { }
+                });
+                this.subscriber = true;
+            }
+
+            // On message
+            this.client.on(Events.MessageCreate, async (message: Message) => {
+                PubSub.instance.publish('message', message);
+            });
+        }
+
+        // On ready
         this.client.on(Events.ClientReady, () => {
             Logger.instance.debug(`DiscordBot: ${this.name} is ready!`);
         });
@@ -77,22 +115,6 @@ export class DiscordBot extends Entity implements IDiscordBot {
         this.timeout = null;
     }
 
-    get _name(): string {
-        return this.name;
-    }
-
-    get _tag(): string {
-        return this.tag;
-    }
-
-    get _token(): string {
-        return this.token;
-    }
-
-    get _client(): Client {
-        return this.client;
-    }
-
     private async splitMessage(content: string): Promise<string[]> {
         const maxLength = 1999;
         let chunks: string[] = [];
@@ -109,10 +131,4 @@ export class DiscordBot extends Entity implements IDiscordBot {
 
         return chunks;
     }
-
-    // setup client
-    // start client
-    // log client
-    // handle message (& emit)
-    // utilities?
 }

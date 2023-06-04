@@ -1,15 +1,15 @@
 import { Router } from 'express';
-import { UserDTO } from "../dto/UserDTO";
+import { UserDTO } from "../../dto/UserDTO";
 import { IUserController } from "./IUserController";
-import Logger from '../../util/logging/Logger';
+import Logger from '../../../util/logging/Logger';
 import validator from 'validator';
-import ValidationError from '../../util/errors/ValidationError';
+import ValidationError from '../../../util/errors/ValidationError';
 import { inject } from 'inversify';
-import { TYPES } from '../../ioc/TYPES';
-import { IUserService } from '../service/IUserService';
-import { isTruthy } from '../../util/isTruthy';
-import NotFoundError from '../../util/errors/NotFoundError';
-import { Controller } from './Controller';
+import { TYPES } from '../../../ioc/TYPES';
+import { IUserService } from '../../service/users/IUserService';
+import { isTruthy } from '../../../util/isTruthy';
+import NotFoundError from '../../../util/errors/NotFoundError';
+import { Controller } from '../Controller';
 
 /**
  * The controller for user-related operations.

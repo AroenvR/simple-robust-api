@@ -1,4 +1,4 @@
-import { UserController } from "../../api/controller/UserController";
+import { UserController } from "../../api/controller/users/UserController";
 import { UserDTO } from "../../api/dto/UserDTO";
 import { generateUUID } from "../../util/uuid";
 import { testServerConfig } from "../testServerConfig";
