@@ -4,6 +4,7 @@ import { UserDTO } from '../../api/dto/UserDTO';
 import { UserSchema } from '../../api/dto/UserSchema';
 import ValidationError from '../../util/errors/ValidationError';
 import { generateUUID } from '../../util/uuid';
+import { User } from '../../api/model/User';
 
 describe('UserDTO', () => {
     let userDTO: UserDTO;
@@ -14,14 +15,68 @@ describe('UserDTO', () => {
 
     // --------------------
 
-    test('Set UUID and Name', () => {
-        const testUuid = 'f47ac10b-58cc-4372-a567-0e02b2c3d479'; // A valid UUID
-        const testName = 'John Doe';
-        userDTO._uuid = testUuid;
-        userDTO._name = testName;
+    test('fromData should correctly populate UserDTO', () => {
+        let dto: any;
+        const data = {
+            id: 1,
+            uuid: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+            name: 'John Doe',
+        };
 
-        expect(userDTO._uuid).toBe(testUuid);
-        expect(userDTO._name).toBe(testName);
+        expect(() => {
+            dto = UserDTO.fromData(data);
+        }).not.toThrow(ValidationError);
+
+        expect(dto._id).toBe(data.id);
+        expect(dto._uuid).toBe(data.uuid);
+        expect(dto._name).toBe(data.name);
+
+        expect(() => {
+            const user = new User(data.id, data.uuid, data.name);
+            dto = UserDTO.fromData(user);
+        }).not.toThrow(ValidationError);
+
+        expect(dto._id).toBe(data.id);
+        expect(dto._uuid).toBe(data.uuid);
+        expect(dto._name).toBe(data.name);
+    });
+
+    // --------------------
+
+    test('Setters for UUID and Name should correctly populate UserDTO', () => {
+        const id = 1;
+        const uuid = 'f47ac10b-58cc-4372-a567-0e02b2c3d479';
+        const name = 'John Doe';
+
+        expect(() => {
+            userDTO._id = id;
+            userDTO._uuid = uuid;
+            userDTO._name = name;
+        }).not.toThrow(ValidationError);
+
+        expect(userDTO._id).toBe(id);
+        expect(userDTO._uuid).toBe(uuid);
+        expect(userDTO._name).toBe(name);
+        expect(userDTO.isValid(userDTO)).toBe(true);
+    });
+
+    // --------------------
+
+    test('isValid should return true for valid data', () => {
+        userDTO._uuid = generateUUID();
+        userDTO._name = 'John Doe';
+
+        const copy = { ...userDTO };
+
+        expect(userDTO.isValid(copy)).toBe(true);
+    });
+
+    // --------------------
+
+    test('Falsy ID should throw error', () => {
+        expect(() => {
+            userDTO._id = -69;
+        }).toThrow(ValidationError);
     });
 
     // --------------------
@@ -29,7 +84,7 @@ describe('UserDTO', () => {
     test('Falsy UUID should throw error', () => {
         expect(() => {
             userDTO._uuid = '';
-        }).toThrow(Error);
+        }).toThrow(ValidationError);
     });
 
     // --------------------
@@ -37,18 +92,7 @@ describe('UserDTO', () => {
     test('Falsy Name should throw error', () => {
         expect(() => {
             userDTO._name = '';
-        }).toThrow(Error);
-    });
-
-    // --------------------
-
-    test('isValid should return true for valid UserDTO', () => {
-        userDTO._uuid = generateUUID();
-        userDTO._name = 'John Doe';
-
-        const dtoCopy = { ...userDTO };
-
-        expect(userDTO.isValid(dtoCopy)).toBe(true);
+        }).toThrow(ValidationError);
     });
 
     // --------------------
@@ -57,18 +101,18 @@ describe('UserDTO', () => {
         const ajv = new Ajv();
         addFormats(ajv);
 
-        const validUserDTO = {
+        const valid = {
             uuid: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
             name: 'John Doe',
         };
 
-        const invalidUserDTO = {
+        const invalid = {
             uuid: 'invalid-uuid',
             name: 'A'.repeat(256),
         };
 
-        expect(ajv.validate(UserSchema, validUserDTO)).toBe(true);
-        expect(ajv.validate(UserSchema, invalidUserDTO)).toBe(false);
+        expect(ajv.validate(UserSchema, valid)).toBe(true);
+        expect(ajv.validate(UserSchema, invalid)).toBe(false);
     });
 
     // --------------------
@@ -84,16 +128,16 @@ describe('UserDTO', () => {
             // Test unexpected data types for UUID
             (userDTO as any).uuid = value;
             expect(() => {
-                const dtoCopy = { ...userDTO };
-                userDTO.isValid(dtoCopy);
+                const copy = { ...userDTO };
+                userDTO.isValid(copy);
             }).toThrow(ValidationError);
 
             // Reset UUID and test unexpected data types for Name
             (userDTO as any).uuid = generateUUID();
             (userDTO as any).name = value;
             expect(() => {
-                const dtoCopy = { ...userDTO };
-                userDTO.isValid(dtoCopy);
+                const copy = { ...userDTO };
+                userDTO.isValid(copy);
             }).toThrow(ValidationError);
         });
     });
@@ -108,12 +152,8 @@ describe('UserDTO', () => {
         ];
 
         sqlInjectionStrings.forEach((value) => {
-            userDTO._uuid = generateUUID();
-            userDTO._name = value;
-
             expect(() => {
-                const dtoCopy = { ...userDTO };
-                userDTO.isValid(dtoCopy);
+                userDTO._name = value;
             }).toThrow(ValidationError);
         });
     });
@@ -128,19 +168,15 @@ describe('UserDTO', () => {
         ];
 
         xssStrings.forEach((value) => {
-            userDTO._uuid = generateUUID();
-            userDTO._name = value;
-
             expect(() => {
-                const dtoCopy = { ...userDTO };
-                userDTO.isValid(dtoCopy);
+                userDTO._name = value;
             }).toThrow(ValidationError);
         });
     });
 
     // --------------------
 
-    test('isValid should handle different Unicode character sets', () => {
+    test('fromData should handle unimplemented Unicode character sets', () => {
         const unicodeNames = [
             'Иван Иванович', // Cyrillic
             '张伟', // Chinese
@@ -148,27 +184,28 @@ describe('UserDTO', () => {
         ];
 
         unicodeNames.forEach((value) => {
-            userDTO._uuid = generateUUID();
-            userDTO._name = value;
-
             expect(() => {
-                const dtoCopy = { ...userDTO };
-                userDTO.isValid(dtoCopy);
+                UserDTO.fromData({
+                    id: 1,
+                    uuid: generateUUID(),
+                    name: value,
+                });
             }).toThrow(ValidationError);
         });
     });
 
     // --------------------
 
-    test('isValid should not leak sensitive information in error messages', () => {
+    test('fromData should not leak sensitive information in error messages', () => {
         const sensitiveInfoString = "John Doe'; SELECT * FROM users; --";
-
-        userDTO._uuid = generateUUID();
-        userDTO._name = sensitiveInfoString;
-        const dtoCopy = { ...userDTO };
+        const data = {
+            id: 1,
+            uuid: generateUUID(),
+            name: sensitiveInfoString,
+        }
 
         try {
-            userDTO.isValid(dtoCopy);
+            UserDTO.fromData(data);
         } catch (error: any) {
             expect(error).toBeInstanceOf(ValidationError);
 
@@ -178,21 +215,5 @@ describe('UserDTO', () => {
             // Check that the error message does not contain a stack trace
             expect(error.message).not.toContain('at ');
         }
-    });
-
-    // --------------------
-
-    test('fromData should correctly populate UserDTO', () => {
-        const data = {
-            id: 1,
-            uuid: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-            name: 'John Doe',
-        };
-
-        expect(userDTO.fromData(data)).toBeInstanceOf(UserDTO);
-
-        expect(userDTO._id).toBe(data.id);
-        expect(userDTO._uuid).toBe(data.uuid);
-        expect(userDTO._name).toBe(data.name);
     });
 });

@@ -15,23 +15,23 @@ export const validUUID = (uuid: string): void => {
 
 /**
  * Validates the given string to ensure it's a non-empty string with a specified maximum length, contains only alphabetical characters, and does not include spaces.
- * @param {string} name - The string to be validated.
+ * @param {string} val - The string to be validated.
  * @param {number} [max] - Optional maximum length for the string.
  * @throws {ValidationError} If the string is not valid, a ValidationError is thrown with a specific error message.
  */
-export const validString = (name: string, max?: number): void => {
+export const validString = (val: string, max?: number): void => {
     if (isTruthy(max, false)) {
-        if (!validator.isLength(name, { min: 1, max: max })) {
+        if (!validator.isLength(val, { min: 1, max: max })) {
             throw new ValidationError('validString: The string must be a non-empty string with a maximum length of 255 characters');
         }
     }
     else {
-        if (!validator.isLength(name, { min: 1 })) {
+        if (!validator.isLength(val, { min: 1 })) {
             throw new ValidationError('validString: The string must be a truthy string');
         }
     }
 
-    const noSpaces = name.replace(/\s/g, '');
+    const noSpaces = val.replace(/\s/g, '');
     if (!validator.isAlpha(noSpaces)) {
         throw new ValidationError('validString: The string must be an alpha-only string');
     }

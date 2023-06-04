@@ -1,5 +1,3 @@
-import Ajv from 'ajv';
-import addFormats from "ajv-formats";
 import DataTransferObject from "./DataTransferObject";
 import { UserSchema } from './UserSchema';
 import { IUser } from "../model/IUser";
@@ -18,19 +16,8 @@ import { validNumber, validString, validUUID } from '../../util/isValidUtil';
  * user._name = "John Doe";
  */
 export class UserDTO extends DataTransferObject implements IUser {
-    private static ajv: Ajv; // TODO: Add to DataTransferObject
     private uuid: string | null = null;
     private name: string | null = null;
-
-    constructor(ajvInstance?: Ajv) {
-        super();
-
-        if (ajvInstance) {
-            UserDTO.ajv = ajvInstance;
-        } else if (!UserDTO.ajv) {
-            UserDTO.ajv = addFormats(new Ajv());
-        }
-    }
 
     get _uuid(): string {
         if (this.uuid === null) throw new Error('UserDTO: Getter called when UUID has not yet been set');
@@ -38,7 +25,7 @@ export class UserDTO extends DataTransferObject implements IUser {
     }
 
     set _uuid(value: string) {
-        if (!isTruthy(value)) throw Error('UserDTO: UUID must be a truthy string');
+        validUUID(value);
         this.uuid = value;
     }
 
@@ -48,32 +35,28 @@ export class UserDTO extends DataTransferObject implements IUser {
     }
 
     set _name(value: string) {
-        if (!isTruthy(value)) throw Error('UserDTO: Name must be a truthy string');
+        validString(value, 255);
         this.name = value;
     }
 
-    public isValid(data: any): boolean {
+    protected checkSchema(data: any): boolean {
         const validationResult = UserDTO.ajv.validate(UserSchema, data);
         if (!validationResult) {
             throw new ValidationError(`UserDTO: JSON validation failed: ${UserDTO.ajv.errorsText(UserDTO.ajv.errors)}`);
         }
 
+        return true;
+    }
+
+    public isValid(data: any): boolean {
         if (!isTruthy(data.uuid) || !isTruthy(data.name)) throw new ValidationError('UserDTO: UUID and Name must be truthy');
+
+        this.checkSchema(data);
 
         if (isTruthy(data.id)) validNumber(data.id);
         validUUID(data.uuid);
         validString(data.name, 255);
 
         return true;
-    }
-
-    public fromData(data: any): UserDTO {
-        this.isValid(data);
-
-        this._id = data.id;
-        this._uuid = data.uuid;
-        this._name = data.name;
-
-        return this;
     }
 }
