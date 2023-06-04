@@ -32,10 +32,12 @@ describe('Users API', () => {
     test('handles an HTTP POST request from whitelisted origin', async () => {
         const payload = [
             {
+                id: 1,
                 uuid: johnUUID,
                 name: 'John Doe'
             },
             {
+                id: 2,
                 uuid: janeUUID,
                 name: 'Jane Doe'
             }
