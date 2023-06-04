@@ -5,6 +5,7 @@ import { generateUUID } from '../../util/uuid';
 import { ContainerWrapper } from '../../ioc/ContainerWrapper';
 import { TYPES } from '../../ioc/TYPES';
 
+// SECURITY testing
 describe('sanitizeMiddleware', () => {
     let app: App;
     const baseUrl = `http://localhost:${testServerConfig.app.port}/v1/users`;

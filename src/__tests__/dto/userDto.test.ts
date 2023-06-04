@@ -6,6 +6,7 @@ import ValidationError from '../../util/errors/ValidationError';
 import { generateUUID } from '../../util/uuid';
 import { User } from '../../api/model/users/User';
 
+// SECURITY testing
 describe('UserDTO', () => {
     let userDTO: UserDTO;
 

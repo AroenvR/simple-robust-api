@@ -5,7 +5,7 @@ import { generateUUID } from "../../util/uuid";
 import { testServerConfig } from "../testServerConfig";
 import axios from "axios";
 
-// TODO: Fix
+// SECURITY testing
 describe('Users API Error Handling', () => {
     let app: App;
     const baseUrl = `http://localhost:${testServerConfig.app.port}/v1/users`;
