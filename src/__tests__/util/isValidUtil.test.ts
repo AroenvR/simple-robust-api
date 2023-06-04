@@ -13,8 +13,8 @@ describe('Validation functions', () => {
     });
 
     test('validUUID should not throw error for valid uuids', () => {
-        const validUUID = 'f47ac10b-58cc-4372-a567-0e02b2c3d479';
-        // expect(() => validUUID(validUUID)).not.toThrow(ValidationError);
+        const valid = 'f47ac10b-58cc-4372-a567-0e02b2c3d479';
+        expect(() => validUUID(valid)).not.toThrow(ValidationError);
     });
 
     // --------------------
@@ -43,7 +43,7 @@ describe('Validation functions', () => {
     });
 
     test('validNumber should not throw error for valid numbers', () => {
-        const validNumber = 1;
-        // expect(() => validNumber(validNumber)).not.toThrow(ValidationError);
+        const valid = 1;
+        expect(() => validNumber(valid)).not.toThrow(ValidationError);
     });
 });
