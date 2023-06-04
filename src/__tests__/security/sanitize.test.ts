@@ -7,6 +7,7 @@ import { TYPES } from '../../ioc/TYPES';
 
 describe('sanitizeMiddleware', () => {
     let app: App;
+    const baseUrl = `http://localhost:${testServerConfig.app.port}/v1/users`;
 
     const johnUUID = generateUUID();
 
@@ -37,7 +38,7 @@ describe('sanitizeMiddleware', () => {
                 name: xssName
             }
         ];
-        const response = await axios.post(`http://localhost:${testServerConfig.app.port}/users`, payload, {
+        const response = await axios.post(baseUrl, payload, {
             headers: {
                 'Content-Type': 'application/json',
                 Origin: 'http://test.com'
@@ -60,7 +61,7 @@ describe('sanitizeMiddleware', () => {
                 name: sqlInjectionName
             }
         ];
-        const response = await axios.post(`http://localhost:${testServerConfig.app.port}/users`, payload, {
+        const response = await axios.post(baseUrl, payload, {
             headers: {
                 'Content-Type': 'application/json',
                 Origin: 'http://test.com'
@@ -81,7 +82,7 @@ describe('sanitizeMiddleware', () => {
         const sqlPayload = "'; DROP TABLE users; --";
 
         const uuids = [xssPayload, sqlPayload];
-        const url = new URL(`http://localhost:${testServerConfig.app.port}/users`);
+        const url = new URL(baseUrl);
         url.searchParams.set("uuids", uuids.join(","));
 
         try {

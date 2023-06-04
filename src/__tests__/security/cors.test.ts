@@ -6,14 +6,8 @@ import { TYPES } from "../../ioc/TYPES";
 
 // SECURITY testing
 describe('CORS middleware', () => {
-    /*
     let app: App;
-
-  beforeAll(() => {
-    app = global.app;
-  });
-    */
-    let app: App;
+    const baseUrl = `http://localhost:${testServerConfig.app.port}/v1/users`;
 
     beforeAll(async () => {
         // Initialize the container
@@ -28,9 +22,6 @@ describe('CORS middleware', () => {
     afterAll(async () => {
         // Shut down the application after all tests.
         await app.stop();
-
-        // Re-enable console.log methods after all tests
-        jest.restoreAllMocks();
     });
 
     // ----------------------------
@@ -43,14 +34,14 @@ describe('CORS middleware', () => {
             'Authorization': `Bearer ${process.env.TEST_BEARER_TOKEN}`
         };
 
-        const response = await axios.get(`http://localhost:${testServerConfig.app.port}/users`, { headers: requestHeaders });
+        const response = await axios.get(baseUrl, { headers: requestHeaders });
         expect(response.status).toBe(200);
     });
 
     // ----------------------------
 
     test('should block requests from unlisted domains', async () => {
-        const response = await axios.get(`http://localhost:${testServerConfig.app.port}/users`, {
+        const response = await axios.get(baseUrl, {
             headers: {
                 Origin: 'http://www.unknown.com'
             }
@@ -64,7 +55,7 @@ describe('CORS middleware', () => {
     // ----------------------------
 
     test('should block requests without an Origin header', async () => {
-        const response = await axios.get(`http://localhost:${testServerConfig.app.port}/users`).catch(err => {
+        const response = await axios.get(baseUrl).catch(err => {
             return err.response;
         });
 

@@ -7,6 +7,7 @@ import { TYPES } from "../../ioc/TYPES";
 // SECURITY testing
 describe('Helmet middleware', () => {
     let app: App;
+    const baseUrl = `http://localhost:${testServerConfig.app.port}/v1/users`;
 
     beforeAll(async () => {
         const containerWrapper = new ContainerWrapper(testServerConfig);
@@ -30,7 +31,7 @@ describe('Helmet middleware', () => {
             'Authorization': `Bearer ${process.env.TEST_BEARER_TOKEN}`
         };
 
-        const response = await axios.get(`http://localhost:${testServerConfig.app.port}/users`, { headers: requestHeaders })
+        const response = await axios.get(baseUrl, { headers: requestHeaders })
             .catch(err => {
                 return err.response;
             });

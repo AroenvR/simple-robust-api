@@ -7,6 +7,7 @@ import { TYPES } from "../../ioc/TYPES";
 // SECURITY testing
 describe('Rate limiter middleware', () => {
     let app: App;
+    const baseUrl = `http://localhost:${testServerConfig.app.port}/v1/users`;
 
     beforeAll(async () => {
         const containerWrapper = new ContainerWrapper(testServerConfig);
@@ -32,13 +33,13 @@ describe('Rate limiter middleware', () => {
 
         // Create 100 requests
         for (let i = 0; i < 100; i++) {
-            const response = await axios.get(`http://localhost:${testServerConfig.app.port}/users`, { headers: requestHeaders });
+            const response = await axios.get(baseUrl, { headers: requestHeaders });
             expect(response.status).toBe(200);
         }
 
         // Create the 101st request and assert status code to be 429
         try {
-            await axios.get(`http://localhost:${testServerConfig.app.port}/users`, { headers: requestHeaders });
+            await axios.get(baseUrl, { headers: requestHeaders });
 
         } catch (error: Error | any) {
             expect(error.response.status).toBe(429);

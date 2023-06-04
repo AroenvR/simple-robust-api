@@ -128,15 +128,19 @@ export default class App {
     private async initRoutes(): Promise<void> {
         Logger.instance.debug(`App: ${this.config.name} initializing API routes.`);
 
-        const controllers = this.container.getAll<IController>(TYPES.Controller);
+        const baseRouter = express.Router();
 
+        const controllers = this.container.getAll<IController>(TYPES.Controller);
         controllers.forEach((controller) => {
             const router = controller.initRoutes();
-            this.app.use(router);
+            baseRouter.use(router);
         });
 
+        // API Version 1
+        this.app.use('/v1/', baseRouter);
+
         this.app.get('/', (req, res) => {
-            res.status(200).json({ message: `Hello from ${this.app.name}!` });
+            res.status(200).json({ message: `Hello from ${this.config.name}!` });
         });
 
         this.app.use(errorHandlerMiddleware); // Error handling middleware

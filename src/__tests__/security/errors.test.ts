@@ -8,6 +8,7 @@ import axios from "axios";
 // TODO: Fix
 describe('Users API Error Handling', () => {
     let app: App;
+    const baseUrl = `http://localhost:${testServerConfig.app.port}/v1/users`;
 
     beforeAll(async () => {
         const containerWrapper = new ContainerWrapper(testServerConfig);
@@ -24,9 +25,12 @@ describe('Users API Error Handling', () => {
     // ----------------------------
 
     test('handles an HTTP GET request for a non-existent user by UUID', async () => {
+        const uuids = [generateUUID(), generateUUID()];
+        const url = new URL(baseUrl);
+        url.searchParams.set("uuids", uuids.join(","));
 
         try {
-            await axios.get(`http://localhost:${testServerConfig.app.port}/users?uuids=${generateUUID()},${generateUUID()}`, {
+            await axios.get(url.toString(), {
                 headers: {
                     Origin: 'http://test.com'
                 }
@@ -52,7 +56,7 @@ describe('Users API Error Handling', () => {
         ];
 
         try {
-            await axios.post(`http://localhost:${testServerConfig.app.port}/users`, payload, {
+            await axios.post(baseUrl, payload, {
                 headers: {
                     'Content-Type': 'application/json',
                     Origin: 'http://test.com'

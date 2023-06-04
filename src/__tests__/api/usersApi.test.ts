@@ -10,6 +10,7 @@ import { TYPES } from "../../ioc/TYPES";
  */
 describe('Users API', () => {
     let app: App;
+    const baseUrl = `http://localhost:${testServerConfig.app.port}/v1/users`;
 
     const origin = 'http://test.com';
     const johnUUID = generateUUID();
@@ -42,7 +43,7 @@ describe('Users API', () => {
                 name: 'Jane Doe'
             }
         ];
-        const response = await axios.post(`http://localhost:${testServerConfig.app.port}/users`, payload, {
+        const response = await axios.post(baseUrl, payload, {
             headers: {
                 'Content-Type': 'application/json',
                 Origin: origin
@@ -67,7 +68,7 @@ describe('Users API', () => {
     // ----------------------------
 
     test('handles an HTTP GET request from whitelisted origin', async () => {
-        const response = await axios.get(`http://localhost:${testServerConfig.app.port}/users`, {
+        const response = await axios.get(baseUrl, {
             headers: {
                 Origin: origin
             }
@@ -92,7 +93,7 @@ describe('Users API', () => {
 
     test('handles an HTTP GET request with uuids query', async () => {
         const uuids = [johnUUID, janeUUID];
-        const url = new URL(`http://localhost:${testServerConfig.app.port}/users`);
+        const url = new URL(baseUrl);
         url.searchParams.set("uuids", uuids.join(","));
 
         const response = await axios.get(url.toString(), {
@@ -124,7 +125,7 @@ describe('Users API', () => {
 
     test('handles an HTTP GET request with names query', async () => { // TODO: Enable.
         const names = ['John Doe', 'Jane Doe'];
-        const url = new URL(`http://localhost:${testServerConfig.app.port}/users`);
+        const url = new URL(baseUrl);
         url.searchParams.set("names", names.join(","));
 
         const response = await axios.get(url.toString(), {
@@ -157,7 +158,7 @@ describe('Users API', () => {
     test.skip('handles an HTTP GET request with uuids and names query', async () => { // TODO: Enable.
         const uuids = [johnUUID];
         const names = ['John Doe'];
-        const url = new URL(`http://localhost:${testServerConfig.app.port}/users`);
+        const url = new URL(baseUrl);
         url.searchParams.set("uuids", uuids.join(","));
         url.searchParams.set("names", names.join(","));
 
