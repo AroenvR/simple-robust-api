@@ -1,12 +1,11 @@
 import App from "../../app/App";
-import { generateUUID } from "../../util/uuid";
 import { testServerConfig } from "../testServerConfig";
 import axios from "axios";
 import { ContainerWrapper } from "../../ioc/ContainerWrapper";
 import { TYPES } from "../../ioc/TYPES";
 
 /**
- * Integration test for the Users API.
+ * Integration test for the App's greeting route.
  */
 describe('Users API', () => {
     let app: App;
