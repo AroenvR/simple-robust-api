@@ -75,9 +75,35 @@ The API will be available at ``http://localhost:3000``.
 To run tests, execute the following command:  
 ``npm run test``
 
+# Adding a new functional object to the API
+Example with a User object
+
+### Entity / DTO setup (copy-pasta for issues):
+```
+- [ ] Create an Entity interface - interface IUser implements IEntity
+- [ ] Create an Entity class - class User extends Entity implements IUser
+- [ ] Create a DTO - class UserDTO extends DataTransferObject implements IUser
+- [ ] Create a schema - const UserSchema
+```
+
+### Business logic setup (copy-pasta for issues):
+```
+- [ ] Create a Repository interface - interface IUserRepo extends IRepository
+- [ ] Create a Repository class - class UserRepo extends Repository implements IUserRepo
+- [ ] Create a Service interface - interface IUserService extends IService
+- [ ] Create a Service class - class UserService extends Service<IUserRepo> implements IUserService
+- [ ] Create a Controller interface - interface IUserController extends IController
+- [ ] Create a Controller class - class UserController extends Controller<IUserService> implements IUserController
+```
+
+### Final steps (copy-pasta for issues):
+```
+- [ ] Add the new objects to the src/database/schema/knexSchemaBuilder function
+- [ ] Add the new service layers to the src/ioc/ContainerWrapper initBusinessLogic function
+```
 
 ## Contributing
 // TODO
 
 ## License
-// TODO
+// TODO. MIT maybe?
