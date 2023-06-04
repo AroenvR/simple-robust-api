@@ -3,7 +3,6 @@ An in-memory **SQLite** database was chosen as the default database since it is 
 This means that the database exists only for the duration of the process that created it and is automatically destroyed when the process ends.  
 As a result, an in-memory SQLite database is not accessible via the file system, and there is no database to protect from local / network access.  
 Only the application and possibly users with root access to the server's device can access the memory of a process.  
-// TODO: Linux SELinux or AppArmor to limit access to the application's memory => https://phoenixnap.com/kb/apparmor-vs-selinux
 
 If a persistent database is necessary, please add authenticated support for your database type of choice.  
 F.ex.: PostgresSQL, MongoDB, SmartContract.
@@ -48,8 +47,9 @@ src/middleware/sanitize.ts
 All data to sanitize is funneled into the sanitizeValue function.
 
 # Data validation:
-validator is being used to validate data throughout the application.  
-https://www.npmjs.com/package/validator
+[validator](https://www.npmjs.com/package/validator) is being used to validate data throughout the application.  
+[ajv](https://www.npmjs.com/package/ajv) is being used to validate data through DTO self-validation.
+
 
 # Error Handler Middleware
 
