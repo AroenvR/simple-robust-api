@@ -39,15 +39,9 @@ export class UserService extends Service<IUserRepo> implements IUserService {
 
         try {
             const users = userDtos.map((dto: UserDTO) => new User(null, dto._uuid, dto._name));
+
             const result = await this.repository.upsert(users);
-
-            const resultDtos = result.map((user: IUser) => {
-                Logger.instance.debug(`${this.name}: Creating user DTO from user:`, user);
-
-                const dto = new UserDTO();
-                dto.fromData(user);
-                return dto;
-            });
+            const resultDtos = result.map((user) => UserDTO.fromData(user));
 
             this.pubSub.publish('users-created', resultDtos);
 
@@ -69,12 +63,7 @@ export class UserService extends Service<IUserRepo> implements IUserService {
 
         try {
             const result = await this.repository.selectAll();
-
-            const resultDtos = result.map((user: User) => {
-                const dto = new UserDTO();
-                dto.fromData(user);
-                return dto;
-            });
+            const resultDtos = result.map((user) => UserDTO.fromData(user));
 
             Logger.instance.debug(`${this.name}: got all users. Returning result:`, resultDtos);
             return resultDtos;
@@ -105,13 +94,7 @@ export class UserService extends Service<IUserRepo> implements IUserService {
 
         try {
             const result = await this.repository.selectByUuids(uuids);
-
-            const resultDtos = result.map((user: User) => {
-                Logger.instance.debug(`${this.name}: getByUuids user:`, user);
-                const dto = new UserDTO();
-                dto.fromData(user);
-                return dto;
-            });
+            const resultDtos = result.map((user) => UserDTO.fromData(user));
 
             Logger.instance.debug(`${this.name}: got users by UUID's. Returning result:`, resultDtos);
             return resultDtos;
@@ -133,12 +116,7 @@ export class UserService extends Service<IUserRepo> implements IUserService {
 
         try {
             const result = await this.repository.selectByNames(names);
-
-            const resultDtos = result.map((user: User) => {
-                const dto = new UserDTO();
-                dto.fromData(user);
-                return dto;
-            });
+            const resultDtos = result.map((user) => UserDTO.fromData(user));
 
             Logger.instance.debug(`${this.name}: got users by names. Returning result:`, resultDtos);
             return resultDtos;

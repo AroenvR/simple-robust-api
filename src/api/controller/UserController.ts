@@ -96,11 +96,7 @@ export class UserController extends Controller<IUserService> implements IUserCon
         Logger.instance.info(`${this.name}: Upserting users.`);
         Logger.instance.debug(`${this.name}: Upserting data:`, data);
 
-        const userDtos = data.map((item: any) => {
-            const dto = new UserDTO();
-            dto.fromData(item);
-            return dto;
-        });
+        const userDtos = data.map((item: any) => UserDTO.fromData(item));
 
         return await this.service.upsert(userDtos);
     }
