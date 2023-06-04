@@ -1,3 +1,6 @@
+/**
+ * ajv JSON Schema for Users
+ */
 export const UserSchema = {
     type: 'object',
     properties: {

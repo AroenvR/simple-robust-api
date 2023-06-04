@@ -1,5 +1,5 @@
-import { UserDTO } from "../../api/dto/UserDTO";
-import { UserService } from "../../api/service/UserService";
+import { UserDTO } from "../../api/dto/users/UserDTO";
+import { UserService } from "../../api/service/users/UserService";
 import { generateUUID } from "../../util/uuid";
 import { testServerConfig } from "../testServerConfig";
 import App from "../../app/App";

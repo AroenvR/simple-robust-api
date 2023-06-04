@@ -1,5 +1,5 @@
-import { UserRepo } from "../../api/repo/UserRepo";
-import { User } from "../../api/model/User";
+import { UserRepo } from "../../api/repo/users/UserRepo";
+import { User } from "../../api/model/users/User";
 import { generateUUID } from "../../util/uuid";
 import { testServerConfig } from "../testServerConfig";
 import App from "../../app/App";

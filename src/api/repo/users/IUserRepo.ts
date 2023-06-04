@@ -1,5 +1,5 @@
-import { IRepository } from "./IRepository";
-import { User } from "../model/User";
+import { IRepository } from "../IRepository";
+import { User } from "../../model/users/User";
 
 /**
  * IUserRepo interface extends IRepository and represents the structure for the user repository.

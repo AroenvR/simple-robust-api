@@ -1,10 +1,10 @@
-import { IDatabase } from "../../database/IDatabase";
+import { IDatabase } from "../../../database/IDatabase";
 import { IUserRepo } from "./IUserRepo";
-import { User } from "../model/User";
-import Logger from "../../util/logging/Logger";
+import { User } from "../../model/users/User";
+import Logger from "../../../util/logging/Logger";
 import { inject } from "inversify";
-import { TYPES } from "../../ioc/TYPES";
-import { Repository } from "./Repository";
+import { TYPES } from "../../../ioc/TYPES";
+import { Repository } from "../Repository";
 import { Knex } from "knex";
 
 // TODO: Indexing?

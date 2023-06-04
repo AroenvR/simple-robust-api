@@ -1,14 +1,13 @@
-import { PubSub } from "../../util/pubSub/PubSub";
-import { TaskProcessor } from "../../util/taskProcessing/TaskProcessor";
-import { UserDTO } from "../dto/UserDTO";
-import Logger from "../../util/logging/Logger";
+import { PubSub } from "../../../util/pubSub/PubSub";
+import { TaskProcessor } from "../../../util/taskProcessing/TaskProcessor";
+import { UserDTO } from "../../dto/users/UserDTO";
+import Logger from "../../../util/logging/Logger";
 import { inject } from "inversify";
-import { TYPES } from "../../ioc/TYPES";
+import { TYPES } from "../../../ioc/TYPES";
 import { IUserService } from "./IUserService";
-import { IUserRepo } from "../repo/IUserRepo";
-import { Service } from "./Service";
-import { User } from "../model/User";
-import { IUser } from "../model/IUser";
+import { IUserRepo } from "../../repo/users/IUserRepo";
+import { Service } from "../Service";
+import { User } from "../../model/users/User";
 
 // TODO: Caching?
 
