@@ -1,6 +1,6 @@
 import { PubSub } from "../../../util/pubSub/PubSub";
 import { TaskProcessor } from "../../../util/taskProcessing/TaskProcessor";
-import { UserDTO } from "../../dto/UserDTO";
+import { UserDTO } from "../../dto/users/UserDTO";
 import Logger from "../../../util/logging/Logger";
 import { inject } from "inversify";
 import { TYPES } from "../../../ioc/TYPES";
@@ -8,6 +8,8 @@ import { IUserService } from "./IUserService";
 import { IUserRepo } from "../../repo/users/IUserRepo";
 import { Service } from "../Service";
 import { User } from "../../model/users/User";
+
+// TODO: Caching?
 
 /**
  * The UserService class provides methods for managing users in the application.

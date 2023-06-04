@@ -1,10 +1,10 @@
 import Ajv from 'ajv';
 import addFormats from "ajv-formats";
-import { UserDTO } from '../../api/dto/UserDTO';
-import { UserSchema } from '../../api/dto/UserSchema';
+import { UserDTO } from '../../api/dto/users/UserDTO';
+import { UserSchema } from '../../api/dto/users/UserSchema';
 import ValidationError from '../../util/errors/ValidationError';
 import { generateUUID } from '../../util/uuid';
-import { User } from '../../api/model/User';
+import { User } from '../../api/model/users/User';
 
 describe('UserDTO', () => {
     let userDTO: UserDTO;

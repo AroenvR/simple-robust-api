@@ -1,9 +1,9 @@
-import DataTransferObject from "./DataTransferObject";
+import DataTransferObject from "../DataTransferObject";
 import { UserSchema } from './UserSchema';
-import { IUser } from "../model/users/IUser";
-import { isTruthy } from "../../util/isTruthy";
-import ValidationError from '../../util/errors/ValidationError';
-import { validNumber, validString, validUUID } from '../../util/isValidUtil';
+import { IUser } from "../../model/users/IUser";
+import { isTruthy } from "../../../util/isTruthy";
+import ValidationError from '../../../util/errors/ValidationError';
+import { validNumber, validString, validUUID } from '../../../util/isValidUtil';
 
 /**
  * Data Transfer Object representing a User entity.

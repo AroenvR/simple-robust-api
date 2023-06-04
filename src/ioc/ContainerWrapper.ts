@@ -4,7 +4,7 @@ import { TYPES } from "./TYPES";
 import { PubSub } from "../util/pubSub/PubSub";
 import { TaskProcessor } from "../util/taskProcessing/TaskProcessor";
 import { UserRepo } from "../api/repo/users/UserRepo";
-import { UserService } from "../api/service/UserService";
+import { UserService } from "../api/service/users/UserService";
 import { UserController } from "../api/controller/users/UserController";
 import App from "../app/App";
 import { IServerConfig } from "../IServerConfig";

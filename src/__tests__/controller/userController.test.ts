@@ -1,5 +1,5 @@
 import { UserController } from "../../api/controller/users/UserController";
-import { UserDTO } from "../../api/dto/UserDTO";
+import { UserDTO } from "../../api/dto/users/UserDTO";
 import { generateUUID } from "../../util/uuid";
 import { testServerConfig } from "../testServerConfig";
 import App from "../../app/App";

@@ -1,6 +1,6 @@
 import { IDatabase } from "../../../database/IDatabase";
 import { IUserRepo } from "./IUserRepo";
-import { User } from "../../model/User";
+import { User } from "../../model/users/User";
 import Logger from "../../../util/logging/Logger";
 import { inject } from "inversify";
 import { TYPES } from "../../../ioc/TYPES";

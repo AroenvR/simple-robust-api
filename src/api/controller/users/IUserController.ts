@@ -1,4 +1,4 @@
-import { UserDTO } from "../../dto/UserDTO";
+import { UserDTO } from "../../dto/users/UserDTO";
 import { IController } from "../IController";
 
 export interface IUserController extends IController {

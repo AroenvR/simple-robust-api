@@ -1,4 +1,4 @@
-import { UserDTO } from "../../dto/UserDTO";
+import { UserDTO } from "../../dto/users/UserDTO";
 import { IService } from "../IService";
 
 export interface IUserService extends IService {

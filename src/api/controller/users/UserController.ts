@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { UserDTO } from "../../dto/UserDTO";
+import { UserDTO } from "../../dto/users/UserDTO";
 import { IUserController } from "./IUserController";
 import Logger from '../../../util/logging/Logger';
 import validator from 'validator';
