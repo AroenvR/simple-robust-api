@@ -10,14 +10,23 @@ The application is structured using a Dependency Injection Container to manage d
 - Currently supported databases:  
     - SQLite3
 
+- In theory supported databases (untested, just have to add it to the DatabaseFactory):
+    - MySQL
+    - PostgreSQL
+    - CockroachDB
+    - MariaDB
+    - Better-SQLite3
+    - Oracle
+    - Amazon Redshift
+    - MSSQL (Microsoft SQL Server)
+
 ## Main Components
 
-- App: The core of the application, responsible for starting and stopping the server, initializing the database, and setting up the routes.
-- Container: Manages the dependencies and services in the application, providing methods to register and get instances of services.
-- Repositories: Interact with the database to perform CRUD operations on specific entities (e.g., Users).
-- Services: Execute any additional logic necessary for handling a request.
-- Controllers: Handle incoming requests, process data, and return responses.
-- Routes: Define the API endpoints and map them to the corresponding controllers.
+- **App**: The core of the application, responsible for starting and stopping the server, initializing the database, and setting up the routes.
+- **ContainerWrapper**: Manages the dependencies in the application (wrapper for the InversifyJS Container).
+- **Repositories**: Interact with the database to perform CRUD operations on specific entities (e.g., Users).
+- **Services**: Execute any additional logic necessary for handling a request.
+- **Controllers**: Handle incoming requests, process data, and return responses.
 
 ## Data Flow
 
@@ -30,16 +39,16 @@ The application is structured using a Dependency Injection Container to manage d
 
 ## Logging
 
-The application includes a built-in logging system that categorizes logs based on severity. The log levels are as follows:
+The application includes logging system that categorizes logs based on severity. The log levels are as follows:
 
 - DEBUG: Only for developers, detailed information to help diagnose issues.
 - INFO: Possibly useful information, not critical but may be helpful to understand the application or a user's behavior.
 - LOG: Useful information, generally informative messages that highlight the progress of the application.
 - WARN: Should be paid attention to, could indicate potential problems or security risks.
-- ERROR: Should be looked at, as it could break something or be a security risk.
+- ERROR: Must be looked at, as it could break something or be a security risk.
 - CRITICAL: This could break the application or be a severe security risk, requires immediate attention.
 
-Logs can be found in the designated log files or in the console, depending on the server configuration.
+Logs can be found in the designated log files, in the console, or the receiving server depending on the configuration.
 
 <hr/>
 
@@ -55,10 +64,10 @@ These instructions will get you a copy of the project up and running on your loc
 ### Installation
 
 1. Clone the repository  
-git clone https://github.com/your-username/your-repository.git
+git clone [simple-robust-api](https://github.com/AroenvR/simple-robust-api.git)
 
 2. Navigate to the project folder  
-``cd your-repository``
+``cd simple-robust-api``
 
 3. Install dependencies  
 ``npm i``
@@ -68,12 +77,15 @@ git clone https://github.com/your-username/your-repository.git
 To start the server, run the following command:  
 ``npm start``
 
-The API will be available at ``http://localhost:3000``.
+The API will be available at ``http://localhost:3000``
 
 ## Testing
 
 To run tests, execute the following command:  
 ``npm run test``
+
+When finished testing, you can conveniently delete the logs with:  
+``node scripts/clear_test_logs.js``
 
 # Adding a new functional object to the API
 Example with a User object
@@ -107,3 +119,6 @@ Example with a User object
 
 ## License
 // TODO. MIT maybe?
+
+### Last README update:
+04/06/2023
