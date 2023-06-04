@@ -22,7 +22,7 @@ export const testServerConfig: IServerConfig = {
         console: false,
         http: false,
         file: true,
-        filePath: path.join(__dirname, './logs', `${new Date().toISOString().replace(/[:.]/g, '-')}.log`),
+        filePath: path.join(__dirname, './logs', `${new Date().toISOString().replace(/[:.]/g, '-')}.test.log`),
     },
     tasks: {
         timeout: 50
