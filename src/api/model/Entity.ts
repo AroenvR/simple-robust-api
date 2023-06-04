@@ -1,5 +1,10 @@
 import { IEntity } from "./IEntity";
 
+/**
+ * Base class (parent) for all Entities.
+ * @abstract
+ * @implements {IEntity}
+ */
 export default abstract class Entity implements IEntity {
     private id: number | null;
 

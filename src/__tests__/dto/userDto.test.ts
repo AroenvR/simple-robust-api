@@ -75,6 +75,10 @@ describe('UserDTO', () => {
 
     test('Falsy ID should throw error', () => {
         expect(() => {
+            userDTO._id = 0;
+        }).toThrow(ValidationError);
+
+        expect(() => {
             userDTO._id = -69;
         }).toThrow(ValidationError);
     });

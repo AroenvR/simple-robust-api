@@ -1,6 +1,11 @@
 import Entity from "./Entity";
 import { IUser } from "./IUser";
 
+/**
+ * User Entity.
+ * @extends {Entity} - The parent of all Entities.
+ * @implements {IUser}
+ */
 export class User extends Entity implements IUser {
     private uuid: string;
     private name: string;

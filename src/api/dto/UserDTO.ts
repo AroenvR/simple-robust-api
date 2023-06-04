@@ -7,13 +7,8 @@ import { validNumber, validString, validUUID } from '../../util/isValidUtil';
 
 /**
  * Data Transfer Object representing a User entity.
- *
- * @implements {IUser} - The User interface.
- * 
- * @example
- * UserDTO user = new UserDTO();
- * user._id = 1;
- * user._name = "John Doe";
+ * @extends {DataTransferObject} - The parent of all DTO's.
+ * @implements {IUser}
  */
 export class UserDTO extends DataTransferObject implements IUser {
     private uuid: string | null = null;
